@@ -60,9 +60,9 @@ class Graphql
 	 * Returns the GraphQL schema
 	 *
 	 * @param \Aimeos\MShop\ContextIface $context Context object
-	 * @return array List of GraphQL query schema definitions
+	 * @return \GraphQL\Type\Schema List of GraphQL query schema definitions
 	 */
-	protected static function schema( \Aimeos\MShop\ContextIface $context ) : array
+	protected static function schema( \Aimeos\MShop\ContextIface $context ) : \GraphQL\Type\Schema
 	{
 		$types = [];
 		$domains = $context->config()->get( 'admin/graphql/domains', ['product'] );
@@ -71,10 +71,10 @@ class Graphql
 		{
 			$name = $context->config()->get( 'admin/graphql/' . $domain . '/name', 'Standard' );
 
-			$classname = '\Aimeos\Graphql\\' . ucfirst( $domain ) . '\\' . $name;
+			$classname = '\Aimeos\Admin\Graphql\\' . ucfirst( $domain ) . '\\' . $name;
 			$object = new $classname( $context );
 
-			$types[$domain] = $object->type();
+			$types[$domain] = $object->types();
 		}
 
 		return new Schema([

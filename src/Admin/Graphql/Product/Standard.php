@@ -3,6 +3,7 @@
 namespace Aimeos\Admin\Graphql\Product;
 
 
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -29,18 +30,22 @@ class Standard extends \Aimeos\Admin\Graphql\Base
 	}
 
 
-	public function type() : array
+	public function types() : ObjectType
 	{
 		$list = [];
 		$attrs = \Aimeos\MShop::create( $this->context(), 'product' )->getSearchAttributes( false );
 
 		foreach( $attrs as $attr ) {
-			$list[] = ['name' => $attr->getCode(), 'type' => $this->type( $attr->getType() ), 'description' => $attr->getLabel()];
+			$list[] = [
+				'name' => $this->name( $attr->getCode() ),
+				'type' => $this->type( $attr->getType() ),
+				'description' => $attr->getLabel()
+			];
 		}
 
 		return new ObjectType( [
 			'name' => 'product',
-			'fields' => function() use ( $registry ) {
+			'fields' => function() use ( $list ) {
 				return $list;
 			}
 		] );

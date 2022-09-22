@@ -2,6 +2,8 @@
 
 namespace Aimeos\Admin\Graphql;
 
+use GraphQL\Type\Definition\Type;
+
 
 abstract class Base
 {
@@ -17,15 +19,22 @@ abstract class Base
 	}
 
 
-	protected function type( string $value ) : string
+	protected function name( string $value ) : string
+	{
+		$pos = strrpos( $value, '.' );
+		return substr( $value, $pos ? $pos + 1 : 0 );
+	}
+
+
+	protected function type( string $value ) : Type
 	{
 		switch( $value )
 		{
-			case 'boolean': return 'Boolean';
-			case 'float': return 'Float';
-			case 'integer': return 'Int';
+			case 'boolean': return Type::boolean();
+			case 'float': return Type::float();
+			case 'integer': return Type::int();
 		}
 
-		return 'String';
+		return Type::string();
 	}
 }
