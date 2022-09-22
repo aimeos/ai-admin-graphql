@@ -51,7 +51,8 @@ class Graphql
 			];
 		}
 
-		return ( new Psr17Factory )->createResponse()->withBody( json_encode( $result ) );
+		$body = \Nyholm\Psr7\Stream::create( json_encode( $result ) );
+		return ( new Psr17Factory )->createResponse()->withBody( $body );
 	}
 
 
@@ -70,7 +71,7 @@ class Graphql
 		{
 			$name = $context->config()->get( 'admin/graphql/' . $domain . '/name', 'Standard' );
 
-			$classname = '\Aimeos\Graphql\\' . ucfirst( $domain ) . '\\Standard';
+			$classname = '\Aimeos\Graphql\\' . ucfirst( $domain ) . '\\' . $name;
 			$object = new $classname( $context );
 
 			$types[$domain] = $object->type();
