@@ -1,9 +1,17 @@
 <?php
 
+/**
+ * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
+ * @copyright Aimeos (aimeos.org), 2022
+ * @package Admin
+ * @subpackage GraphQL
+ */
+
+
 namespace Aimeos\Admin;
 
 
-use GraphQL\GraphQL;
+use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
 use GraphQL\Type\Definition\ObjectType;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -25,7 +33,7 @@ class Graphql
 		{
 			$input = json_decode( (string) $request->getBody(), true);
 
-			$result = GraphQL::executeQuery(
+			$result = GraphQLBase::executeQuery(
 				self::schema( $context ),
 				$input['query'] ?? null,
 				[], // root
