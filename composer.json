@@ -1,5 +1,5 @@
 {
-	"name": "aimeos-extensions/ai-admin-graphql",
+	"name": "aimeos/ai-admin-graphql",
 	"description": "Aimeos Admin GraphQL API extension",
 	"keywords": ["aimeos", "extension", "graphql"],
 	"type": "aimeos-extension",
