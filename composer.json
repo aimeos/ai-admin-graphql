@@ -1,0 +1,38 @@
+{
+	"name": "aimeos-extensions/ai-admin-graphql",
+	"description": "Aimeos Admin GraphQL API extension",
+	"keywords": ["aimeos", "extension", "graphql"],
+	"type": "aimeos-extension",
+	"license": "LGPL-3.0",
+	"support": {
+		"source": "https://github.com/aimeos/ai-admin-graphql",
+		"issues": "https://github.com/aimeos/ai-admin-graphql/issues",
+		"forum": "https://aimeos.org/help",
+		"wiki": "https://aimeos.org/docs"
+	},
+	"prefer-stable": true,
+	"minimum-stability": "dev",
+	"require": {
+		"php": "~7.1||^8.0.11",
+		"aimeos/aimeos-core": "dev-master"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "~7.0||~8.0||~9.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Aimeos\\": "src"
+		},
+		"classmap": [
+			"src"
+		]
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Aimeos\\": "tests"
+		},
+		"classmap": [
+			"tests"
+		]
+	}
+}
