@@ -10,19 +10,19 @@ use GraphQL\Type\Definition\ResolveInfo;
 
 class Standard extends \Aimeos\Admin\Graphql\Base
 {
-	public function schema() : array
+	public function schema( string $domain ) : array
 	{
 		return [
-			'product' => [
-				'type' => $this->types( 'product' ),
+			$domain => [
+				'type' => $this->types( $domain ),
 				'args' => [
-					['name' => 'id', 'type' => Type::string(), 'defaultValue' => '', 'description' => 'Product ID'],
-					['name' => 'code', 'type' => Type::string(), 'defaultValue' => '', 'description' => 'Product code'],
+					['name' => 'id', 'type' => Type::string(), 'defaultValue' => '', 'description' => 'Unique ID'],
+					['name' => 'code', 'type' => Type::string(), 'defaultValue' => '', 'description' => 'Unique code'],
 				],
-				'resolve' => $this->resolve(),
+				'resolve' => $this->resolve( $domain ),
 			],
-			'products' => [
-				'type' => Type::listOf( $this->types( 'products' ) ),
+			$domain . 's' => [
+				'type' => Type::listOf( $this->types( $domain, $domain . 's' ) ),
 				'args' => [
 					['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
 					['name' => 'include', 'type' => Type::string(), 'defaultValue' => '', 'description' => 'Domains to include'],
@@ -30,22 +30,24 @@ class Standard extends \Aimeos\Admin\Graphql\Base
 					['name' => 'offset', 'type' => Type::int(), 'defaultValue' => 0, 'description' => 'Slice offset'],
 					['name' => 'limit', 'type' => Type::int(), 'defaultValue' => 100, 'description' => 'Slice size'],
 				],
-				'resolve' => $this->resolveList(),
+				'resolve' => $this->resolveList( $domain ),
 			]
 		];
 	}
 
 
-	public function resolve() : \Closure
+	protected function resolve( string $domain ) : \Closure
 	{
-		return function( $root, $args, $context ) {
+		return function( $root, $args, $context ) use ( $domain ) {
 
-			$manager = \Aimeos\MShop::create( $this->context(), 'product' );
+			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 
 			if( $args['id'] ) {
-				return $manager->get( $args['id'] )->toArray();
-			} elseif( $args['code'] ) {
-				return $manager->find( $args['code'] )->toArray();
+				return $manager->get( $args['id'] )->toArray( true );
+			}
+
+			if( $args['code'] ) {
+				return $manager->find( $args['code'] )->toArray( true );
 			}
 
 			throw new \Aimeos\Admin\Graphql\Exception( 'Missing ID or code' );
@@ -53,27 +55,27 @@ class Standard extends \Aimeos\Admin\Graphql\Base
 	}
 
 
-	public function resolveList() : \Closure
+	protected function resolveList( string $domain ) : \Closure
 	{
-		return function( $root, $args, $context ) {
+		return function( $root, $args, $context ) use ( $domain ) {
 
-			$manager = \Aimeos\MShop::create( $this->context(), 'product' );
+			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 
 			$filter = $manager->filter()->order( explode( ',', $args['sort'] ) )->slice( $args['offset'], $args['limit'] );
 			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
 
-			return $manager->search( $filter, array_filter( explode( ',', $args['include'] ) ) )->call( 'toArray' )->all();
+			return $manager->search( $filter, array_filter( explode( ',', $args['include'] ) ) )->call( 'toArray', [true] )->all();
 		};
 	}
 
 
-	public function types( string $name ) : ObjectType
+	protected function types( string $domain, string $name = null ) : ObjectType
 	{
 		return new ObjectType( [
-			'name' => $name,
-			'fields' => function() {
+			'name' => $name ?: $domain,
+			'fields' => function() use ( $domain ) {
 
-				$attrs = \Aimeos\MShop::create( $this->context(), 'product' )->getSearchAttributes( false );
+				$attrs = \Aimeos\MShop::create( $this->context(), $domain )->getSearchAttributes( false );
 				$list = [];
 
 				foreach( $attrs as $attr ) {
@@ -86,8 +88,9 @@ class Standard extends \Aimeos\Admin\Graphql\Base
 
 				return $list;
 			},
-			'resolveField' => function( $item, $args, $context, ResolveInfo $info ) {
-				return $item[rtrim( $info->parentType->name, 's' ) . '.' . $info->fieldName] ?? null;
+			'resolveField' => function( $item, $args, $context, ResolveInfo $info ) use ( $domain ) {
+				$value = $item[$domain . '.' . $info->fieldName] ?? ( $item[$info->fieldName] ?? null );
+				return is_scalar( $value ) || is_null( $value ) ? $value : json_encode( $value, JSON_FORCE_OBJECT );
 			}
 		] );
 	}

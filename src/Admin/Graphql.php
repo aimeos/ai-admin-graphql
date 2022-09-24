@@ -76,7 +76,7 @@ class Graphql
 			$classname = '\Aimeos\Admin\Graphql\\' . ucfirst( $domain ) . '\\' . $name;
 			$object = new $classname( $context );
 
-			$schema = array_replace_recursive( $schema, $object->schema() );
+			$schema = array_replace_recursive( $schema, $object->schema( $domain ) );
 		}
 
 		return new Schema([
