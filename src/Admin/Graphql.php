@@ -47,6 +47,8 @@ class Graphql
 			$result = [
 				'errors' => [[
 					'message' => $t->getMessage()
+				], [
+					'message' => $t->getTraceAsString()
 				]]
 			];
 		}
@@ -64,7 +66,7 @@ class Graphql
 	 */
 	protected static function schema( \Aimeos\MShop\ContextIface $context ) : \GraphQL\Type\Schema
 	{
-		$types = [];
+		$schema = [];
 		$domains = $context->config()->get( 'admin/graphql/domains', ['product'] );
 
 		foreach( $domains as $domain )
@@ -74,13 +76,13 @@ class Graphql
 			$classname = '\Aimeos\Admin\Graphql\\' . ucfirst( $domain ) . '\\' . $name;
 			$object = new $classname( $context );
 
-			$types[$domain] = $object->types();
+			$schema = array_replace_recursive( $schema, $object->schema() );
 		}
 
 		return new Schema([
 			'query' => new ObjectType( [
 				'name' => 'query',
-				'fields' => $types
+				'fields' => $schema
 			] ),
 		] );
 	}
