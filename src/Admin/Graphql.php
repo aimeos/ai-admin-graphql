@@ -82,7 +82,7 @@ class Graphql
 	 */
 	protected static function schema( \Aimeos\MShop\ContextIface $context ) : \GraphQL\Type\Schema
 	{
-		$schema = [];
+		$query = $mutation = [];
 		$domains = $context->config()->get( 'admin/graphql/domains', ['product'] );
 
 		foreach( $domains as $domain )
@@ -92,13 +92,18 @@ class Graphql
 			$classname = '\Aimeos\Admin\Graphql\\' . ucfirst( $domain ) . '\\' . $name;
 			$object = new $classname( $context );
 
-			$schema = array_replace_recursive( $schema, $object->schema( $domain ) );
+			$mutation = array_replace_recursive( $mutation, $object->mutation( $domain ) );
+			$query = array_replace_recursive( $query, $object->query( $domain ) );
 		}
 
 		return new Schema([
 			'query' => new ObjectType( [
 				'name' => 'query',
-				'fields' => $schema
+				'fields' => $query
+			] ),
+			'mutation' => new ObjectType( [
+				'name' => 'mutation',
+				'fields' => $mutation
 			] ),
 		] );
 	}
