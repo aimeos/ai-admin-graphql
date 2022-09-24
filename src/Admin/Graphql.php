@@ -12,6 +12,7 @@ namespace Aimeos\Admin;
 
 
 use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
 use GraphQL\Type\Definition\ObjectType;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -31,7 +32,22 @@ class Graphql
 	{
 		try
 		{
-			$input = json_decode( (string) $request->getBody(), true);
+			/** admin/graphql/debug
+			 * Send debug information withing responses to clients if an error occurrs
+			 *
+			 * By default, the Aimeos admin GraphQL API won't send any details
+			 * besides the error message to the client if an error occurred. This
+			 * prevents leaking sensitive information to attackers. For debugging
+			 * your requests it's helpful to see the stack strace. If you set this
+			 * configuration option to true, the stack trace will be returned too.
+			 *
+			 * @param boolean True to return the stack trace in response, false for error message only
+			 * @since 2022.10
+			 * @category Developer
+			 */
+			$debug = $context->config()->get( 'admin/graphql/debug', false );
+
+			$input = json_decode( (string) $request->getBody(), true );
 
 			$result = GraphQLBase::executeQuery(
 				self::schema( $context ),
@@ -40,17 +56,17 @@ class Graphql
 				null, // context
 				$input['variables'] ?? null,
 				$input['operationName'] ?? null
-			)->toArray();
+			)->toArray( $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : 0 );
 		}
 		catch( \Throwable $t )
 		{
-			$result = [
-				'errors' => [[
-					'message' => $t->getMessage()
-				], [
-					'message' => $t->getTraceAsString()
-				]]
-			];
+			$error = ['message' => $t->getMessage()];
+
+			if( $debug ) {
+				$error['locations'] = $t->getTrace();
+			}
+
+			$result = ['errors' => [$error]];
 		}
 
 		$body = \Nyholm\Psr7\Stream::create( json_encode( $result ) );
