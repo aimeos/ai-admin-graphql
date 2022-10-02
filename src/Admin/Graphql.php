@@ -84,7 +84,7 @@ class Graphql
 	{
 		$query = $mutation = [];
 		$stdname = $context->config()->get( 'admin/graphql/name', 'Standard' );
-		$domains = $context->config()->get( 'admin/graphql/domains', ['product'] );
+		$domains = $context->config()->get( 'admin/graphql/domains', [] );
 
 		foreach( $domains as $domain )
 		{

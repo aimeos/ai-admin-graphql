@@ -103,12 +103,14 @@ abstract class Base
 
 	protected function inputType( string $domain ) : InputObjectType
 	{
-		if( isset( self::$types[$domain . 'Input'] ) ) {
-			return self::$types[$domain . 'Input'];
+		$name = str_replace( '/', '', $domain );
+
+		if( isset( self::$types[$name . 'Input'] ) ) {
+			return self::$types[$name . 'Input'];
 		}
 
 		return self::$types[$domain . 'Input'] = new InputObjectType( [
-			'name' => $domain . 'Input',
+			'name' => $name . 'Input',
 			'fields' => function() use ( $domain ) {
 
 				$attrs = \Aimeos\MShop::create( $this->context(), $domain )->getSearchAttributes( false );
@@ -139,12 +141,14 @@ abstract class Base
 
 	protected function outputType( string $domain ) : ObjectType
 	{
-		if( isset( self::$types[$domain . 'Output'] ) ) {
-			return self::$types[$domain . 'Output'];
+		$name = str_replace( '/', '', $domain );
+
+		if( isset( self::$types[$name . 'Output'] ) ) {
+			return self::$types[$name . 'Output'];
 		}
 
-		return self::$types[$domain . 'Output'] = new ObjectType( [
-			'name' => $domain . 'Output',
+		return self::$types[$name . 'Output'] = new ObjectType( [
+			'name' => $name . 'Output',
 			'fields' => function() use ( $domain ) {
 
 				$attrs = \Aimeos\MShop::create( $this->context(), $domain )->getSearchAttributes( false );
