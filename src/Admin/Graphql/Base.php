@@ -3,10 +3,16 @@
 namespace Aimeos\Admin\Graphql;
 
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\InputObjectType;
 
 
 abstract class Base
 {
+	static private $types = [];
+
+
 	public function __construct( \Aimeos\MShop\ContextIface $context )
 	{
 		$this->context = $context;
@@ -19,10 +25,166 @@ abstract class Base
 	}
 
 
+	protected function deleteItems( string $domain ) : \Closure
+	{
+		return function( $root, $args, $context ) use ( $domain ) {
+			\Aimeos\MShop::create( $this->context(), $domain )->delete( $args['id'] );
+			return $args['id'];
+		};
+	}
+
+
+	protected function getItem( string $domain ) : \Closure
+	{
+		return function( $root, $args, $context ) use ( $domain ) {
+			return \Aimeos\MShop::create( $this->context(), $domain )->get( $args['id'] )->toArray( true );
+		};
+	}
+
+
+	protected function findItem( string $domain ) : \Closure
+	{
+		return function( $root, $args, $context ) use ( $domain ) {
+			return \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'] )->toArray( true );
+		};
+	}
+
+
+	protected function searchItems( string $domain ) : \Closure
+	{
+		return function( $root, $args, $context ) use ( $domain ) {
+
+			$manager = \Aimeos\MShop::create( $this->context(), $domain );
+
+			$filter = $manager->filter()->order( explode( ',', $args['sort'] ) )->slice( $args['offset'], $args['limit'] );
+			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
+
+			return $manager->search( $filter, array_filter( explode( ',', $args['include'] ) ) )->call( 'toArray', [true] )->all();
+		};
+	}
+
+
+	protected function saveItem( string $domain ) : \Closure
+	{
+		return function( $root, $args, $context ) use ( $domain ) {
+
+			if( empty( $entry = $args['input'] ) ) {
+				throw new \Aimeos\Admin\Graphql\Exception( 'Parameter "input" must not be empty' );
+			}
+
+			$manager = \Aimeos\MShop::create( $this->context(), $domain );
+			$entry = $this->prefix( $domain, $entry );
+
+			return $manager->save( $manager->create()->fromArray( $entry, true ) );
+	};
+	}
+
+
+	protected function saveItems( string $domain ) : \Closure
+	{
+		return function( $root, $args, $context ) use ( $domain ) {
+
+			if( empty( $entries = $args['input'] ) ) {
+				throw new \Aimeos\Admin\Graphql\Exception( 'Parameter "input" must not be empty' );
+			}
+
+			$items = [];
+			$manager = \Aimeos\MShop::create( $this->context(), $domain );
+
+			foreach( $entries as $entry ) {
+				$entry = $this->prefix( $domain, $entry );
+				$items[] = $manager->create()->fromArray( $entry, true );
+			}
+
+			return $manager->save( $items );
+		};
+	}
+
+
+	protected function inputType( string $domain ) : InputObjectType
+	{
+		if( isset( self::$types[$domain . 'Input'] ) ) {
+			return self::$types[$domain . 'Input'];
+		}
+
+		return self::$types[$domain . 'Input'] = new InputObjectType( [
+			'name' => $domain . 'Input',
+			'fields' => function() use ( $domain ) {
+
+				$attrs = \Aimeos\MShop::create( $this->context(), $domain )->getSearchAttributes( false );
+				$list = [];
+
+				foreach( $attrs as $attr )
+				{
+					if( strpos( $attr->getCode(), ':' ) === false )
+					{
+						$list[] = [
+							'name' => $this->name( $attr->getCode() ),
+							'type' => $this->type( $attr->getType() ),
+							'description' => $attr->getLabel()
+						];
+					}
+				}
+
+				return $list;
+			},
+			/*
+			'parseValue' => function( array $values ) use ( $domain ) {
+				return $this->prefix( $domain, $values );
+			}
+			*/
+		] );
+	}
+
+
+	protected function outputType( string $domain ) : ObjectType
+	{
+		if( isset( self::$types[$domain . 'Output'] ) ) {
+			return self::$types[$domain . 'Output'];
+		}
+
+		return self::$types[$domain . 'Output'] = new ObjectType( [
+			'name' => $domain . 'Output',
+			'fields' => function() use ( $domain ) {
+
+				$attrs = \Aimeos\MShop::create( $this->context(), $domain )->getSearchAttributes( false );
+				$list = [];
+
+				foreach( $attrs as $attr ) {
+					$list[] = [
+						'name' => $this->name( $attr->getCode() ),
+						'type' => $this->type( $attr->getType() ),
+						'description' => $attr->getLabel()
+					];
+				}
+
+				return $list;
+			},
+			'resolveField' => function( $item, $args, $context, ResolveInfo $info ) use ( $domain ) {
+
+				$value = $item[$domain . '.' . $info->fieldName] ?? ( $item[$info->fieldName] ?? null );
+				return is_scalar( $value ) || is_null( $value ) ? $value : json_encode( $value, JSON_FORCE_OBJECT );
+			}
+		] );
+	}
+
+
 	protected function name( string $value ) : string
 	{
 		$pos = strrpos( $value, '.' );
 		return substr( $value, $pos ? $pos + 1 : 0 );
+	}
+
+
+	protected function prefix( string $domain, array $entry ) : array
+	{
+		$map = [];
+
+		foreach( $entry as $key => $value ) {
+			$map[$domain . '.' . $key] = $value;
+		}
+
+		return $map;
 	}
 
 
