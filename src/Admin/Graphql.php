@@ -83,13 +83,18 @@ class Graphql
 	protected static function schema( \Aimeos\MShop\ContextIface $context ) : \GraphQL\Type\Schema
 	{
 		$query = $mutation = [];
+		$stdname = $context->config()->get( 'admin/graphql/name', 'Standard' );
 		$domains = $context->config()->get( 'admin/graphql/domains', ['product'] );
 
 		foreach( $domains as $domain )
 		{
 			$name = $context->config()->get( 'admin/graphql/' . $domain . '/name', 'Standard' );
-
 			$classname = '\Aimeos\Admin\Graphql\\' . ucfirst( $domain ) . '\\' . $name;
+
+			if( !class_exists( $classname ) ) {
+				$classname = '\Aimeos\Admin\Graphql\\' . $stdname;
+			}
+
 			$object = new $classname( $context );
 
 			$mutation = array_replace_recursive( $mutation, $object->mutation( $domain ) );
