@@ -37,7 +37,10 @@ abstract class Base
 	protected function getItem( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
-			return \Aimeos\MShop::create( $this->context(), $domain )->get( $args['id'] )->toArray( true );
+
+			return \Aimeos\MShop::create( $this->context(), $domain )
+				->get( $args['id'], explode( ',', $args['include'] ) )
+				->toArray( true );
 		};
 	}
 
@@ -45,7 +48,10 @@ abstract class Base
 	protected function findItem( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
-			return \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'] )->toArray( true );
+
+			return \Aimeos\MShop::create( $this->context(), $domain )
+				->find( $args['code'], explode( ',', $args['include'] ) )
+				->toArray( true );
 		};
 	}
 

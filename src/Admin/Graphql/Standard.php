@@ -49,6 +49,7 @@ class Standard extends Base
 				'type' => $this->outputType( $domain ),
 				'args' => [
 					['name' => 'id', 'type' => Type::string(), 'description' => 'Unique ID'],
+					['name' => 'include', 'type' => Type::string(), 'defaultValue' => '', 'description' => 'Domains to include'],
 				],
 				'resolve' => $this->getItem( $domain ),
 			],
