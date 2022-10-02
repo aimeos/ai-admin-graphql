@@ -115,7 +115,7 @@ abstract class Base
 			return self::$types[$name . 'Input'];
 		}
 
-		return self::$types[$domain . 'Input'] = new InputObjectType( [
+		return self::$types[$name . 'Input'] = new InputObjectType( [
 			'name' => $name . 'Input',
 			'fields' => function() use ( $domain ) {
 

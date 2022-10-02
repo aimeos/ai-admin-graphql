@@ -10,28 +10,28 @@ class Standard extends Base
 	public function mutation( string $domain ) : array
 	{
 		return [
-			'delete' . ucfirst( $domain ) => [
+			'delete' . str_replace( '/', '', ucwords( $domain, '/' ) ) => [
 				'type' => Type::string(),
 				'args' => [
 					['name' => 'id', 'type' => Type::string(), 'description' => 'Item ID'],
 				],
 				'resolve' => $this->deleteItems( $domain ),
 			],
-			'delete' . ucfirst( $domain ) . 's' => [
+			'delete' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 's' => [
 				'type' => Type::listOf( Type::string() ),
 				'args' => [
 					['name' => 'id', 'type' => Type::listOf( Type::string() ), 'description' => 'List of item IDs'],
 				],
 				'resolve' => $this->deleteItems( $domain ),
 			],
-			'save' . ucfirst( $domain ) => [
+			'save' . str_replace( '/', '', ucwords( $domain, '/' ) ) => [
 				'type' => $this->outputType( $domain ),
 				'args' => [
 					['name' => 'input', 'type' => $this->inputType( $domain ), 'description' => 'Item object'],
 				],
 				'resolve' => $this->saveItem( $domain ),
 			],
-			'save' . ucfirst( $domain ) . 's' => [
+			'save' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 's' => [
 				'type' => Type::listOf( $this->outputType( $domain ) ),
 				'args' => [
 					['name' => 'input', 'type' => Type::listOf( $this->inputType( $domain ) ), 'description' => 'Item objects'],
@@ -45,7 +45,7 @@ class Standard extends Base
 	public function query( string $domain ) : array
 	{
 		return [
-			'get' . ucfirst( $domain ) => [
+			'get' . str_replace( '/', '', ucwords( $domain, '/' ) ) => [
 				'type' => $this->outputType( $domain ),
 				'args' => [
 					['name' => 'id', 'type' => Type::string(), 'description' => 'Unique ID'],
@@ -53,7 +53,7 @@ class Standard extends Base
 				],
 				'resolve' => $this->getItem( $domain ),
 			],
-			'search' . ucfirst( $domain ) . 's' => [
+			'search' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 's' => [
 				'type' => Type::listOf( $this->outputType( $domain ) ),
 				'args' => [
 					['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],

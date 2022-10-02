@@ -11,7 +11,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	{
 		$list = parent::query( $domain );
 
-		$list['find' . ucfirst( $domain )] = [
+		$list['findProduct'] = [
 			'type' => $this->outputType( $domain ),
 			'args' => [
 				['name' => 'code', 'type' => Type::string(), 'description' => 'Unique code'],
