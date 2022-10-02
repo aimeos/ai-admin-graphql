@@ -5,7 +5,7 @@ namespace Aimeos\Admin\Graphql\Product;
 use GraphQL\Type\Definition\Type;
 
 
-class Standard extends Base
+class Standard extends \Aimeos\Admin\Graphql\Standard
 {
 	public function query( string $domain ) : array
 	{
