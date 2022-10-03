@@ -168,19 +168,43 @@ abstract class Base
 					}
 				}
 
+				if( $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
+					$list['address'] = Type::listOf( $this->outputType( $domain . '/address' ) );
+				}
+
+				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
+					$list['lists'] = Type::listOf( $this->outputType( $domain . '/lists' ) );
+				}
+
 				if( $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
 					$list['property'] = Type::listOf( $this->outputType( $domain . '/property' ) );
+				}
+
+				if( $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
+					$list['children'] = Type::listOf( $this->outputType( $domain ) );
 				}
 
 				return $list;
 			},
 			'resolveField' => function( $item, $args, $context, ResolveInfo $info ) use ( $domain ) {
 
+				if( $info->fieldName === 'address' && $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
+					return $item->getAddressItems();
+				}
+
+				if( $info->fieldName === 'lists' && $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
+					return $item->getListItems();
+				}
+
 				if( $info->fieldName === 'property' && $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
 					return $item->getPropertyItems();
 				}
 
-				$value = $item->get( str_replace( '/', '.', $domain ) . '.' . $info->fieldName );
+				if( $info->fieldName === 'children' && $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
+					return $item->getChildren();
+				}
+
+				$value = $item->get( str_replace( '/', '.', $domain ) . '.' . $info->fieldName ) ?: $item->get( $info->fieldName );
 				return is_scalar( $value ) || is_null( $value ) ? $value : json_encode( $value, JSON_FORCE_OBJECT );
 			}
 		] );
