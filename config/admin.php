@@ -6,6 +6,7 @@ return [
 			'attribute' => 'attribute',
 			'catalog' => 'catalog',
 			'coupon' => 'coupon',
+			'coupon/code' => 'coupon/code',
 			'customer' => 'customer',
 			'index' => 'index',
 			'locale' => 'locale',
