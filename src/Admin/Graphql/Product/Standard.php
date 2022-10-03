@@ -15,7 +15,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			'type' => $this->outputType( $domain ),
 			'args' => [
 				['name' => 'code', 'type' => Type::string(), 'description' => 'Unique code'],
-				['name' => 'include', 'type' => Type::string(), 'defaultValue' => '', 'description' => 'Domains to include'],
+				['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
 			],
 			'resolve' => $this->findItem( $domain ),
 		];
