@@ -173,11 +173,30 @@ abstract class Base
 				}
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
-					$list['lists'] = Type::listOf( $this->outputType( $domain . '/lists' ) );
+					$list['lists'] = [
+						'type' => Type::listOf( $this->outputType( $domain . '/lists' ) ),
+						'args' => [
+							'domain' => Type::listOf( Type::String() ),
+							'listtype' => Type::listOf( Type::String() ),
+							'type' => Type::listOf( Type::String() ),
+						],
+						'resolve' => function( $item, $args ) {
+							return $item->getListItems( $args['domain'] ?? null, $args['listtype'] ?? null, $args['type'] ?? null, false );
+						}
+					];
 				}
 
-				if( $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
-					$list['property'] = Type::listOf( $this->outputType( $domain . '/property' ) );
+				if( $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface )
+				{
+					$list['property'] = [
+						'type' => Type::listOf( $this->outputType( $domain . '/property' ) ),
+						'args' => [
+							'type' => Type::listOf( Type::String() ),
+						],
+						'resolve' => function( $item, $args ) {
+							return $item->getPropertyItems( $args['type'] ?? null, false );
+						}
+					];
 				}
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
