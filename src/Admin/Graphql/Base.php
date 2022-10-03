@@ -37,10 +37,7 @@ abstract class Base
 	protected function getItem( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
-
-			return \Aimeos\MShop::create( $this->context(), $domain )
-				->get( $args['id'], explode( ',', $args['include'] ) )
-				->toArray( true );
+			return \Aimeos\MShop::create( $this->context(), $domain )->get( $args['id'], explode( ',', $args['include'] ) );
 		};
 	}
 
@@ -48,10 +45,7 @@ abstract class Base
 	protected function findItem( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
-
-			return \Aimeos\MShop::create( $this->context(), $domain )
-				->find( $args['code'], explode( ',', $args['include'] ) )
-				->toArray( true );
+			return \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'], explode( ',', $args['include'] ) );
 		};
 	}
 
@@ -65,7 +59,7 @@ abstract class Base
 			$filter = $manager->filter()->order( $args['sort'] )->slice( $args['offset'], $args['limit'] );
 			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
 
-			return $manager->search( $filter, array_filter( explode( ',', $args['include'] ) ) )->call( 'toArray', [true] )->all();
+			return $manager->search( $filter, array_filter( explode( ',', $args['include'] ) ) )->all();
 		};
 	}
 
@@ -157,22 +151,36 @@ abstract class Base
 			'name' => $name . 'Output',
 			'fields' => function() use ( $domain ) {
 
-				$attrs = \Aimeos\MShop::create( $this->context(), $domain )->getSearchAttributes( false );
+				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				$attrs = $manager->getSearchAttributes( false );
+				$item = $manager->create();
 				$list = [];
 
-				foreach( $attrs as $attr ) {
-					$list[] = [
-						'name' => $this->name( $attr->getCode() ),
-						'type' => $this->type( $attr->getType() ),
-						'description' => $attr->getLabel()
-					];
+				foreach( $attrs as $attr )
+				{
+					if( strpos( $attr->getCode(), ':' ) === false )
+					{
+						$list[] = [
+							'name' => $this->name( $attr->getCode() ),
+							'type' => $this->type( $attr->getType() ),
+							'description' => $attr->getLabel()
+						];
+					}
+				}
+
+				if( $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
+					$list['property'] = Type::listOf( $this->outputType( $domain . '/property' ) );
 				}
 
 				return $list;
 			},
 			'resolveField' => function( $item, $args, $context, ResolveInfo $info ) use ( $domain ) {
 
-				$value = $item[$domain . '.' . $info->fieldName] ?? ( $item[$info->fieldName] ?? null );
+				if( $info->fieldName === 'property' && $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
+					return $item->getPropertyItems();
+				}
+
+				$value = $item->get( str_replace( '/', '.', $domain ) . '.' . $info->fieldName );
 				return is_scalar( $value ) || is_null( $value ) ? $value : json_encode( $value, JSON_FORCE_OBJECT );
 			}
 		] );
