@@ -62,7 +62,7 @@ abstract class Base
 
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 
-			$filter = $manager->filter()->order( explode( ',', $args['sort'] ) )->slice( $args['offset'], $args['limit'] );
+			$filter = $manager->filter()->order( $args['sort'] )->slice( $args['offset'], $args['limit'] );
 			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
 
 			return $manager->search( $filter, array_filter( explode( ',', $args['include'] ) ) )->call( 'toArray', [true] )->all();
