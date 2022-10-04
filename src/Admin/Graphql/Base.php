@@ -125,7 +125,7 @@ abstract class Base
 			$ref = array_keys( $entry['lists'] ?? [] );
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 
-			if( $entry[$domain . '.id'] ) {
+			if( isset( $entry[$domain . '.id'] ) ) {
 				$item = $manager->get( $entry[$domain . '.id'], $ref );
 			} else {
 				$item = $manager->create();
@@ -152,7 +152,7 @@ abstract class Base
 
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 
-			$ids = array_column( $entries, $domain . '.id' );
+			$ids = array_filter( array_column( $entries, $domain . '.id' ) );
 			$filter = $manager->filter()->add( $domain . '.id', '==', $ids )->slice( 0, count( $entries ) );
 
 			$products = $manager->search( $filter, array_keys( $entry['lists'] ?? [] ) );
@@ -160,7 +160,7 @@ abstract class Base
 			$items = [];
 			foreach( $entries as $entry )
 			{
-				$item = $products->get( $entry[$domain . '.id'] ) ?: $manager->create();
+				$item = $products->get( $entry[$domain . '.id'] ?? null ) ?: $manager->create();
 				$items[] = $this->updateItem( $manager, $item, $entry );
 			}
 
