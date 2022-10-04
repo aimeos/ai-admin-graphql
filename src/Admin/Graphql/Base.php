@@ -6,6 +6,7 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\InputObjectType;
+use Aimeos\MShop\Common\Item\Iface as ItemIface;
 
 
 abstract class Base
@@ -152,44 +153,21 @@ abstract class Base
 			'fields' => function() use ( $domain ) {
 
 				$manager = \Aimeos\MShop::create( $this->context(), $domain );
-				$attrs = $manager->getSearchAttributes( false );
+				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$item = $manager->create();
-				$list = [];
 
-				foreach( $attrs as $attr )
-				{
-					if( strpos( $attr->getCode(), ':' ) === false )
-					{
-						$list[] = [
-							'name' => $this->name( $attr->getCode() ),
-							'type' => $this->type( $attr->getType() ),
-							'description' => $attr->getLabel()
-						];
-					}
+				if( $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
+					$list['children'] = Type::listOf( $this->treeOutputType( $domain ) );
 				}
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
-					$list['address'] = Type::listOf( $this->outputType( $domain . '/address' ) );
-				}
-
-				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
-					$list['lists'] = [
-						'type' => Type::listOf( $this->outputType( $domain . '/lists' ) ),
-						'args' => [
-							'domain' => Type::listOf( Type::String() ),
-							'listtype' => Type::listOf( Type::String() ),
-							'type' => Type::listOf( Type::String() ),
-						],
-						'resolve' => function( $item, $args ) {
-							return $item->getListItems( $args['domain'] ?? null, $args['listtype'] ?? null, $args['type'] ?? null, false );
-						}
-					];
+					$list['address'] = Type::listOf( $this->addressOutputType( $domain . '/address' ) );
 				}
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface )
 				{
 					$list['property'] = [
-						'type' => Type::listOf( $this->outputType( $domain . '/property' ) ),
+						'type' => Type::listOf( $this->propertyOutputType( $domain . '/property' ) ),
 						'args' => [
 							'type' => Type::listOf( Type::String() ),
 						],
@@ -199,34 +177,179 @@ abstract class Base
 					];
 				}
 
-				if( $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
-					$list['children'] = Type::listOf( $this->outputType( $domain ) );
+				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface )
+				{
+					foreach( $this->context()->config()->get( 'admin/graphql/lists-domains', [] ) as $name )
+					{
+						$list[$name . 'list'] = [
+							'type' => Type::listOf( $this->listsOutputType( $domain . '/lists' ) ),
+							'args' => [
+								'listtype' => Type::listOf( Type::String() ),
+								'type' => Type::listOf( Type::String() ),
+							],
+							'resolve' => function( $item, $args ) use ( $name ) {
+								return $item->getListItems( $name, $args['listtype'] ?? null, $args['type'] ?? null, false );
+							}
+						];
+					}
 				}
 
 				return $list;
 			},
-			'resolveField' => function( $item, $args, $context, ResolveInfo $info ) use ( $domain ) {
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
+				return $this->resolve( $item, $domain, $info->fieldName );
+			}
+		] );
+	}
+
+
+	protected function addressOutputType( string $domain ) : ObjectType
+	{
+		$name = str_replace( '/', '', $domain );
+
+		if( isset( self::$types[$name . 'Output'] ) ) {
+			return self::$types[$name . 'Output'];
+		}
+
+		return self::$types[$name . 'Output'] = new ObjectType( [
+			'name' => $name . 'Output',
+			'fields' => function() use ( $domain ) {
+
+				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				return $this->fields( $manager->getSearchAttributes( false ) );
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
 
 				if( $info->fieldName === 'address' && $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
 					return $item->getAddressItems();
 				}
 
+				return $this->resolve( $item, $domain, $info->fieldName );
+			}
+		] );
+	}
+
+
+	protected function listsOutputType( string $domain ) : ObjectType
+	{
+		$name = str_replace( '/', '', $domain );
+
+		if( isset( self::$types[$name . 'Output'] ) ) {
+			return self::$types[$name . 'Output'];
+		}
+
+		return self::$types[$name . 'Output'] = new ObjectType( [
+			'name' => $name . 'Output',
+			'fields' => function() use ( $domain ) {
+
+				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				$list = $this->fields( $manager->getSearchAttributes( false ) );
+
+				if( $domains = $this->context()->config()->get( 'admin/graphql/lists-domains', [] ) )
+				{
+					foreach( $domains as $name ) {
+						$list[$name] = $this->outputType( $name );
+					}
+				}
+
+				return $list;
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
+
 				if( $info->fieldName === 'lists' && $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
 					return $item->getListItems();
 				}
+
+				if( in_array( $info->fieldName, $this->context()->config()->get( 'admin/graphql/lists-domains', [] ) ) ) {
+					return $item->getRefItem();
+				}
+
+				return $this->resolve( $item, $domain, $info->fieldName );
+			}
+		] );
+	}
+
+
+	protected function propertyOutputType( string $domain ) : ObjectType
+	{
+		$name = str_replace( '/', '', $domain );
+
+		if( isset( self::$types[$name . 'Output'] ) ) {
+			return self::$types[$name . 'Output'];
+		}
+
+		return self::$types[$name . 'Output'] = new ObjectType( [
+			'name' => $name . 'Output',
+			'fields' => function() use ( $domain ) {
+
+				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				return $this->fields( $manager->getSearchAttributes( false ) );
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
 
 				if( $info->fieldName === 'property' && $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
 					return $item->getPropertyItems();
 				}
 
+				return $this->resolve( $item, $domain, $info->fieldName );
+			}
+		] );
+	}
+
+
+	protected function treeOutputType( string $domain ) : ObjectType
+	{
+		$name = str_replace( '/', '', $domain );
+
+		if( isset( self::$types[$name . 'Output'] ) ) {
+			return self::$types[$name . 'Output'];
+		}
+
+		return self::$types[$name . 'Output'] = new ObjectType( [
+			'name' => $name . 'Output',
+			'fields' => function() use ( $domain ) {
+
+				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				$list = $this->fields( $manager->getSearchAttributes( false ) );
+				$item = $manager->create();
+
+				if( $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
+					$list['children'] = Type::listOf( $this->treeOutputType( $domain ) );
+				}
+
+				return $list;
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
+
 				if( $info->fieldName === 'children' && $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
 					return $item->getChildren();
 				}
 
-				$value = $item->get( str_replace( '/', '.', $domain ) . '.' . $info->fieldName ) ?: $item->get( $info->fieldName );
-				return is_scalar( $value ) || is_null( $value ) ? $value : json_encode( $value, JSON_FORCE_OBJECT );
+				return $this->resolve( $item, $domain, $info->fieldName );
 			}
 		] );
+	}
+
+
+	protected function fields( array $attrs ) : array
+	{
+		$list = [];
+
+		foreach( $attrs as $attr )
+		{
+			if( strpos( $attr->getCode(), ':' ) === false )
+			{
+				$code = $this->name( $attr->getCode() );
+
+				$list[$code] = [
+					'name' => $code,
+					'description' => $attr->getLabel(),
+					'type' => $code !== 'id' ? $this->type( $attr->getType() ) : Type::String(),
+				];
+			}
+		}
+
+		return $list;
 	}
 
 
@@ -246,6 +369,13 @@ abstract class Base
 		}
 
 		return $map;
+	}
+
+
+	protected function resolve( ItemIface $item, string $domain, string $name ) : ?string
+	{
+		$value = $item->get( str_replace( '/', '.', $domain ) . '.' . $name ) ?: $item->get( $name );
+		return is_scalar( $value ) || is_null( $value ) ? $value : json_encode( $value, JSON_FORCE_OBJECT );
 	}
 
 
