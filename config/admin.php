@@ -26,6 +26,18 @@ return [
 			'supplier' => 'supplier',
 			'tag' => 'tag',
 			'text' => 'text',
+		],
+		'lists-domains' => [
+			'attribute' => 'attribute',
+			'catalog' => 'catalog',
+			'customer' => 'customer',
+			'media' => 'media',
+			'price' => 'price',
+			'product' => 'product',
+			'service' => 'service',
+			'supplier' => 'supplier',
+			'tag' => 'tag',
+			'text' => 'text',
 		]
 	],
 ];
