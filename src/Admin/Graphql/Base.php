@@ -59,7 +59,7 @@ abstract class Base
 			$filter = $manager->filter()->order( $args['sort'] )->slice( $args['offset'], $args['limit'] );
 			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
 
-			return $manager->search( $filter, array_filter( explode( ',', $args['include'] ) ) )->all();
+			return $manager->search( $filter, $args['include'] )->all();
 		};
 	}
 
