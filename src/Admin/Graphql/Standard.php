@@ -1,12 +1,32 @@
 <?php
 
+/**
+ * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
+ * @copyright Aimeos (aimeos.org), 2022
+ * @package Admin
+ * @subpackage GraphQL
+ */
+
+
 namespace Aimeos\Admin\Graphql;
 
 use GraphQL\Type\Definition\Type;
 
 
+/**
+ * GraphQL class for all domains
+ *
+ * @package Admin
+ * @subpackage GraphQL
+ */
 class Standard extends Base
 {
+	/**
+	 * Returns GraphQL schema definition for the available mutations
+	 *
+	 * @param string $domain Domain name of the responsible manager
+	 * @return array GraphQL mutation schema definition
+	 */
 	public function mutation( string $domain ) : array
 	{
 		return [
@@ -42,6 +62,12 @@ class Standard extends Base
 	}
 
 
+	/**
+	 * Returns GraphQL schema definition for the available queries
+	 *
+	 * @param string $domain Domain name of the responsible manager
+	 * @return array GraphQL query schema definition
+	 */
 	public function query( string $domain ) : array
 	{
 		return [

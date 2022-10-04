@@ -18,6 +18,12 @@ use GraphQL\Type\Definition\ObjectType;
 use Nyholm\Psr7\Factory\Psr17Factory;
 
 
+/**
+ * Central GraphQL class for handling requests
+ *
+ * @package Admin
+ * @subpackage GraphQL
+ */
 class Graphql
 {
 	/**
