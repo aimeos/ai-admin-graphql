@@ -114,28 +114,19 @@ abstract class Base
 			'name' => $name . 'Input',
 			'fields' => function() use ( $domain ) {
 
-				$attrs = \Aimeos\MShop::create( $this->context(), $domain )->getSearchAttributes( false );
-				$list = [];
+				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				$list = $this->fields( $manager->getSearchAttributes( false ) );
+				$item = $manager->create();
 
-				foreach( $attrs as $attr )
-				{
-					if( strpos( $attr->getCode(), ':' ) === false )
-					{
-						$list[] = [
-							'name' => $this->name( $attr->getCode() ),
-							'type' => $this->type( $attr->getType() ),
-							'description' => $attr->getLabel()
-						];
-					}
+				if( $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
+					$list['property'] = Type::listOf( $this->inputType( $domain . '/property' ) );
 				}
 
 				return $list;
 			},
-			/*
 			'parseValue' => function( array $values ) use ( $domain ) {
 				return $this->prefix( $domain, $values );
 			}
-			*/
 		] );
 	}
 
@@ -179,19 +170,12 @@ abstract class Base
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface )
 				{
-					foreach( $this->context()->config()->get( 'admin/graphql/lists-domains', [] ) as $name )
-					{
-						$list[$name . 'list'] = [
-							'type' => Type::listOf( $this->listsOutputType( $domain . '/lists' ) ),
-							'args' => [
-								'listtype' => Type::listOf( Type::String() ),
-								'type' => Type::listOf( Type::String() ),
-							],
-							'resolve' => function( $item, $args ) use ( $name ) {
-								return $item->getListItems( $name, $args['listtype'] ?? null, $args['type'] ?? null, false );
-							}
-						];
-					}
+					$list['lists'] = [
+						'type' => $this->listsRefOutputType( $domain . '/lists' ),
+						'resolve' => function( ItemIface $item, array $args ) {
+							return $item;
+						}
+					];
 				}
 
 				return $list;
@@ -230,41 +214,86 @@ abstract class Base
 	}
 
 
-	protected function listsOutputType( string $domain ) : ObjectType
+	protected function listsOutputType( string $path, string $domain ) : ObjectType
 	{
-		$name = str_replace( '/', '', $domain );
+		$name = str_replace( '/', '', $path ) . $domain . 'Output';
 
-		if( isset( self::$types[$name . 'Output'] ) ) {
-			return self::$types[$name . 'Output'];
+		if( isset( self::$types[$name] ) ) {
+			return self::$types[$name];
 		}
 
-		return self::$types[$name . 'Output'] = new ObjectType( [
+		return self::$types[$name] = new ObjectType( [
 			'name' => $name . 'Output',
-			'fields' => function() use ( $domain ) {
+			'fields' => function() use ( $path, $domain ) {
 
-				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				$manager = \Aimeos\MShop::create( $this->context(), $path );
+
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
+				$list['item'] = $this->outputType( $domain );
+
+				return $list;
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $path ) {
+
+				if( $info->fieldName === 'item' && $item instanceof \Aimeos\MShop\Common\Item\Lists\Iface ) {
+					return $item->getRefItem();
+				}
+
+				return $this->resolve( $item, $path, $info->fieldName );
+			}
+		] );
+	}
+
+
+	protected function listsRefOutputType( string $path ) : ObjectType
+	{
+		$name = str_replace( '/', '', $path ) . 'refOutput';
+
+		if( isset( self::$types[$name] ) ) {
+			return self::$types[$name];
+		}
+
+		return self::$types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() use ( $path ) {
 
 				if( $domains = $this->context()->config()->get( 'admin/graphql/lists-domains', [] ) )
 				{
-					foreach( $domains as $name ) {
-						$list[$name] = $this->outputType( $name );
+					foreach( $domains as $domain )
+					{
+						$list[$domain] = [
+							'type' => Type::listOf( $this->listsOutputType( $path, $domain ) ),
+							'args' => [
+								'listtype' => Type::listOf( Type::String() ),
+								'type' => Type::listOf( Type::String() ),
+							],
+							'resolve' => function( $item, $args ) use ( $domain ) {
+								return $item->getListItems( $domain, $args['listtype'] ?? null, $args['type'] ?? null, false );
+							}
+						];
 					}
 				}
 
 				return $list;
 			},
-			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
+		] );
+	}
 
-				if( $info->fieldName === 'lists' && $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
-					return $item->getListItems();
-				}
 
-				if( in_array( $info->fieldName, $this->context()->config()->get( 'admin/graphql/lists-domains', [] ) ) ) {
-					return $item->getRefItem();
-				}
+	protected function propertyInputType( string $domain ) : ObjectType
+	{
+		$name = str_replace( '/', '', $domain );
 
-				return $this->resolve( $item, $domain, $info->fieldName );
+		if( isset( self::$types[$name . 'Input'] ) ) {
+			return self::$types[$name . 'Input'];
+		}
+
+		return self::$types[$name . 'Input'] = new ObjectType( [
+			'name' => $name . 'Input',
+			'fields' => function() use ( $domain ) {
+
+				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				return $this->fields( $manager->getSearchAttributes( false ) );
 			}
 		] );
 	}
