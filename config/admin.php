@@ -8,7 +8,6 @@ return [
 			'coupon' => 'coupon',
 			'coupon/code' => 'coupon/code',
 			'customer' => 'customer',
-			'index' => 'index',
 			'locale' => 'locale',
 			'locale/currency' => 'locale/currency',
 			'locale/language' => 'locale/language',
