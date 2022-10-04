@@ -53,7 +53,9 @@ class Graphql
 			 */
 			$debug = $context->config()->get( 'admin/graphql/debug', false );
 
-			$input = json_decode( (string) $request->getBody(), true );
+			if( empty( $input = json_decode( (string) $request->getBody(), true ) ) ) {
+				throw new \Aimeos\Admin\Graphql\Exception( 'Invalid input' );
+			}
 
 			$result = GraphQLBase::executeQuery(
 				self::schema( $context ),
