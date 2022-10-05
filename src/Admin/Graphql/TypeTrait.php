@@ -25,7 +25,7 @@ use Aimeos\MShop\Common\Item\Iface as ItemIface;
  */
 trait TypeTrait
 {
-	static private $types = [];
+	private static $types = [];
 
 
 	/**
@@ -99,12 +99,12 @@ trait TypeTrait
 	}
 
 
-    /**
-     * Defines the GraphQL lists input type
-     *
-     * @param string $path Path of the domain manager
-     * @return \GraphQL\Type\Definition\InputObjectType Input type definition
-     */
+	/**
+	 * Defines the GraphQL lists input type
+	 *
+	 * @param string $path Path of the domain manager
+	 * @return \GraphQL\Type\Definition\InputObjectType Input type definition
+	 */
 	protected function listsInputType( string $path ) : InputObjectType
 	{
 		$name = str_replace( '/', '', $path ) . 'refInput';
@@ -163,12 +163,12 @@ trait TypeTrait
 	}
 
 
-    /**
-     * Defines the GraphQL property input type
-     *
-     * @param string $path Path of the domain manager
-     * @return \GraphQL\Type\Definition\InputObjectType Input type definition
-     */
+	/**
+	 * Defines the GraphQL property input type
+	 *
+	 * @param string $path Path of the domain manager
+	 * @return \GraphQL\Type\Definition\InputObjectType Input type definition
+	 */
 	protected function propertyInputType( string $domain ) : ObjectType
 	{
 		$name = str_replace( '/', '', $domain ) . 'Input';
@@ -188,12 +188,12 @@ trait TypeTrait
 	}
 
 
-    /**
-     * Defines the GraphQL output types
-     *
-     * @param string $path Path of the domain manager
-     * @return \GraphQL\Type\Definition\ObjectType Output type definition
-     */
+	/**
+	 * Defines the GraphQL output types
+	 *
+	 * @param string $path Path of the domain manager
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
 	protected function outputType( string $domain ) : ObjectType
 	{
 		$name = str_replace( '/', '', $domain ) . 'Output';
@@ -250,12 +250,12 @@ trait TypeTrait
 	}
 
 
-    /**
-     * Defines the GraphQL address output type
-     *
-     * @param string $path Path of the domain manager
-     * @return \GraphQL\Type\Definition\ObjectType Output type definition
-     */
+	/**
+	 * Defines the GraphQL address output type
+	 *
+	 * @param string $path Path of the domain manager
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
 	protected function addressOutputType( string $domain ) : ObjectType
 	{
 		$name = str_replace( '/', '', $domain ) . 'Output';
@@ -283,12 +283,12 @@ trait TypeTrait
 	}
 
 
-    /**
-     * Defines the GraphQL list reference output type
-     *
-     * @param string $path Path of the domain manager
-     * @return \GraphQL\Type\Definition\ObjectType Output type definition
-     */
+	/**
+	 * Defines the GraphQL list reference output type
+	 *
+	 * @param string $path Path of the domain manager
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
 	protected function listsOutputType( string $path ) : ObjectType
 	{
 		$name = str_replace( '/', '', $path ) . 'refOutput';
@@ -324,13 +324,13 @@ trait TypeTrait
 	}
 
 
-    /**
-     * Defines the GraphQL lists output type
-     *
-     * @param string $path Path of the domain manager
+	/**
+	 * Defines the GraphQL lists output type
+	 *
+	 * @param string $path Path of the domain manager
 	 * @param string $domain Domain name of the referenced item
-     * @return \GraphQL\Type\Definition\ObjectType Output type definition
-     */
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
 	protected function listsRefOutputType( string $path, string $domain ) : ObjectType
 	{
 		$name = str_replace( '/', '', $path ) . $domain . 'Output';
@@ -362,12 +362,12 @@ trait TypeTrait
 	}
 
 
-    /**
-     * Defines the GraphQL property output type
-     *
-     * @param string $path Path of the domain manager
-     * @return \GraphQL\Type\Definition\ObjectType Output type definition
-     */
+	/**
+	 * Defines the GraphQL property output type
+	 *
+	 * @param string $path Path of the domain manager
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
 	protected function propertyOutputType( string $domain ) : ObjectType
 	{
 		$name = str_replace( '/', '', $domain ) . 'Output';
@@ -395,12 +395,12 @@ trait TypeTrait
 	}
 
 
-    /**
-     * Defines the GraphQL tree output type
-     *
-     * @param string $path Path of the domain manager
-     * @return \GraphQL\Type\Definition\ObjectType Output type definition
-     */
+	/**
+	 * Defines the GraphQL tree output type
+	 *
+	 * @param string $path Path of the domain manager
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
 	protected function treeOutputType( string $domain ) : ObjectType
 	{
 		$name = str_replace( '/', '', $domain ) . 'Output';
