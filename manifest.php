@@ -11,7 +11,4 @@ return [
 	'include' => [
 		'src',
 	],
-	'i18n' => [
-		'admin' => 'i18n',
-	],
 ];
