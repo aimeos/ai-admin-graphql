@@ -35,6 +35,39 @@ class GraphqlTest extends \PHPUnit\Framework\TestCase
 	}
 
 
+	public function testFindAttribute()
+	{
+		$body = '{"query":"query {\n  findAttribute(code: \"xs\",domain: \"product\",type: \"size\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"code":"xs"', (string) $response->getBody() );
+	}
+
+
+	public function testFindCatalog()
+	{
+		$body = '{"query":"query {\n  findCatalog(code: \"cafe\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"code":"cafe"', (string) $response->getBody() );
+	}
+
+
+	public function testFindCustomer()
+	{
+		$body = '{"query":"query {\n  findCustomer(code: \"test@example.com\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"code":"test@example.com"', (string) $response->getBody() );
+	}
+
+
 	public function testFindProduct()
 	{
 		$body = '{"query":"query {\n  findProduct(code: \"CNC\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
@@ -43,6 +76,28 @@ class GraphqlTest extends \PHPUnit\Framework\TestCase
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
 
 		$this->assertStringContainsString( '"code":"CNC"', (string) $response->getBody() );
+	}
+
+
+	public function testFindService()
+	{
+		$body = '{"query":"query {\n  findService(code: \"unitdeliverycode\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"code":"unitdeliverycode"', (string) $response->getBody() );
+	}
+
+
+	public function testFindSupplier()
+	{
+		$body = '{"query":"query {\n  findSupplier(code: \"unitSupplier001\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"code":"unitSupplier001"', (string) $response->getBody() );
 	}
 
 
