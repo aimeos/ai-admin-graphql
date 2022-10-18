@@ -9,7 +9,7 @@
 namespace Aimeos\Admin;
 
 
-class GraphqlTest extends \PHPUnit\Framework\TestCase
+class StandardTest extends \PHPUnit\Framework\TestCase
 {
 	private $context;
 
@@ -43,17 +43,6 @@ class GraphqlTest extends \PHPUnit\Framework\TestCase
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
 
 		$this->assertStringContainsString( '"code":"xs"', (string) $response->getBody() );
-	}
-
-
-	public function testFindCatalog()
-	{
-		$body = '{"query":"query {\n  findCatalog(code: \"cafe\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
-		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
-
-		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
-
-		$this->assertStringContainsString( '"code":"cafe"', (string) $response->getBody() );
 	}
 
 
