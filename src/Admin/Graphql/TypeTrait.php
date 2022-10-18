@@ -403,7 +403,7 @@ trait TypeTrait
 	 */
 	protected function treeOutputType( string $domain ) : ObjectType
 	{
-		$name = str_replace( '/', '', $domain ) . 'Output';
+		$name = str_replace( '/', '', $domain ) . 'TreeOutput';
 
 		if( isset( self::$types[$name] ) ) {
 			return self::$types[$name];
@@ -414,12 +414,9 @@ trait TypeTrait
 			'fields' => function() use ( $domain ) {
 
 				$manager = \Aimeos\MShop::create( $this->context(), $domain );
-				$list = $this->fields( $manager->getSearchAttributes( false ) );
-				$item = $manager->create();
 
-				if( $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
-					$list['children'] = Type::listOf( $this->treeOutputType( $domain ) );
-				}
+				$list = $this->fields( $manager->getSearchAttributes( false ) );
+				$list['children'] = Type::listOf( $this->treeOutputType( $domain ) );
 
 				return $list;
 			},
