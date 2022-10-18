@@ -106,7 +106,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-/*	public function testMoveCatalog()
+	public function testMoveCatalog()
 	{
 		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Catalog\\Manager\\Standard' )
 			->setConstructorArgs( array( $this->context ) )
@@ -117,12 +117,12 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Catalog\\Manager\\Standard', $stub );
 
-		$body = '{"query":"mutation {\n  moveCatalog(id: "1", parentid: null) {\n    id\n  }\n}\n","variables":{},"operationName":null}';
+		$body = '{"query":"mutation {\n  moveCatalog(id: \"1\", parentid: null)\n}\n","variables":{},"operationName":null}';
 		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
 
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
 
-		$this->assertStringContainsString( '1', (string) $response->getBody() );
+		$this->assertStringContainsString( '"moveCatalog":"1"', (string) $response->getBody() );
 	}
-*/
+
 }
