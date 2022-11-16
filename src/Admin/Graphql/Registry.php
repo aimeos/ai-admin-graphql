@@ -18,14 +18,26 @@ use Aimeos\MShop\Common\Item\Iface as ItemIface;
 
 
 /**
- * Trait providing the methods for defining the GraphQL types
+ * Type registry for defining the GraphQL types
  *
  * @package Admin
  * @subpackage GraphQL
  */
-trait TypeTrait
+class Registry
 {
-	private static $types = [];
+	private $context;
+	private $types = [];
+
+
+	/**
+	 * Initializes the object
+	 *
+	 * @param \Aimeos\MShop\ContextIface $context Context object
+	 */
+	public function __construct( \Aimeos\MShop\ContextIface $context )
+	{
+		$this->context = $context;
+	}
 
 
 	/**
@@ -34,19 +46,19 @@ trait TypeTrait
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\InputObjectType Input type definition
 	 */
-	protected function inputType( string $path ) : InputObjectType
+	public function inputType( string $path ) : InputObjectType
 	{
 		$name = str_replace( '/', '', $path ) . 'Input';
 
-		if( isset( self::$types[$name] ) ) {
-			return self::$types[$name];
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
 		}
 
-		return self::$types[$name] = new InputObjectType( [
+		return $this->types[$name] = new InputObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $path ) {
 
-				$manager = \Aimeos\MShop::create( $this->context(), $path );
+				$manager = \Aimeos\MShop::create( $this->context, $path );
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$item = $manager->create();
 
@@ -77,19 +89,19 @@ trait TypeTrait
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\InputObjectType Input type definition
 	 */
-	protected function addressInputType( string $path ) : InputObjectType
+	public function addressInputType( string $path ) : InputObjectType
 	{
 		$name = str_replace( '/', '', $path ) . 'Input';
 
-		if( isset( self::$types[$name] ) ) {
-			return self::$types[$name];
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
 		}
 
-		return self::$types[$name] = new InputObjectType( [
+		return $this->types[$name] = new InputObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $path ) {
 
-				$manager = \Aimeos\MShop::create( $this->context(), $path );
+				$manager = \Aimeos\MShop::create( $this->context, $path );
 				return $this->fields( $manager->getSearchAttributes( false ) );
 			},
 			'parseValue' => function( array $values ) use ( $path ) {
@@ -105,19 +117,19 @@ trait TypeTrait
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\InputObjectType Input type definition
 	 */
-	protected function listsInputType( string $path ) : InputObjectType
+	public function listsInputType( string $path ) : InputObjectType
 	{
 		$name = str_replace( '/', '', $path ) . 'refInput';
 
-		if( isset( self::$types[$name] ) ) {
-			return self::$types[$name];
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
 		}
 
-		return self::$types[$name] = new InputObjectType( [
+		return $this->types[$name] = new InputObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $path ) {
 
-				if( $domains = $this->context()->config()->get( 'admin/graphql/lists-domains', [] ) )
+				if( $domains = $this->context->config()->get( 'admin/graphql/lists-domains', [] ) )
 				{
 					foreach( $domains as $domain ) {
 						$list[$domain] = Type::listOf( $this->listsRefInputType( $path, $domain ) );
@@ -137,19 +149,19 @@ trait TypeTrait
 	 * @param string $domain Domain name of the referenced item
 	 * @return \GraphQL\Type\Definition\InputObjectType Input type definition
 	 */
-	protected function listsRefInputType( string $path, string $domain ) : InputObjectType
+	public function listsRefInputType( string $path, string $domain ) : InputObjectType
 	{
 		$name = str_replace( '/', '', $path ) . $domain . 'Input';
 
-		if( isset( self::$types[$name] ) ) {
-			return self::$types[$name];
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
 		}
 
-		return self::$types[$name] = new InputObjectType( [
+		return $this->types[$name] = new InputObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $path, $domain ) {
 
-				$manager = \Aimeos\MShop::create( $this->context(), $path );
+				$manager = \Aimeos\MShop::create( $this->context, $path );
 
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$list['item'] = $this->inputType( $domain );
@@ -169,19 +181,19 @@ trait TypeTrait
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\InputObjectType Input type definition
 	 */
-	protected function propertyInputType( string $domain ) : ObjectType
+	public function propertyInputType( string $domain ) : ObjectType
 	{
 		$name = str_replace( '/', '', $domain ) . 'Input';
 
-		if( isset( self::$types[$name] ) ) {
-			return self::$types[$name];
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
 		}
 
-		return self::$types[$name] = new ObjectType( [
+		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $domain ) {
 
-				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				$manager = \Aimeos\MShop::create( $this->context, $domain );
 				return $this->fields( $manager->getSearchAttributes( false ) );
 			}
 		] );
@@ -194,19 +206,19 @@ trait TypeTrait
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	protected function outputType( string $domain ) : ObjectType
+	public function outputType( string $domain ) : ObjectType
 	{
 		$name = str_replace( '/', '', $domain ) . 'Output';
 
-		if( isset( self::$types[$name] ) ) {
-			return self::$types[$name];
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
 		}
 
-		return self::$types[$name] = new ObjectType( [
+		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $domain ) {
 
-				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				$manager = \Aimeos\MShop::create( $this->context, $domain );
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$item = $manager->create();
 
@@ -256,19 +268,19 @@ trait TypeTrait
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	protected function addressOutputType( string $domain ) : ObjectType
+	public function addressOutputType( string $domain ) : ObjectType
 	{
 		$name = str_replace( '/', '', $domain ) . 'Output';
 
-		if( isset( self::$types[$name] ) ) {
-			return self::$types[$name];
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
 		}
 
-		return self::$types[$name] = new ObjectType( [
+		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $domain ) {
 
-				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				$manager = \Aimeos\MShop::create( $this->context, $domain );
 				return $this->fields( $manager->getSearchAttributes( false ) );
 			},
 			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
@@ -289,19 +301,19 @@ trait TypeTrait
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	protected function listsOutputType( string $path ) : ObjectType
+	public function listsOutputType( string $path ) : ObjectType
 	{
 		$name = str_replace( '/', '', $path ) . 'refOutput';
 
-		if( isset( self::$types[$name] ) ) {
-			return self::$types[$name];
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
 		}
 
-		return self::$types[$name] = new ObjectType( [
+		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $path ) {
 
-				if( $domains = $this->context()->config()->get( 'admin/graphql/lists-domains', [] ) )
+				if( $domains = $this->context->config()->get( 'admin/graphql/lists-domains', [] ) )
 				{
 					foreach( $domains as $domain )
 					{
@@ -331,19 +343,19 @@ trait TypeTrait
 	 * @param string $domain Domain name of the referenced item
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	protected function listsRefOutputType( string $path, string $domain ) : ObjectType
+	public function listsRefOutputType( string $path, string $domain ) : ObjectType
 	{
 		$name = str_replace( '/', '', $path ) . $domain . 'Output';
 
-		if( isset( self::$types[$name] ) ) {
-			return self::$types[$name];
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
 		}
 
-		return self::$types[$name] = new ObjectType( [
+		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $path, $domain ) {
 
-				$manager = \Aimeos\MShop::create( $this->context(), $path );
+				$manager = \Aimeos\MShop::create( $this->context, $path );
 
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$list['item'] = $this->outputType( $domain );
@@ -368,19 +380,19 @@ trait TypeTrait
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	protected function propertyOutputType( string $domain ) : ObjectType
+	public function propertyOutputType( string $domain ) : ObjectType
 	{
 		$name = str_replace( '/', '', $domain ) . 'Output';
 
-		if( isset( self::$types[$name] ) ) {
-			return self::$types[$name];
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
 		}
 
-		return self::$types[$name] = new ObjectType( [
+		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $domain ) {
 
-				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				$manager = \Aimeos\MShop::create( $this->context, $domain );
 				return $this->fields( $manager->getSearchAttributes( false ) );
 			},
 			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
@@ -401,19 +413,19 @@ trait TypeTrait
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	protected function treeOutputType( string $domain ) : ObjectType
+	public function treeOutputType( string $domain ) : ObjectType
 	{
 		$name = str_replace( '/', '', $domain ) . 'TreeOutput';
 
-		if( isset( self::$types[$name] ) ) {
-			return self::$types[$name];
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
 		}
 
-		return self::$types[$name] = new ObjectType( [
+		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $domain ) {
 
-				$manager = \Aimeos\MShop::create( $this->context(), $domain );
+				$manager = \Aimeos\MShop::create( $this->context, $domain );
 
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$list['children'] = Type::listOf( $this->treeOutputType( $domain ) );

@@ -32,7 +32,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$list = parent::query( $domain );
 
 		$list['findCustomer'] = [
-			'type' => $this->outputType( $domain ),
+			'type' => $this->types()->outputType( $domain ),
 			'args' => [
 				['name' => 'code', 'type' => Type::string(), 'description' => 'Unique code'],
 				['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],

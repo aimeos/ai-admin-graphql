@@ -45,16 +45,16 @@ class Standard extends Base
 				'resolve' => $this->deleteItems( $domain ),
 			],
 			'save' . str_replace( '/', '', ucwords( $domain, '/' ) ) => [
-				'type' => $this->outputType( $domain ),
+				'type' => $this->types()->outputType( $domain ),
 				'args' => [
-					['name' => 'input', 'type' => $this->inputType( $domain ), 'description' => 'Item object'],
+					['name' => 'input', 'type' => $this->types()->inputType( $domain ), 'description' => 'Item object'],
 				],
 				'resolve' => $this->saveItem( $domain ),
 			],
 			'save' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 's' => [
-				'type' => Type::listOf( $this->outputType( $domain ) ),
+				'type' => Type::listOf( $this->types()->outputType( $domain ) ),
 				'args' => [
-					['name' => 'input', 'type' => Type::listOf( $this->inputType( $domain ) ), 'description' => 'Item objects'],
+					['name' => 'input', 'type' => Type::listOf( $this->types()->inputType( $domain ) ), 'description' => 'Item objects'],
 				],
 				'resolve' => $this->saveItems( $domain ),
 			]
@@ -72,7 +72,7 @@ class Standard extends Base
 	{
 		return [
 			'get' . str_replace( '/', '', ucwords( $domain, '/' ) ) => [
-				'type' => $this->outputType( $domain ),
+				'type' => $this->types()->outputType( $domain ),
 				'args' => [
 					['name' => 'id', 'type' => Type::string(), 'description' => 'Unique ID'],
 					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
@@ -80,7 +80,7 @@ class Standard extends Base
 				'resolve' => $this->getItem( $domain ),
 			],
 			'search' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 's' => [
-				'type' => Type::listOf( $this->outputType( $domain ) ),
+				'type' => Type::listOf( $this->types()->outputType( $domain ) ),
 				'args' => [
 					['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
 					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
