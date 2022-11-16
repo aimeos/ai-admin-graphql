@@ -10,10 +10,7 @@ class TestHelper
 	public static function bootstrap()
 	{
 		$aimeos = self::getAimeos();
-
-		$includepaths = $aimeos->getIncludePaths();
-		$includepaths[] = get_include_path();
-		set_include_path( implode( PATH_SEPARATOR, $includepaths ) );
+		\Aimeos\MShop::cache( false );
 	}
 
 
@@ -41,19 +38,13 @@ class TestHelper
 	}
 
 
-	public static function getHtmlTemplatePaths()
-	{
-		return self::getAimeos()->getTemplatePaths( 'client/html/templates' );
-	}
-
-
 	public static function view( $site = 'unittest', \Aimeos\Base\Config\Iface $config = null )
 	{
 		if( $config === null ) {
 			$config = self::context( $site )->config();
 		}
 
-		$view = new \Aimeos\Base\View\Standard( self::getHtmlTemplatePaths() );
+		$view = new \Aimeos\Base\View\Standard();
 
 		$trans = new \Aimeos\Base\Translation\None( 'de_DE' );
 		$helper = new \Aimeos\Base\View\Helper\Translate\Standard( $view, $trans );
