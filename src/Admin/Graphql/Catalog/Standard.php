@@ -32,9 +32,9 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$list = parent::mutation( $domain );
 
 		$list['insertCatalog'] = [
-			'type' => $this->outputType( $domain ),
+			'type' => $this->types()->outputType( $domain ),
 			'args' => [
-				['name' => 'input', 'type' => Type::nonNull( $this->inputType( $domain ) ), 'description' => 'Item object'],
+				['name' => 'input', 'type' => Type::nonNull( $this->types()->inputType( $domain ) ), 'description' => 'Item object'],
 				['name' => 'parentid', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'ID of the parent category'],
 				['name' => 'refid', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'Category ID the new item should be inserted before'],
 			],
@@ -67,7 +67,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$list = parent::query( $domain );
 
 		$list['getCatalogPath'] = [
-			'type' => Type::listOf( $this->outputType( $domain ) ),
+			'type' => Type::listOf( $this->types()->outputType( $domain ) ),
 			'args' => [
 				['name' => 'id', 'type' => Type::nonNull( Type::string() ), 'description' => 'Unique category ID'],
 				['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
@@ -76,7 +76,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		];
 
 		$list['getCatalogTree'] = [
-			'type' => $this->treeOutputType( $domain ),
+			'type' => $this->types()->treeOutputType( $domain ),
 			'args' => [
 				['name' => 'id', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'Unique category ID'],
 				['name' => 'level', 'type' => Type::int(), 'defaultValue' => 3, 'description' => '1 = node only, 2 = with children, 3 = whole subtree'],
@@ -86,7 +86,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		];
 
 		$list['findCatalog'] = [
-			'type' => $this->outputType( $domain ),
+			'type' => $this->types()->outputType( $domain ),
 			'args' => [
 				['name' => 'code', 'type' => Type::nonNull( Type::string() ), 'description' => 'Unique code'],
 				['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],

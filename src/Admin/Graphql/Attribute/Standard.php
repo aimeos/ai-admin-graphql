@@ -32,7 +32,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$list = parent::query( $domain );
 
 		$list['findAttribute'] = [
-			'type' => $this->outputType( $domain ),
+			'type' => $this->types()->outputType( $domain ),
 			'args' => [
 				['name' => 'code', 'type' => Type::string(), 'description' => 'Unique code'],
 				['name' => 'domain', 'type' => Type::string(), 'description' => 'Domain of the attribute'],

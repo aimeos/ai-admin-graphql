@@ -19,18 +19,22 @@ namespace Aimeos\Admin\Graphql;
  */
 abstract class Base
 {
-	use TypeTrait;
 	use UpdateTrait;
+
+	private $context;
+	private $registry;
 
 
 	/**
 	 * Initializes the object
 	 *
 	 * @param \Aimeos\MShop\ContextIface $context Context object
+	 * @param \Aimeos\Admin\Graphql\Registry Type registry object
 	 */
-	public function __construct( \Aimeos\MShop\ContextIface $context )
+	public function __construct( \Aimeos\MShop\ContextIface $context, Registry $registry )
 	{
 		$this->context = $context;
+		$this->registry = $registry;
 	}
 
 
@@ -166,5 +170,16 @@ abstract class Base
 
 			return $manager->save( $items );
 		};
+	}
+
+
+	/**
+	 * Returns the types registry
+	 *
+	 * @return \Aimeos\Admin\Graphql\Registry Type registry object
+	 */
+	protected function types() : Registry
+	{
+		return $this->registry;
 	}
 }
