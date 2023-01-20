@@ -456,7 +456,7 @@ class Registry
 
 		foreach( $attrs as $attr )
 		{
-			if( strpos( $attr->getCode(), ':' ) === false )
+			if( strpos( $attr->getCode(), ':' ) === false && strpos( $attr->getCode(), '()' ) === false )
 			{
 				$code = $this->name( $attr->getCode() );
 
