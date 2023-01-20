@@ -527,7 +527,7 @@ class Registry
 	 */
 	protected function resolve( ItemIface $item, string $domain, string $name )
 	{
-		return $item->get( str_replace( '/', '.', $domain ) . '.' . $name ) ?: $item->get( $name );
+		return $item->get( str_replace( '/', '.', $domain ) . '.' . $name ) ?? $item->get( $name );
 	}
 
 
@@ -544,9 +544,7 @@ class Registry
 			case 'boolean': return Type::boolean();
 			case 'float': return Type::float();
 			case 'integer': return Type::int();
-			case 'date': return $this->customTypes['date'];
-			case 'datetime': return $this->customTypes['datetime'];
-			case 'json': return $this->customTypes['json'];
+			case 'json': return \Aimeos\GraphQL\Type\Definition\Json::type();
 		}
 
 		return Type::string();
