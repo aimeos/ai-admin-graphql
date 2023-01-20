@@ -27,7 +27,6 @@ class Registry
 {
 	private $context;
 	private $types = [];
-	private $customTypes;
 
 
 	/**
@@ -38,12 +37,6 @@ class Registry
 	public function __construct( \Aimeos\MShop\ContextIface $context )
 	{
 		$this->context = $context;
-
-		$this->customTypes = [
-			'date' => new \MLL\GraphQLScalars\Date(),
-			'datetime' => new \MLL\GraphQLScalars\DateTime(),
-			'json' => new \MLL\GraphQLScalars\JSON(),
-		];
 	}
 
 
