@@ -15,7 +15,8 @@
 	"require": {
 		"php": "~7.1||^8.0.11",
 		"aimeos/aimeos-core": "2022.10.*",
-		"webonyx/graphql-php": "~15.0@dev",
+		"webonyx/graphql-php": "~15.0",
+		"mll-lab/graphql-php-scalars": "~6.0",
 		"nyholm/psr7": "~1.2"
 	},
 	"require-dev": {
