@@ -27,6 +27,7 @@ class Registry
 {
 	private $context;
 	private $types = [];
+	private $customTypes;
 
 
 	/**
@@ -37,6 +38,12 @@ class Registry
 	public function __construct( \Aimeos\MShop\ContextIface $context )
 	{
 		$this->context = $context;
+
+		$this->customTypes = [
+			'date' => new \MLL\GraphQLScalars\Date(),
+			'datetime' => new \MLL\GraphQLScalars\DateTime(),
+			'json' => new \MLL\GraphQLScalars\JSON(),
+		];
 	}
 
 
@@ -222,12 +229,12 @@ class Registry
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$item = $manager->create();
 
-				if( $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
-					$list['children'] = Type::listOf( $this->treeOutputType( $domain ) );
-				}
-
 				if( $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
 					$list['address'] = Type::listOf( $this->addressOutputType( $domain . '/address' ) );
+				}
+
+				if( $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
+					$list['children'] = Type::listOf( $this->treeOutputType( $domain ) );
 				}
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface )
@@ -518,10 +525,9 @@ class Registry
 	 * @param string $name Name of the requested value
 	 * @return string|null Requested value
 	 */
-	protected function resolve( ItemIface $item, string $domain, string $name ) : ?string
+	protected function resolve( ItemIface $item, string $domain, string $name )
 	{
-		$value = $item->get( str_replace( '/', '.', $domain ) . '.' . $name ) ?: $item->get( $name );
-		return is_scalar( $value ) || is_null( $value ) ? $value : json_encode( $value, JSON_FORCE_OBJECT );
+		return $item->get( str_replace( '/', '.', $domain ) . '.' . $name ) ?: $item->get( $name );
 	}
 
 
@@ -538,6 +544,9 @@ class Registry
 			case 'boolean': return Type::boolean();
 			case 'float': return Type::float();
 			case 'integer': return Type::int();
+			case 'date': return $this->customTypes['date'];
+			case 'datetime': return $this->customTypes['datetime'];
+			case 'json': return $this->customTypes['json'];
 		}
 
 		return Type::string();
