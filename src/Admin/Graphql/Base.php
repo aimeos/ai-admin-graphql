@@ -93,6 +93,20 @@ abstract class Base
 
 
 	/**
+	 * Returns a closure for returning a single type item by its code
+	 *
+	 * @param string $domain Domain path of the manager
+	 * @return \Closure Anonymous method returning one item
+	 */
+	protected function findTypeItem( string $domain ) : \Closure
+	{
+		return function( $root, $args, $context ) use ( $domain ) {
+			return \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'], [], $args['domain'] );
+		};
+	}
+
+
+	/**
 	 * Returns a closure for returning several items
 	 *
 	 * @param string $domain Domain path of the manager
