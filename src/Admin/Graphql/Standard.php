@@ -70,7 +70,7 @@ class Standard extends Base
 	 */
 	public function query( string $domain ) : array
 	{
-		return [
+		$list = [
 			'get' . str_replace( '/', '', ucwords( $domain, '/' ) ) => [
 				'type' => $this->types()->outputType( $domain ),
 				'args' => [
@@ -91,5 +91,19 @@ class Standard extends Base
 				'resolve' => $this->searchItems( $domain ),
 			]
 		];
+
+		if( !substr_compare( $domain, '/type', -5 ) )
+		{
+			$list['find' . str_replace( '/', '', ucwords( $domain, '/' ) )] = [
+				'type' => $this->types()->outputType( $domain ),
+				'args' => [
+					['name' => 'code', 'type' => Type::string(), 'description' => 'Unique code'],
+					['name' => 'domain', 'type' => Type::string(), 'description' => 'Domain of the type'],
+				],
+				'resolve' => $this->findTypeItem( $domain ),
+			];
+		}
+
+		return $list;
 	}
 }

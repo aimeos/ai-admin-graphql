@@ -68,6 +68,17 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	}
 
 
+	public function testFindProductType()
+	{
+		$body = '{"query":"query {\n  findProductType(code: \"default\", domain: \"product\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"code":"default"', (string) $response->getBody() );
+	}
+
+
 	public function testFindService()
 	{
 		$body = '{"query":"query {\n  findService(code: \"unitdeliverycode\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
