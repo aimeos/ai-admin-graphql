@@ -19,6 +19,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		\Aimeos\MShop::cache( true );
 		$this->context = \TestHelper::context();
 		$this->context->config()->set( 'admin/graphql/debug', true );
+		$this->context->setView( \TestHelper::view( 'unittest', $this->context->config() ) );
 	}
 
 

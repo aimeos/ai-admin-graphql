@@ -55,6 +55,9 @@ class TestHelper
 
 		$view = new \Aimeos\Base\View\Standard( self::getHtmlTemplatePaths() );
 
+		$helper = new \Aimeos\Base\View\Helper\Access\All( $view );
+		$view->addHelper( 'access', $helper );
+
 		$trans = new \Aimeos\Base\Translation\None( 'de_DE' );
 		$helper = new \Aimeos\Base\View\Helper\Translate\Standard( $view, $trans );
 		$view->addHelper( 'translate', $helper );
