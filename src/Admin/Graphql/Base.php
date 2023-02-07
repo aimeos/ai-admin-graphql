@@ -60,7 +60,7 @@ abstract class Base
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . 'delete', [] );
+			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/delete', [] );
 
 			if( $context->view()->access( $groups ) !== true ) {
 				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
@@ -83,7 +83,7 @@ abstract class Base
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . 'get', [] );
+			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
 
 			if( $context->view()->access( $groups ) !== true ) {
 				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
@@ -105,7 +105,7 @@ abstract class Base
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . 'get', [] );
+			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
 
 			if( $context->view()->access( $groups ) !== true ) {
 				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
@@ -127,7 +127,7 @@ abstract class Base
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . 'get', [] );
+			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
 
 			if( $context->view()->access( $groups ) !== true ) {
 				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
@@ -149,7 +149,8 @@ abstract class Base
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . 'get', [] );
+			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
+error_log(print_r($groups, true));
 
 			if( $context->view()->access( $groups ) !== true ) {
 				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
@@ -176,7 +177,7 @@ abstract class Base
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . 'save', [] );
+			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/save', [] );
 
 			if( $context->view()->access( $groups ) !== true ) {
 				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
@@ -211,7 +212,7 @@ abstract class Base
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . 'save', [] );
+			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/save', [] );
 
 			if( $context->view()->access( $groups ) !== true ) {
 				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
