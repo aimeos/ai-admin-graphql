@@ -2,723 +2,1532 @@
 
 return [
 	'attribute' => [
-		/** admin/graphql/resource/attribute/groups
-		 * List of user groups that are allowed to manage attribute items
+		/** admin/graphql/resource/attribute/delete
+		 * List of user groups that are allowed to delete attribute items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'editor', 'super'],
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/attribute/save
+		 * List of user groups that are allowed to create and update attribute items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/attribute/get
+		 * List of user groups that are allowed to retrieve attribute items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
 		'lists' => [
-			/** admin/graphql/resource/attribute/lists/groups
-			 * List of user groups that are allowed to manage attribute lists items
+			/** admin/graphql/resource/attribute/lists/delete
+			 * List of user groups that are allowed to delete attribute lists items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/attribute/lists/save
+			 * List of user groups that are allowed to create and update attribute lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/attribute/lists/get
+			 * List of user groups that are allowed to retrieve attribute lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
 			'type' => [
-				/** admin/graphql/resource/attribute/lists/type/groups
-				 * List of user groups that are allowed to manage attribute lists type items
+				/** admin/graphql/resource/attribute/lists/type/delete
+				 * List of user groups that are allowed to delete attribute lists type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
-				'groups' => ['admin', 'editor', 'super'],
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/attribute/lists/type/save
+				 * List of user groups that are allowed to create and update attribute lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/attribute/lists/type/get
+				 * List of user groups that are allowed to retrieve attribute lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
 			],
 		],
 		'property' => [
-			/** admin/graphql/resource/attribute/property/groups
-			 * List of user groups that are allowed to manage attribute property items
-			 *
-			 * @param array List of user group names
-			 * @since 2018.07
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-			'type' => [
-				/** admin/graphql/resource/attribute/property/type/groups
-				 * List of user groups that are allowed to manage attribute property type items
-				 *
-				 * @param array List of user group names
-				 * @since 2018.07
-				 */
-				'groups' => ['admin', 'editor', 'super'],
-			],
-		],
-		'type' => [
-			/** admin/graphql/resource/attribute/type/groups
-			 * List of user groups that are allowed to manage attribute type items
+			/** admin/graphql/resource/attribute/property/delete
+			 * List of user groups that are allowed to delete attribute property items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
-		],
-	],
-	'catalog' => [
-		/** admin/graphql/resource/catalog/groups
-		 * List of user groups that are allowed to manage catalog items
-		 *
-		 * @param array List of user group names
-		 * @since 2022.10
-		 */
-		'groups' => ['admin', 'editor', 'super'],
-		'lists' => [
-			/** admin/graphql/resource/catalog/lists/groups
-			 * List of user groups that are allowed to manage catalog lists items
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/attribute/property/save
+			 * List of user groups that are allowed to create and update attribute property items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/attribute/property/get
+			 * List of user groups that are allowed to retrieve attribute property items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
 			'type' => [
-				/** admin/graphql/resource/catalog/lists/type/groups
-				 * List of user groups that are allowed to manage catalog lists type items
+				/** admin/graphql/resource/attribute/property/type/delete
+				 * List of user groups that are allowed to delete attribute property type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
-				'groups' => ['admin', 'editor', 'super'],
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/attribute/property/type/save
+				 * List of user groups that are allowed to create and update attribute property type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/attribute/property/type/get
+				 * List of user groups that are allowed to retrieve attribute property type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
+			],
+		],
+		'type' => [
+			/** admin/graphql/resource/attribute/type/delete
+			 * List of user groups that are allowed to delete attribute type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'delete' => ['admin', 'super'],
+
+			/** admin/graphql/resource/attribute/type/save
+			 * List of user groups that are allowed to create and update attribute type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'super'],
+
+			/** admin/graphql/resource/attribute/type/get
+			 * List of user groups that are allowed to retrieve attribute type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+		],
+	],
+	'catalog' => [
+		/** admin/graphql/resource/catalog/delete
+		 * List of user groups that are allowed to delete catalog items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/catalog/save
+		 * List of user groups that are allowed to create and update catalog items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/catalog/get
+		 * List of user groups that are allowed to retrieve catalog items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
+		'lists' => [
+			/** admin/graphql/resource/catalog/lists/delete
+			 * List of user groups that are allowed to delete catalog lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/catalog/lists/save
+			 * List of user groups that are allowed to create and update catalog lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/catalog/lists/get
+			 * List of user groups that are allowed to retrieve catalog lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
+			'type' => [
+				/** admin/graphql/resource/catalog/lists/type/delete
+				 * List of user groups that are allowed to delete catalog lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/catalog/lists/type/save
+				 * List of user groups that are allowed to create and update catalog lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/catalog/lists/type/get
+				 * List of user groups that are allowed to retrieve catalog lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
 			],
 		],
 	],
 	'coupon' => [
-		/** admin/graphql/resource/coupon/groups
-		 * List of user groups that are allowed to manage coupon items
+		/** admin/graphql/resource/coupon/delete
+		 * List of user groups that are allowed to delete coupon items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'editor', 'super'],
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/coupon/save
+		 * List of user groups that are allowed to create and update coupon items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/coupon/get
+		 * List of user groups that are allowed to retrieve coupon items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
 		'code' => [
-			/** admin/graphql/resource/coupon/code/groups
-			 * List of user groups that are allowed to manage coupon code items
+			/** admin/graphql/resource/coupon/code/delete
+			 * List of user groups that are allowed to delete attribute type items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
-		],
-		'config' => [
-			/** admin/graphql/resource/coupon/config/groups
-			 * List of user groups that are allowed to fetch available coupon configuration
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/coupon/code/save
+			 * List of user groups that are allowed to create and update attribute type items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/coupon/code/get
+			 * List of user groups that are allowed to retrieve attribute type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 	],
 	'customer' => [
-		/** admin/graphql/resource/customer/groups
-		 * List of user groups that are allowed to manage customer items
+		/** admin/graphql/resource/customer/delete
+		 * List of user groups that are allowed to delete customer items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'editor', 'super'],
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/customer/save
+		 * List of user groups that are allowed to create and update customer items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/customer/get
+		 * List of user groups that are allowed to retrieve customer items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
 		'address' => [
-			/** admin/graphql/resource/customer/address/groups
-			 * List of user groups that are allowed to manage customer address items
+			/** admin/graphql/resource/customer/address/delete
+			 * List of user groups that are allowed to delete customer address items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/customer/address/save
+			 * List of user groups that are allowed to create and update customer address items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/customer/address/get
+			 * List of user groups that are allowed to retrieve customer address items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 		'group' => [
-			/** admin/graphql/resource/customer/group/groups
-			 * List of user groups that are allowed to manage customer group items
+			/** admin/graphql/resource/customer/group/delete
+			 * List of user groups that are allowed to delete customer group items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'super'],
+
+			/** admin/graphql/resource/customer/group/save
+			 * List of user groups that are allowed to create and update customer group items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'super'],
+
+			/** admin/graphql/resource/customer/group/get
+			 * List of user groups that are allowed to retrieve customer group items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 		'lists' => [
-			/** admin/graphql/resource/customer/lists/groups
-			 * List of user groups that are allowed to manage customer lists items
+			/** admin/graphql/resource/customer/lists/delete
+			 * List of user groups that are allowed to delete customer lists items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/customer/lists/save
+			 * List of user groups that are allowed to create and update customer lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/customer/lists/get
+			 * List of user groups that are allowed to retrieve customer lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
 			'type' => [
-				/** admin/graphql/resource/customer/lists/type/groups
-				 * List of user groups that are allowed to manage customer lists type items
+				/** admin/graphql/resource/customer/lists/type/delete
+				 * List of user groups that are allowed to delete customer lists type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
-				'groups' => ['admin', 'editor', 'super'],
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/customer/lists/type/save
+				 * List of user groups that are allowed to create and update customer lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/customer/lists/type/get
+				 * List of user groups that are allowed to retrieve customer lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
 			],
 		],
 		'property' => [
-			/** admin/graphql/resource/customer/property/groups
-			 * List of user groups that are allowed to manage customer property items
+			/** admin/graphql/resource/customer/property/delete
+			 * List of user groups that are allowed to delete customer property items
 			 *
 			 * @param array List of user group names
-			 * @since 2018.07
+			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/customer/property/save
+			 * List of user groups that are allowed to create and update customer property items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/customer/property/get
+			 * List of user groups that are allowed to retrieve customer property items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
 			'type' => [
-				/** admin/graphql/resource/customer/property/type/groups
-				 * List of user groups that are allowed to manage customer property type items
+				/** admin/graphql/resource/customer/property/type/delete
+				 * List of user groups that are allowed to delete customer property type items
 				 *
 				 * @param array List of user group names
-				 * @since 2018.07
+				 * @since 2022.10
 				 */
-				'groups' => ['admin', 'editor', 'super'],
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/customer/property/type/save
+				 * List of user groups that are allowed to create and update customer property type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/customer/property/type/get
+				 * List of user groups that are allowed to retrieve customer property type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
 			],
-		],
-	],
-	'index' => [
-		/** admin/graphql/resource/index/groups
-		 * List of user groups that are allowed to manage index items
-		 *
-		 * @param array List of user group names
-		 * @since 2020.10
-		 */
-		'groups' => ['admin', 'editor', 'super'],
-		'attribute' => [
-			/** admin/graphql/resource/index/attribute/groups
-			 * List of user groups that are allowed to manage index attribute items
-			 *
-			 * @param array List of user group names
-			 * @since 2020.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-		],
-		'attribute' => [
-			/** admin/graphql/resource/index/attribute/groups
-			 * List of user groups that are allowed to manage index attribute items
-			 *
-			 * @param array List of user group names
-			 * @since 2020.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-		],
-		'catalog' => [
-			/** admin/graphql/resource/index/catalog/groups
-			 * List of user groups that are allowed to manage index catalog items
-			 *
-			 * @param array List of user group names
-			 * @since 2020.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-		],
-		'price' => [
-			/** admin/graphql/resource/index/price/groups
-			 * List of user groups that are allowed to manage index price items
-			 *
-			 * @param array List of user group names
-			 * @since 2020.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-		],
-		'supplier' => [
-			/** admin/graphql/resource/index/supplier/groups
-			 * List of user groups that are allowed to manage index supplier items
-			 *
-			 * @param array List of user group names
-			 * @since 2020.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-		],
-		'text' => [
-			/** admin/graphql/resource/index/text/groups
-			 * List of user groups that are allowed to manage index text items
-			 *
-			 * @param array List of user group names
-			 * @since 2020.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
 		],
 	],
 	'locale' => [
-		/** admin/graphql/resource/locale/groups
-		 * List of user groups that are allowed to manage locale items
+		/** admin/graphql/resource/locale/delete
+		 * List of user groups that are allowed to delete locale items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'super'],
+		'delete' => ['admin', 'super'],
+
+		/** admin/graphql/resource/locale/save
+		 * List of user groups that are allowed to create and update locale items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'super'],
+
+		/** admin/graphql/resource/locale/get
+		 * List of user groups that are allowed to retrieve locale items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'super'],
+
 		'site' => [
-			/** admin/graphql/resource/locale/site/groups
-			 * List of user groups that are allowed to manage locale site items
+			/** admin/graphql/resource/locale/site/delete
+			 * List of user groups that are allowed to delete locale site items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'super'],
+			'delete' => ['admin', 'super'],
+
+			/** admin/graphql/resource/locale/site/save
+			 * List of user groups that are allowed to create and update locale site items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'super'],
+
+			/** admin/graphql/resource/locale/site/get
+			 * List of user groups that are allowed to retrieve locale site items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'super'],
 		],
 		'language' => [
-			/** admin/graphql/resource/locale/language/groups
-			 * List of user groups that are allowed to manage locale language items
+			/** admin/graphql/resource/locale/language/delete
+			 * List of user groups that are allowed to delete locale language items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'super'],
+			'delete' => ['super'],
+
+			/** admin/graphql/resource/locale/language/save
+			 * List of user groups that are allowed to create and update locale language items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['super'],
+
+			/** admin/graphql/resource/locale/language/get
+			 * List of user groups that are allowed to retrieve locale language items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 		'currency' => [
-			/** admin/graphql/resource/locale/currency/groups
-			 * List of user groups that are allowed to manage locale currency items
+			/** admin/graphql/resource/locale/currency/delete
+			 * List of user groups that are allowed to delete locale currency items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'super'],
+			'delete' => ['super'],
+
+			/** admin/graphql/resource/locale/currency/save
+			 * List of user groups that are allowed to create and update locale currency items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['super'],
+
+			/** admin/graphql/resource/locale/currency/get
+			 * List of user groups that are allowed to retrieve locale currency items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 	],
 	'media' => [
-		/** admin/graphql/resource/media/groups
-		 * List of user groups that are allowed to manage media items
+		/** admin/graphql/resource/media/delete
+		 * List of user groups that are allowed to delete media items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'editor', 'super'],
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/media/save
+		 * List of user groups that are allowed to create and update media items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/media/get
+		 * List of user groups that are allowed to retrieve media items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
 		'lists' => [
-			/** admin/graphql/resource/media/lists/groups
-			 * List of user groups that are allowed to manage media lists items
+			/** admin/graphql/resource/media/lists/delete
+			 * List of user groups that are allowed to delete media lists items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/media/lists/save
+			 * List of user groups that are allowed to create and update media lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/media/lists/get
+			 * List of user groups that are allowed to retrieve media lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
 			'type' => [
-				/** admin/graphql/resource/media/lists/type/groups
-				 * List of user groups that are allowed to manage media lists type items
+				/** admin/graphql/resource/media/lists/type/delete
+				 * List of user groups that are allowed to delete media lists type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
-				'groups' => ['admin', 'editor', 'super'],
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/media/lists/type/save
+				 * List of user groups that are allowed to create and update media lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/media/lists/type/get
+				 * List of user groups that are allowed to retrieve media lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
 			],
 		],
-		'type' => [
-			/** admin/graphql/resource/media/type/groups
-			 * List of user groups that are allowed to manage media type items
+		'property' => [
+			/** admin/graphql/resource/media/property/delete
+			 * List of user groups that are allowed to delete media property items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
-		],
-		'property' => [
-			/** admin/graphql/resource/media/property/groups
-			 * List of user groups that are allowed to manage media property items
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/media/property/save
+			 * List of user groups that are allowed to create and update media property items
 			 *
 			 * @param array List of user group names
-			 * @since 2018.07
+			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/media/property/get
+			 * List of user groups that are allowed to retrieve media property items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
 			'type' => [
-				/** admin/graphql/resource/media/property/type/groups
-				 * List of user groups that are allowed to manage media property type items
+				/** admin/graphql/resource/media/property/type/delete
+				 * List of user groups that are allowed to delete media property type items
 				 *
 				 * @param array List of user group names
-				 * @since 2018.07
+				 * @since 2022.10
 				 */
-				'groups' => ['admin', 'editor', 'super'],
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/media/property/type/save
+				 * List of user groups that are allowed to create and update media property type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/media/property/type/get
+				 * List of user groups that are allowed to retrieve media property type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
 			],
+		],
+		'type' => [
+			/** admin/graphql/resource/media/type/delete
+			 * List of user groups that are allowed to delete media type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'delete' => ['admin', 'super'],
+
+			/** admin/graphql/resource/media/type/save
+			 * List of user groups that are allowed to create and update media type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'super'],
+
+			/** admin/graphql/resource/media/type/get
+			 * List of user groups that are allowed to retrieve media type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 	],
 	'order' => [
-		/** admin/graphql/resource/order/groups
-		 * List of user groups that are allowed to manage order items
+		/** admin/graphql/resource/media/delete
+		 * List of user groups that are allowed to delete media items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'editor', 'super'],
-		'address' => [
-			/** admin/graphql/resource/order/address/groups
-			 * List of user groups that are allowed to manage order address items
-			 *
-			 * @param array List of user group names
-			 * @since 2022.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-		],
-		'coupon' => [
-			/** admin/graphql/resource/order/coupon/groups
-			 * List of user groups that are allowed to manage order coupon items
-			 *
-			 * @param array List of user group names
-			 * @since 2022.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-		],
-		'product' => [
-			/** admin/graphql/resource/order/product/groups
-			 * List of user groups that are allowed to manage order product items
-			 *
-			 * @param array List of user group names
-			 * @since 2022.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-			'attribute' => [
-				/** admin/graphql/resource/order/product/attribute/groups
-				 * List of user groups that are allowed to manage order product attribute items
-				 *
-				 * @param array List of user group names
-				 * @since 2022.10
-				 */
-				'groups' => ['admin', 'editor', 'super'],
-			],
-		],
-		'service' => [
-			/** admin/graphql/resource/order/service/groups
-			 * List of user groups that are allowed to manage order service items
-			 *
-			 * @param array List of user group names
-			 * @since 2022.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-			'attribute' => [
-				/** admin/graphql/resource/order/service/attribute/groups
-				 * List of user groups that are allowed to manage order service attribute items
-				 *
-				 * @param array List of user group names
-				 * @since 2022.10
-				 */
-				'groups' => ['admin', 'editor', 'super'],
-			],
-		],
-		'status' => [
-			/** admin/graphql/resource/order/status/groups
-			 * List of user groups that are allowed to manage order status items
-			 *
-			 * @param array List of user group names
-			 * @since 2022.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-		],
+		'delete' => [],
+
+		/** admin/graphql/resource/media/save
+		 * List of user groups that are allowed to create and update media items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/media/get
+		 * List of user groups that are allowed to retrieve media items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
 	],
 	'plugin' => [
-		/** admin/graphql/resource/plugin/groups
-		 * List of user groups that are allowed to manage plugin items
+		/** admin/graphql/resource/plugin/delete
+		 * List of user groups that are allowed to delete plugin items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'super'],
-		'config' => [
-			/** admin/graphql/resource/plugin/config/groups
-			 * List of user groups that are allowed to fetch available plugin configuration
-			 *
-			 * @param array List of user group names
-			 * @since 2022.10
-			 */
-			'groups' => ['admin', 'super'],
-		],
+		'delete' => ['admin', 'super'],
+
+		/** admin/graphql/resource/plugin/save
+		 * List of user groups that are allowed to create and update plugin items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'super'],
+
+		/** admin/graphql/resource/plugin/get
+		 * List of user groups that are allowed to retrieve plugin items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'super'],
+
 		'type' => [
-			/** admin/graphql/resource/plugin/type/groups
-			 * List of user groups that are allowed to manage plugin type items
+			/** admin/graphql/resource/plugin/type/delete
+			 * List of user groups that are allowed to delete plugin type items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'super'],
+			'delete' => ['admin', 'super'],
+
+			/** admin/graphql/resource/plugin/type/save
+			 * List of user groups that are allowed to create and update plugin type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'super'],
+
+			/** admin/graphql/resource/plugin/type/get
+			 * List of user groups that are allowed to retrieve plugin type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 	],
 	'price' => [
-		/** admin/graphql/resource/price/groups
-		 * List of user groups that are allowed to manage price items
+		/** admin/graphql/resource/product/delete
+		 * List of user groups that are allowed to delete product items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'editor', 'super'],
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/product/save
+		 * List of user groups that are allowed to create and update product items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/product/get
+		 * List of user groups that are allowed to retrieve product items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
 		'lists' => [
-			/** admin/graphql/resource/price/lists/groups
-			 * List of user groups that are allowed to manage price lists items
+			/** admin/graphql/resource/product/lists/delete
+			 * List of user groups that are allowed to delete product lists items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/product/lists/save
+			 * List of user groups that are allowed to create and update product lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/product/lists/get
+			 * List of user groups that are allowed to retrieve product lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
 			'type' => [
-				/** admin/graphql/resource/price/lists/type/groups
-				 * List of user groups that are allowed to manage price lists type items
+				/** admin/graphql/resource/product/lists/type/delete
+				 * List of user groups that are allowed to delete product lists type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
-				'groups' => ['admin', 'editor', 'super'],
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/product/lists/type/save
+				 * List of user groups that are allowed to create and update product lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/product/lists/type/get
+				 * List of user groups that are allowed to retrieve product lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
 			],
 		],
 		'property' => [
-			/** admin/graphql/resource/price/property/groups
-			 * List of user groups that are allowed to manage price property items
-			 *
-			 * @param array List of user group names
-			 * @since 2019.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-			'type' => [
-				/** admin/graphql/resource/price/property/type/groups
-				 * List of user groups that are allowed to manage price property type items
-				 *
-				 * @param array List of user group names
-				 * @since 2019.10
-				 */
-				'groups' => ['admin', 'editor', 'super'],
-			],
-		],
-		'type' => [
-			/** admin/graphql/resource/price/type/groups
-			 * List of user groups that are allowed to manage price type items
+			/** admin/graphql/resource/product/property/delete
+			 * List of user groups that are allowed to delete product property items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/product/property/save
+			 * List of user groups that are allowed to create and update product property items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/product/property/get
+			 * List of user groups that are allowed to retrieve product property items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
+			'type' => [
+				/** admin/graphql/resource/product/property/type/delete
+				 * List of user groups that are allowed to delete product property type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/product/property/type/save
+				 * List of user groups that are allowed to create and update product property type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/product/property/type/get
+				 * List of user groups that are allowed to retrieve product property type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
+			],
+		],
+		'type' => [
+			/** admin/graphql/resource/product/type/delete
+			 * List of user groups that are allowed to delete product type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'delete' => ['admin', 'super'],
+
+			/** admin/graphql/resource/product/type/save
+			 * List of user groups that are allowed to create and update product type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'super'],
+
+			/** admin/graphql/resource/product/type/get
+			 * List of user groups that are allowed to retrieve product type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 	],
 	'product' => [
-		/** admin/graphql/resource/product/groups
-		 * List of user groups that are allowed to manage product items
+		/** admin/graphql/resource/product/delete
+		 * List of user groups that are allowed to delete product items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'editor', 'super'],
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/product/save
+		 * List of user groups that are allowed to create and update product items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/product/get
+		 * List of user groups that are allowed to retrieve product items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
 		'lists' => [
-			/** admin/graphql/resource/product/lists/groups
-			 * List of user groups that are allowed to manage product lists items
+			/** admin/graphql/resource/product/lists/delete
+			 * List of user groups that are allowed to delete product lists items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/product/lists/save
+			 * List of user groups that are allowed to create and update product lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/product/lists/get
+			 * List of user groups that are allowed to retrieve product lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
 			'type' => [
-				/** admin/graphql/resource/product/lists/type/groups
-				 * List of user groups that are allowed to manage product lists type items
+				/** admin/graphql/resource/product/lists/type/delete
+				 * List of user groups that are allowed to delete product lists type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
-				'groups' => ['admin', 'editor', 'super'],
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/product/lists/type/save
+				 * List of user groups that are allowed to create and update product lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/product/lists/type/get
+				 * List of user groups that are allowed to retrieve product lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
 			],
 		],
 		'property' => [
-			/** admin/graphql/resource/product/property/groups
-			 * List of user groups that are allowed to manage product property items
+			/** admin/graphql/resource/product/property/delete
+			 * List of user groups that are allowed to delete product property items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/product/property/save
+			 * List of user groups that are allowed to create and update product property items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/product/property/get
+			 * List of user groups that are allowed to retrieve product property items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
 			'type' => [
-				/** admin/graphql/resource/product/property/type/groups
-				 * List of user groups that are allowed to manage product property type items
+				/** admin/graphql/resource/product/property/type/delete
+				 * List of user groups that are allowed to delete product property type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
-				'groups' => ['admin', 'editor', 'super'],
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/product/property/type/save
+				 * List of user groups that are allowed to create and update product property type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/product/property/type/get
+				 * List of user groups that are allowed to retrieve product property type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
 			],
 		],
 		'type' => [
-			/** admin/graphql/resource/product/type/groups
-			 * List of user groups that are allowed to manage product type items
+			/** admin/graphql/resource/product/type/delete
+			 * List of user groups that are allowed to delete product type items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'super'],
+
+			/** admin/graphql/resource/product/type/save
+			 * List of user groups that are allowed to create and update product type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'super'],
+
+			/** admin/graphql/resource/product/type/get
+			 * List of user groups that are allowed to retrieve product type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 	],
 	'rule' => [
-		/** admin/graphql/resource/rule/groups
-		 * List of user groups that are allowed to manage rule items
+		/** admin/graphql/resource/rule/delete
+		 * List of user groups that are allowed to delete rule items
 		 *
 		 * @param array List of user group names
-		 * @since 2021.04
+		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'editor', 'super'],
-		'config' => [
-			/** admin/graphql/resource/rule/config/groups
-			 * List of user groups that are allowed to fetch available rule configuration
-			 *
-			 * @param array List of user group names
-			 * @since 2021.04
-			 */
-			'groups' => ['admin', 'editor', 'super'],
-		],
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/rule/save
+		 * List of user groups that are allowed to create and update rule items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/rule/get
+		 * List of user groups that are allowed to retrieve rule items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
 		'type' => [
-			/** admin/graphql/resource/rule/type/groups
-			 * List of user groups that are allowed to manage rule type items
+			/** admin/graphql/resource/rule/type/delete
+			 * List of user groups that are allowed to delete rule type items
 			 *
 			 * @param array List of user group names
-			 * @since 2021.04
+			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'super'],
+
+			/** admin/graphql/resource/rule/type/save
+			 * List of user groups that are allowed to create and update rule type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'super'],
+
+			/** admin/graphql/resource/rule/type/get
+			 * List of user groups that are allowed to retrieve rule type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 	],
 	'service' => [
-		/** admin/graphql/resource/service/groups
-		 * List of user groups that are allowed to manage service items
+		/** admin/graphql/resource/service/delete
+		 * List of user groups that are allowed to delete service items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'super'],
-		'config' => [
-			/** admin/graphql/resource/service/config/groups
-			 * List of user groups that are allowed to fetch available service configuration
-			 *
-			 * @param array List of user group names
-			 * @since 2022.10
-			 */
-			'groups' => ['admin', 'super'],
-		],
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/service/save
+		 * List of user groups that are allowed to create and update service items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/service/get
+		 * List of user groups that are allowed to retrieve service items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
 		'lists' => [
-			/** admin/graphql/resource/service/lists/groups
-			 * List of user groups that are allowed to manage service lists items
+			/** admin/graphql/resource/service/lists/delete
+			 * List of user groups that are allowed to delete service lists items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/service/lists/save
+			 * List of user groups that are allowed to create and update service lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/service/lists/get
+			 * List of user groups that are allowed to retrieve service lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
 			'type' => [
-				/** admin/graphql/resource/service/lists/type/groups
-				 * List of user groups that are allowed to manage service lists type items
+				/** admin/graphql/resource/service/lists/type/delete
+				 * List of user groups that are allowed to delete service lists type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
-				'groups' => ['admin', 'super'],
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/service/lists/type/save
+				 * List of user groups that are allowed to create and update service lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/service/lists/type/get
+				 * List of user groups that are allowed to retrieve service lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
 			],
-		],
-		'type' => [
-			/** admin/graphql/resource/service/type/groups
-			 * List of user groups that are allowed to manage service type items
-			 *
-			 * @param array List of user group names
-			 * @since 2022.10
-			 */
-			'groups' => ['admin', 'super'],
 		],
 	],
 	'stock' => [
-		/** admin/graphql/resource/stock/groups
-		 * List of user groups that are allowed to manage stock items
+		/** admin/graphql/resource/stock/delete
+		 * List of user groups that are allowed to delete stock items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'editor', 'super'],
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/stock/save
+		 * List of user groups that are allowed to create and update stock items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/stock/get
+		 * List of user groups that are allowed to retrieve stock items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
 		'type' => [
-			/** admin/graphql/resource/stock/type/groups
-			 * List of user groups that are allowed to manage stock type items
+			/** admin/graphql/resource/stock/type/delete
+			 * List of user groups that are allowed to delete stock type items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'super'],
+
+			/** admin/graphql/resource/stock/type/save
+			 * List of user groups that are allowed to create and update stock type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'super'],
+
+			/** admin/graphql/resource/stock/type/get
+			 * List of user groups that are allowed to retrieve stock type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 	],
 	'supplier' => [
-		/** admin/graphql/resource/supplier/groups
-		 * List of user groups that are allowed to manage supplier items
+		/** admin/graphql/resource/supplier/delete
+		 * List of user groups that are allowed to delete supplier items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'editor', 'super'],
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/supplier/save
+		 * List of user groups that are allowed to create and update supplier items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/supplier/get
+		 * List of user groups that are allowed to retrieve supplier items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
 		'address' => [
-			/** admin/graphql/resource/supplier/address/groups
-			 * List of user groups that are allowed to manage supplier address items
+			/** admin/graphql/resource/supplier/address/delete
+			 * List of user groups that are allowed to delete supplier address items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/supplier/address/save
+			 * List of user groups that are allowed to create and update supplier address items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/supplier/address/get
+			 * List of user groups that are allowed to retrieve supplier address items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 		'lists' => [
-			/** admin/graphql/resource/supplier/lists/groups
-			 * List of user groups that are allowed to manage supplier lists items
+			/** admin/graphql/resource/supplier/lists/delete
+			 * List of user groups that are allowed to delete supplier lists items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/supplier/lists/save
+			 * List of user groups that are allowed to create and update supplier lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/supplier/lists/get
+			 * List of user groups that are allowed to retrieve supplier lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
 			'type' => [
-				/** admin/graphql/resource/supplier/lists/type/groups
-				 * List of user groups that are allowed to manage supplier lists type items
+				/** admin/graphql/resource/supplier/lists/type/delete
+				 * List of user groups that are allowed to delete supplier lists type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
-				'groups' => ['admin', 'editor', 'super'],
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/supplier/lists/type/save
+				 * List of user groups that are allowed to create and update supplier lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/supplier/lists/type/get
+				 * List of user groups that are allowed to retrieve supplier lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
 			],
-		],
-		'type' => [
-			/** admin/graphql/resource/supplier/type/groups
-			 * List of user groups that are allowed to manage supplier type items
-			 *
-			 * @param array List of user group names
-			 * @since 2022.10
-			 */
-			'groups' => ['admin', 'editor', 'super'],
 		],
 	],
 	'tag' => [
-		/** admin/graphql/resource/tag/groups
-		 * List of user groups that are allowed to manage tag items
+		/** admin/graphql/resource/tag/delete
+		 * List of user groups that are allowed to delete tag items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'editor', 'super'],
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/tag/save
+		 * List of user groups that are allowed to create and update tag items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/tag/get
+		 * List of user groups that are allowed to retrieve tag items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
 		'type' => [
-			/** admin/graphql/resource/tag/type/groups
-			 * List of user groups that are allowed to manage tag type items
+			/** admin/graphql/resource/tag/type/delete
+			 * List of user groups that are allowed to delete tag type items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'super'],
+
+			/** admin/graphql/resource/tag/type/save
+			 * List of user groups that are allowed to create and update tag type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'super'],
+
+			/** admin/graphql/resource/tag/type/get
+			 * List of user groups that are allowed to retrieve tag type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 	],
 	'text' => [
-		/** admin/graphql/resource/text/groups
-		 * List of user groups that are allowed to manage text items
+		/** admin/graphql/resource/text/delete
+		 * List of user groups that are allowed to delete text items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'groups' => ['admin', 'editor', 'super'],
+		'delete' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/text/save
+		 * List of user groups that are allowed to create and update text items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'editor', 'super'],
+
+		/** admin/graphql/resource/text/get
+		 * List of user groups that are allowed to retrieve text items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+
 		'lists' => [
-			/** admin/graphql/resource/text/lists/groups
-			 * List of user groups that are allowed to manage text lists items
+			/** admin/graphql/resource/text/lists/delete
+			 * List of user groups that are allowed to delete text lists items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/text/lists/save
+			 * List of user groups that are allowed to create and update text lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'editor', 'super'],
+
+			/** admin/graphql/resource/text/lists/get
+			 * List of user groups that are allowed to retrieve text lists items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
+
 			'type' => [
-				/** admin/graphql/resource/text/lists/type/groups
-				 * List of user groups that are allowed to manage text lists type items
+				/** admin/graphql/resource/text/lists/type/delete
+				 * List of user groups that are allowed to delete text lists type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
-				'groups' => ['admin', 'editor', 'super'],
+				'delete' => ['admin', 'super'],
+
+				/** admin/graphql/resource/text/lists/type/save
+				 * List of user groups that are allowed to create and update text lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'save' => ['admin', 'super'],
+
+				/** admin/graphql/resource/text/lists/type/get
+				 * List of user groups that are allowed to retrieve text lists type items
+				 *
+				 * @param array List of user group names
+				 * @since 2022.10
+				 */
+				'get' => ['admin', 'editor', 'super'],
 			],
 		],
 		'type' => [
-			/** admin/graphql/resource/text/type/groups
-			 * List of user groups that are allowed to manage text type items
+			/** admin/graphql/resource/text/type/delete
+			 * List of user groups that are allowed to delete text type items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'groups' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'super'],
+
+			/** admin/graphql/resource/text/type/save
+			 * List of user groups that are allowed to create and update text type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'save' => ['admin', 'super'],
+
+			/** admin/graphql/resource/text/type/get
+			 * List of user groups that are allowed to retrieve text type items
+			 *
+			 * @param array List of user group names
+			 * @since 2022.10
+			 */
+			'get' => ['admin', 'editor', 'super'],
 		],
 	],
 ];
