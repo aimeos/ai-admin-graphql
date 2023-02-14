@@ -13,13 +13,13 @@
 	"prefer-stable": true,
 	"minimum-stability": "dev",
 	"require": {
-		"php": "~7.1||^8.0.11",
+		"php": "^8.0.11",
 		"aimeos/aimeos-core": "dev-master",
 		"webonyx/graphql-php": "~15.0",
 		"nyholm/psr7": "~1.2"
 	},
 	"require-dev": {
-		"phpunit/phpunit": "~7.0||~8.0||~9.0"
+		"phpunit/phpunit": "~9.0"
 	},
 	"autoload": {
 		"psr-4": {
