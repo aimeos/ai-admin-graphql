@@ -3,14 +3,9 @@
 <phpunit bootstrap="bootstrap.php">
 	<testsuites>
 		<testsuite name="Tests">
-			<directory>./</directory>
+			<directory suffix=".php">./</directory>
 		</testsuite>
 	</testsuites>
-	<filter>
-		<whitelist>
-			<directory suffix=".php">../src</directory>
-		</whitelist>
-	</filter>
 	<logging>
 		<log type="coverage-clover" target="coverage.xml"/>
 	</logging>
