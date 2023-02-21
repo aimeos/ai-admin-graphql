@@ -13,5 +13,4 @@
       <directory suffix=".php">./</directory>
     </testsuite>
   </testsuites>
-  <logging/>
 </phpunit>
