@@ -25,8 +25,8 @@ use Aimeos\MShop\Common\Item\Iface as ItemIface;
  */
 class Registry
 {
-	private $context;
-	private $types = [];
+	private \Aimeos\MShop\ContextIface $context;
+	private array $types = [];
 
 
 	/**

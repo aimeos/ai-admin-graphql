@@ -21,8 +21,8 @@ abstract class Base
 {
 	use UpdateTrait;
 
-	private $context;
-	private $registry;
+	private \Aimeos\MShop\ContextIface $context;
+	private Registry $registry;
 
 
 	/**
