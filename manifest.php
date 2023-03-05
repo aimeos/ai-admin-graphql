@@ -8,7 +8,4 @@ return [
 	'depends' => [
 		'aimeos-core',
 	],
-	'include' => [
-		'src',
-	],
 ];
