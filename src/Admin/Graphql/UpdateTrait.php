@@ -90,7 +90,7 @@ trait UpdateTrait
 			foreach( $list as $subentry )
 			{
 				$listItem = $listItems->pop() ?: $manager->createListItem();
-				$refItem = isset( $subentry['item'] ) ? $domainManager->create()->fromArray( $subentry['item'] ) : null;
+				$refItem = isset( $subentry['item'] ) ? $domainManager->create()->fromArray( $subentry['item'], true ) : null;
 
 				if( isset( $subentry['item']['address'] ) && $refItem instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
 					$refItem = $this->updateAddresses( $domainManager, $refItem, $subentry['item']['address'] );
