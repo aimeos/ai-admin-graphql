@@ -186,7 +186,7 @@ abstract class Base
 				throw new \Aimeos\Admin\Graphql\Exception( 'Parameter "input" must not be empty' );
 			}
 
-			$ref = array_keys( $entry['lists'] ?? [] );
+			$ref = array_merge(array_keys( $entry['lists'] ?? [] ), $entry['property'] ? [$domain.'/property'] : [] );
 			$manager = \Aimeos\MShop::create( $context, $domain );
 
 			if( isset( $entry[$domain . '.id'] ) ) {
@@ -226,7 +226,8 @@ abstract class Base
 			$ids = array_filter( array_column( $entries, $domain . '.id' ) );
 			$filter = $manager->filter()->add( $domain . '.id', '==', $ids )->slice( 0, count( $entries ) );
 
-			$products = $manager->search( $filter, array_keys( $entry['lists'] ?? [] ) );
+			$ref = array_merge(array_keys( $entry['lists'] ?? [] ), $entry['property'] ? [$domain.'/property'] : [] );
+			$products = $manager->search( $filter, $ref );
 
 			$items = [];
 			foreach( $entries as $entry )
