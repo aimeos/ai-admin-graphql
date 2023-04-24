@@ -101,8 +101,6 @@ trait UpdateTrait
 					$refItem->addListItem($subListItem->getDomain(), $subListItem, $subListItem->getRefItem());
 				    }
 				}
-				
-				$refItem = isset( $subentry['item'] ) ? $domainManager->create()->fromArray( $subentry['item'], true ) : null;
 
 				if( isset( $subentry['item']['address'] ) && $refItem instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
 					$refItem = $this->updateAddresses( $domainManager, $refItem, $subentry['item']['address'] );
