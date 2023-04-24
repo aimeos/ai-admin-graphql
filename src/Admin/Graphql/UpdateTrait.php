@@ -92,19 +92,13 @@ trait UpdateTrait
 				$id = $subentry['item'][$domain.'.id'] ?? '';
 				
 				$listItem = $listItems->find( function( $item ) use ( $id ) {
-				    return $id === $item->getRefId();
+				    return $id == $item->getRefId();
 				}, $manager->createListItem() );
 				
 				unset( $listItems[$listItem->getId()] );
 
-				$refItem = isset( $subentry['item'] ) ? $domainManager->create()->fromArray( $subentry['item'], true ) : null;
-
-				if( $oldRefItem = $listItem->getRefItem() ) {
-				    foreach ( $oldRefItem->getListItems() as $subListItem )
-				    {
-					$refItem->addListItem($subListItem->getDomain(), $subListItem, $subListItem->getRefItem());
-				    }
-				}
+				$refItem = $listItem->getRefItem() ?: $domainManager->create();
+				$refItem->fromArray( $subentry['item'] ?? [], true );
 
 				if( isset( $subentry['item']['address'] ) && $refItem instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
 					$refItem = $this->updateAddresses( $domainManager, $refItem, $subentry['item']['address'] );
