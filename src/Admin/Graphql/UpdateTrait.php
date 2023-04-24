@@ -89,7 +89,19 @@ trait UpdateTrait
 
 			foreach( $list as $subentry )
 			{
-				$listItem = $listItems->pop() ?: $manager->createListItem();
+				$listItem = $listItems->find( function ( $value ) use ( $subentry, $domain ) {
+				    return ( $subentry['item'][$domain.'.id'] ?? '' ) === $value->getRefId();
+				}, $manager->createListItem() );
+				$listItems->remove( [$listItem->getId()] );
+
+				$refItem = isset( $subentry['item'] ) ? $domainManager->create()->fromArray( $subentry['item'], true ) : null;
+				if ( $oldRefItem = $listItem->getRefItem() ) {
+				    foreach ( $oldRefItem->getListItems() as $subListItem )
+				    {
+					$refItem->addListItem($subListItem->getDomain(), $subListItem, $subListItem->getRefItem());
+				    }
+				}
+				
 				$refItem = isset( $subentry['item'] ) ? $domainManager->create()->fromArray( $subentry['item'], true ) : null;
 
 				if( isset( $subentry['item']['address'] ) && $refItem instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
