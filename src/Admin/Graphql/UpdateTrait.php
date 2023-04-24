@@ -85,17 +85,21 @@ trait UpdateTrait
 		foreach( $entries as $domain => $list )
 		{
 			$domainManager = \Aimeos\MShop::create( $this->context(), $domain );
-			$listItems = $item->getListItems( $domain )->reverse();
+			$listItems = $item->getListItems( $domain );
 
 			foreach( $list as $subentry )
 			{
-				$listItem = $listItems->find( function ( $value ) use ( $subentry, $domain ) {
-				    return ( $subentry['item'][$domain.'.id'] ?? '' ) === $value->getRefId();
+				$id = $subentry['item'][$domain.'.id'] ?? '';
+				
+				$listItem = $listItems->find( function( $item ) use ( $id ) {
+				    return $id === $item->getRefId();
 				}, $manager->createListItem() );
-				$listItems->remove( [$listItem->getId()] );
+				
+				unset( $listItems[$listItem->getId()] );
 
 				$refItem = isset( $subentry['item'] ) ? $domainManager->create()->fromArray( $subentry['item'], true ) : null;
-				if ( $oldRefItem = $listItem->getRefItem() ) {
+
+				if( $oldRefItem = $listItem->getRefItem() ) {
 				    foreach ( $oldRefItem->getListItems() as $subListItem )
 				    {
 					$refItem->addListItem($subListItem->getDomain(), $subListItem, $subListItem->getRefItem());
