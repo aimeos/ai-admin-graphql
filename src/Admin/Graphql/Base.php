@@ -186,11 +186,7 @@ abstract class Base
 				throw new \Aimeos\Admin\Graphql\Exception( 'Parameter "input" must not be empty' );
 			}
 
-			$ref = array_keys( $entry['lists'] ?? [] );
-			if( isset( $entry['property'] ) ) {
-				$ref[] = $domain . '/property';
-			}
-
+			$ref = $this->getRefs( $entry );
 			$manager = \Aimeos\MShop::create( $context, $domain );
 
 			if( isset( $entry[$domain . '.id'] ) ) {
@@ -230,12 +226,12 @@ abstract class Base
 			$ids = array_filter( array_column( $entries, $domain . '.id' ) );
 			$filter = $manager->filter()->add( $domain . '.id', '==', $ids )->slice( 0, count( $entries ) );
 
-			$ref = array_keys( $entry['lists'] ?? [] );
-			if( isset( $entry['property'] ) ) {
-				$ref[] = $domain . '/property';
+			$ref = [];
+			foreach( $entries as $entry ) {
+				$ref = array_merge( $ref, $this->getRefs( $entry ) );
 			}
 
-			$products = $manager->search( $filter, $ref );
+			$products = $manager->search( $filter, array_unique( $ref ) );
 			$items = [];
 
 			foreach( $entries as $entry )
@@ -246,6 +242,29 @@ abstract class Base
 
 			return $manager->save( $items );
 		};
+	}
+
+
+	/**
+	 * Recursively collect all referenced domains
+	 * @param array $entry Entry or subentry with input data
+	 * @return array Array with all domains collected
+	 */
+	protected function getRefs( array $entry ): array
+	{
+		$ref = array_keys( $entry['lists'] ?? [] );
+		foreach( $entry['lists'] ?? [] as $domain => $subentry )
+		{
+			foreach( $subentry ?? [] as $subItem ) {
+				$ref = array_merge( $ref, $this->getRefs( $subItem['item'] ?? [] ) );
+			}
+		}
+		
+		if( isset( $entry['property'] ) ) {
+			$ref[] = $domain . '/property';
+		}
+		
+		return array_unique( $ref );
 	}
 
 
