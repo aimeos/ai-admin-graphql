@@ -187,7 +187,7 @@ error_log(print_r($groups, true));
 				throw new \Aimeos\Admin\Graphql\Exception( 'Parameter "input" must not be empty' );
 			}
 
-			$ref = $this->getRefs( $entry );
+			$ref = $this->getRefs( $entry, $domain );
 			$manager = \Aimeos\MShop::create( $context, $domain );
 
 			if( isset( $entry[$domain . '.id'] ) ) {
@@ -229,7 +229,7 @@ error_log(print_r($groups, true));
 
 			$ref = [];
 			foreach( $entries as $entry ) {
-				$ref = array_merge( $ref, $this->getRefs( $entry ) );
+				$ref = array_merge( $ref, $this->getRefs( $entry, $domain ) );
 			}
 
 			$products = $manager->search( $filter, array_unique( $ref ) );
@@ -249,15 +249,16 @@ error_log(print_r($groups, true));
 	/**
 	 * Recursively collect all referenced domains
 	 * @param array $entry Entry or subentry with input data
+	 * @param  string $domain Domain of subentry
 	 * @return array Array with all domains collected
 	 */
-	protected function getRefs( array $entry ): array
+	protected function getRefs( array $entry, string $domain ): array
 	{
 		$ref = array_keys( $entry['lists'] ?? [] );
-		foreach( $entry['lists'] ?? [] as $domain => $subentry )
+		foreach( $entry['lists'] ?? [] as $listDomain => $subentry )
 		{
 			foreach( $subentry ?? [] as $subItem ) {
-				$ref = array_merge( $ref, $this->getRefs( $subItem['item'] ?? [] ) );
+				$ref = array_merge( $ref, $this->getRefs( $subItem['item'] ?? [], $listDomain ) );
 			}
 		}
 		
