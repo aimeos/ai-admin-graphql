@@ -89,10 +89,11 @@ trait UpdateTrait
 
 			foreach( $list as $subentry )
 			{
-				$id = $subentry['item'][$domain.'.id'] ?? '';
+				$listId = $subentry['id'] ?? '';
+				$refId = $subentry['item'][$domain.'.id'] ?? $subentry['refid'] ?? '';
 
-				$listItem = $listItems->find( function( $item ) use ( $id ) {
-				    return $id == $item->getRefId();
+				$listItem = $listItems->find( function( $item ) use ( $listId, $refId ) {
+					return $listId == $item->getId() || $refId == $item->getRefId();
 				}, $manager->createListItem() );
 
 				unset( $listItems[$listItem->getId()] );
