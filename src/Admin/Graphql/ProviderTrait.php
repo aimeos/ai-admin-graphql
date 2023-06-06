@@ -35,6 +35,7 @@ trait ProviderTrait
 			'type' => Type::listOf( $this->types()->configOutputType( $domain ) ),
 			'args' => [
 				['name' => 'provider', 'type' => Type::string(), 'description' => 'Provider name with decorators separated by comma'],
+				['name' => 'type', 'type' => Type::string(), 'description' => 'Provider type'],
 			],
 			'resolve' => $this->getConfig( $domain ),
 		];
@@ -63,7 +64,7 @@ trait ProviderTrait
 			$manager = \Aimeos\MShop::create( $context, $domain );
 			$item = $manager->create()->setProvider( $args['provider'] );
 
-			return $manager->getProvider( $item, '' )->getConfigBE();
+			return $manager->getProvider( $item, $args['type'] )->getConfigBE();
 		};
 	}
 }
