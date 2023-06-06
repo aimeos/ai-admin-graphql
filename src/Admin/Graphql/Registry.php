@@ -296,6 +296,49 @@ class Registry
 
 
 	/**
+	 * Defines the GraphQL config output type
+	 *
+	 * @param string $domain Name of the domain to retrieve the configuration
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
+	public function configOutputType( string $domain ) : ObjectType
+	{
+		$name = str_replace( '/', '', $domain ) . 'ConfigOutput';
+
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
+		}
+
+		return $this->types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() {
+				return [
+					'code' => [
+						'name' => 'code',
+						'type' => Type::String(),
+					],
+					'label' => [
+						'name' => 'label',
+						'type' => Type::String(),
+					],
+					'type' => [
+						'name' => 'type',
+						'type' => Type::String(),
+					],
+				];
+			},
+			'resolveField' => function( $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
+				switch( $info->fieldName ) {
+					case 'code': return $item->getCode();
+					case 'label': return $item->getLabel();
+					case 'type': return $item->getType();
+				}
+			}
+		] );
+	}
+
+
+	/**
 	 * Defines the GraphQL list reference output type
 	 *
 	 * @param string $path Path of the domain manager
@@ -377,7 +420,7 @@ class Registry
 	/**
 	 * Defines the GraphQL property output type
 	 *
-	 * @param string $path Path of the domain manager
+	 * @param string $domain Name of the domain which is using the property item
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
 	public function propertyOutputType( string $domain ) : ObjectType
