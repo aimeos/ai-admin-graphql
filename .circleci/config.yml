@@ -16,12 +16,12 @@ jobs:
           MYSQL_PASSWORD: aimeos
     steps:
       - checkout
-      - run: git clone --depth=50 --branch=master https://github.com/aimeos/aimeos-core ../aimeos-core
+      - run: git clone --depth=50 --branch=2023.07 https://github.com/aimeos/aimeos-core ../aimeos-core
       - run: cd .. && mv project aimeos-core/ext/ai-admin-graphql && mv aimeos-core project && cd project
       - restore_cache:
           keys:
             - php80-{{ checksum "composer.json" }}
-      - run: composer req --no-update webonyx/graphql-php:dev-master
+      - run: composer req --no-update webonyx/graphql-php
       - run: composer update -n --prefer-dist
       - save_cache:
           key: php80-{{ checksum "composer.json" }}
@@ -41,12 +41,12 @@ jobs:
           MYSQL_PASSWORD: aimeos
     steps:
       - checkout
-      - run: git clone --depth=50 --branch=master https://github.com/aimeos/aimeos-core ../aimeos-core
+      - run: git clone --depth=50 --branch=2023.07 https://github.com/aimeos/aimeos-core ../aimeos-core
       - run: cd .. && mv project aimeos-core/ext/ai-admin-graphql && mv aimeos-core project && cd project
       - restore_cache:
           keys:
             - php81-{{ checksum "composer.json" }}
-      - run: composer req --no-update webonyx/graphql-php:dev-master
+      - run: composer req --no-update webonyx/graphql-php
       - run: composer update -n --prefer-dist
       - save_cache:
           key: php81-{{ checksum "composer.json" }}
@@ -67,12 +67,12 @@ jobs:
           MYSQL_PASSWORD: aimeos
     steps:
       - checkout
-      - run: git clone --depth=50 --branch=master https://github.com/aimeos/aimeos-core ../aimeos-core
+      - run: git clone --depth=50 --branch=2023.07 https://github.com/aimeos/aimeos-core ../aimeos-core
       - run: cd .. && mv project aimeos-core/ext/ai-admin-graphql && mv aimeos-core project && cd project
       - restore_cache:
           keys:
             - php82-{{ checksum "composer.json" }}
-      - run: composer req --no-update webonyx/graphql-php:dev-master
+      - run: composer req --no-update webonyx/graphql-php
       - run: composer update -n --prefer-dist
       - save_cache:
           key: php82-{{ checksum "composer.json" }}
