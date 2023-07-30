@@ -12,6 +12,7 @@ return [
 			'coupon' => 'coupon',
 			'coupon/code' => 'coupon/code',
 			'customer' => 'customer',
+			'customer/group' => 'customer/group',
 			'customer/lists/type' => 'customer/lists/type',
 			'customer/property/type' => 'customer/property/type',
 			'locale' => 'locale',
