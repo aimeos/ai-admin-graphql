@@ -360,7 +360,7 @@ class Registry
 				{
 					foreach( $domains as $domain )
 					{
-						$list[$domain] = [
+						$list[str_replace( '/', '', $domain )] = [
 							'type' => Type::listOf( $this->listsRefOutputType( $path, $domain ) ),
 							'args' => [
 								'listtype' => Type::listOf( Type::String() ),

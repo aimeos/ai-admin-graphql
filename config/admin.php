@@ -56,6 +56,7 @@ return [
 			'attribute' => 'attribute',
 			'catalog' => 'catalog',
 			'customer' => 'customer',
+			'customer/group' => 'customer/group',
 			'media' => 'media',
 			'price' => 'price',
 			'product' => 'product',
