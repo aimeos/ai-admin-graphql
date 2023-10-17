@@ -132,7 +132,7 @@ class Registry
 				if( $domains = $this->context->config()->get( 'admin/graphql/lists-domains', [] ) )
 				{
 					foreach( $domains as $domain ) {
-						$list[$domain] = Type::listOf( $this->listsRefInputType( $path, $domain ) );
+						$list[str_replace( '/', '', $domain )] = Type::listOf( $this->listsRefInputType( $path, $domain ) );
 					}
 				}
 
@@ -151,7 +151,7 @@ class Registry
 	 */
 	public function listsRefInputType( string $path, string $domain ) : InputObjectType
 	{
-		$name = str_replace( '/', '', $path ) . $domain . 'Input';
+		$name = str_replace( '/', '', $path . $domain ) . 'Input';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
