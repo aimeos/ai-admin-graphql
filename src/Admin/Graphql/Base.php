@@ -254,17 +254,22 @@ abstract class Base
 	protected function getRefs( array $entry, string $domain ): array
 	{
 		$ref = array_keys( $entry['lists'] ?? [] );
+
+		if( ( $key = array_search( 'customergroup', $ref ) ) !== false ) {
+			$ref[$key] = 'customer/group';
+		}
+
 		foreach( $entry['lists'] ?? [] as $listDomain => $subentry )
 		{
 			foreach( $subentry ?? [] as $subItem ) {
 				$ref = array_merge( $ref, $this->getRefs( $subItem['item'] ?? [], $listDomain ) );
 			}
 		}
-		
+
 		if( isset( $entry['property'] ) ) {
 			$ref[] = $domain . '/property';
 		}
-		
+
 		return array_unique( $ref );
 	}
 
