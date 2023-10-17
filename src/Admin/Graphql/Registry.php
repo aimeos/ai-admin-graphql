@@ -577,8 +577,10 @@ class Registry
 	{
 		switch( $name )
 		{
+			case 'bool':
 			case 'boolean': return Type::boolean();
 			case 'float': return Type::float();
+			case 'int':
 			case 'integer': return Type::int();
 			case 'json': return \Aimeos\GraphQL\Type\Definition\Json::type();
 		}
