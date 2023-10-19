@@ -217,10 +217,7 @@ abstract class Base
 				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
 			}
 
-			if( empty( $entries = $args['input'] ) ) {
-				throw new \Aimeos\Admin\Graphql\Exception( 'Parameter "input" must not be empty' );
-			}
-
+			$entries = (array) $args['input'];
 			$manager = \Aimeos\MShop::create( $context, $domain );
 
 			$ids = array_filter( array_column( $entries, $domain . '.id' ) );
