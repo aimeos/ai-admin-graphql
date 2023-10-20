@@ -332,31 +332,6 @@ return [
 			 */
 			'get' => ['admin', 'editor', 'super'],
 		],
-		'group' => [
-			/** admin/graphql/resource/customer/group/delete
-			 * List of user groups that are allowed to delete customer group items
-			 *
-			 * @param array List of user group names
-			 * @since 2022.10
-			 */
-			'delete' => ['admin', 'super'],
-
-			/** admin/graphql/resource/customer/group/save
-			 * List of user groups that are allowed to create and update customer group items
-			 *
-			 * @param array List of user group names
-			 * @since 2022.10
-			 */
-			'save' => ['admin', 'super'],
-
-			/** admin/graphql/resource/customer/group/get
-			 * List of user groups that are allowed to retrieve customer group items
-			 *
-			 * @param array List of user group names
-			 * @since 2022.10
-			 */
-			'get' => ['admin', 'editor', 'super'],
-		],
 		'lists' => [
 			/** admin/graphql/resource/customer/lists/delete
 			 * List of user groups that are allowed to delete customer lists items
@@ -459,6 +434,31 @@ return [
 				'get' => ['admin', 'editor', 'super'],
 			],
 		],
+	],
+	'group' => [
+		/** admin/graphql/resource/group/delete
+		 * List of user groups that are allowed to delete customer group items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'delete' => ['admin', 'super'],
+
+		/** admin/graphql/resource/group/save
+		 * List of user groups that are allowed to create and update customer group items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'save' => ['admin', 'super'],
+
+		/** admin/graphql/resource/group/get
+		 * List of user groups that are allowed to retrieve customer group items
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
 	],
 	'locale' => [
 		/** admin/graphql/resource/locale/delete

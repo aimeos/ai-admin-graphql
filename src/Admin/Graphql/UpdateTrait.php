@@ -84,10 +84,6 @@ trait UpdateTrait
 	{
 		foreach( $entries as $domain => $list )
 		{
-			if( $domain === 'customergroup' ) {
-				$domain = 'customer/group';
-			}
-
 			$domainManager = \Aimeos\MShop::create( $this->context(), $domain );
 			$listItems = $item->getListItems( $domain );
 

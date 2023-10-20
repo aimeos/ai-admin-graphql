@@ -252,10 +252,6 @@ abstract class Base
 	{
 		$ref = array_keys( $entry['lists'] ?? [] );
 
-		if( ( $key = array_search( 'customergroup', $ref ) ) !== false ) {
-			$ref[$key] = 'customer/group';
-		}
-
 		foreach( $entry['lists'] ?? [] as $listDomain => $subentry )
 		{
 			foreach( $subentry ?? [] as $subItem ) {
