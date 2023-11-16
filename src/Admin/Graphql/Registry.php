@@ -325,6 +325,14 @@ class Registry
 						'name' => 'type',
 						'type' => Type::String(),
 					],
+					'required' => [
+						'name' => 'required',
+						'type' => Type::Boolean(),
+					],
+					'default' => [
+						'name' => 'default',
+						'type' => Type::String(),
+					],
 				];
 			},
 			'resolveField' => function( $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
@@ -332,6 +340,8 @@ class Registry
 					case 'code': return $item->getCode();
 					case 'label': return $item->getLabel();
 					case 'type': return $item->getType();
+					case 'required': return $item->isRequired();
+					case 'default': return (string) $item->getDefault();
 				}
 			}
 		] );
