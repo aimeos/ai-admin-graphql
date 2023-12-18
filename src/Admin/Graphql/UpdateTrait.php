@@ -90,17 +90,13 @@ trait UpdateTrait
 			foreach( $list as $subentry )
 			{
 				$listId = $subentry['id'] ?? '';
+				$listType = $subentry['type'] ?? 'default';
 				$refId = $subentry['item'][$domain.'.id'] ?? $subentry['refid'] ?? '';
 
-				$listItem = $listItems->find( function( $item ) use ( $listId, $refId ) {
-					return $listId == $item->getId() || $refId == $item->getRefId();
-				}, $manager->createListItem() );
+				$listItem = $listItems->get( $listId ) ?? $item->getListItem( $domain, $listType, $refId ) ?? $manager->createListItem();
+				$refItem = $listItem->getRefItem() ?? $domainManager->create();
 
-				unset( $listItems[$listItem->getId()] );
-
-				$refItem = null;
 				if ( isset( $subentry['item'] ) ) {
-					$refItem = $listItem->getRefItem() ?: $domainManager->create();
 					$refItem->fromArray( $subentry['item'], true );
 				}
 
@@ -116,7 +112,8 @@ trait UpdateTrait
 					$refItem = $this->updateProperties( $domainManager, $refItem, $subentry['item']['property'] );
 				}
 
-				$item->addListItem( $domain, $listItem->fromArray( $subentry ), $refItem );
+				$item->addListItem( $domain, $listItem->fromArray( $subentry, true ), $refItem );
+				unset( $listItems[$listItem->getId()] );
 			}
 
 			$item->deleteListItems( $listItems );
