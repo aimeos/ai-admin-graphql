@@ -80,7 +80,7 @@ class Standard extends Base
 				'resolve' => $this->getItem( $domain ),
 			],
 			'search' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 's' => [
-				'type' => Type::listOf( $this->types()->outputType( $domain ) ),
+				'type' => $this->types()->searchOutputType( $domain ),
 				'args' => [
 					['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
 					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],

@@ -160,7 +160,13 @@ abstract class Base
 			$filter = $manager->filter()->order( $args['sort'] )->slice( $args['offset'], $args['limit'] );
 			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
 
-			return $manager->search( $filter, $args['include'] )->all();
+			$total = 0;
+			$items = $manager->search( $filter, $args['include'], $total )->all();
+
+			return [
+				'items' => $items,
+				'total' => $total
+			];
 		};
 	}
 

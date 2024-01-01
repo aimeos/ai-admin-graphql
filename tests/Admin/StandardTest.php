@@ -109,7 +109,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$ids = $manager->search( $filter )->keys()->all();
 
 		$search = addslashes( addslashes( json_encode( ['==' => ['product.id' => $ids]] ) ) );
-		$body = '{"query":"query {\n  searchProducts(filter: \"' . $search . '\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$body = '{"query":"query {\n  searchProducts(filter: \"' . $search . '\") {\n    items {\n      id\n      code\n    }\n    total\n  }\n}\n","variables":{},"operationName":null}';
 		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
 
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );

@@ -461,6 +461,43 @@ class Registry
 
 
 	/**
+	 * Defines the GraphQL search output types
+	 *
+	 * @param string $path Path of the domain manager
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
+	public function searchOutputType( string $domain ) : ObjectType
+	{
+		$name = 'search' . str_replace( '/', '', ucwords( $domain ) ) . 'Output';
+
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
+		}
+
+		return $this->types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() use ( $domain ) {
+				return [
+					'items' => [
+						'name' => 'items',
+						'description' => 'List of items',
+						'type' => Type::listOf( $this->outputType( $domain ) ),
+					],
+					'total' => [
+						'name' => 'total',
+						'description' => 'Total number of items',
+						'type' => Type::int(),
+					]
+				];
+			},
+			'resolveField' => function( array $map, array $args, $context, ResolveInfo $info ) {
+				return $map[$info->fieldName] ?? null;
+			}
+		] );
+	}
+
+
+	/**
 	 * Defines the GraphQL tree output type
 	 *
 	 * @param string $path Path of the domain manager
