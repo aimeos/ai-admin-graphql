@@ -428,6 +428,246 @@ class Registry
 
 
 	/**
+	 * Defines the GraphQL order output types
+	 *
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
+	public function orderOutputType() : ObjectType
+	{
+		$name = 'specificOrderOutput';
+
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
+		}
+
+		return $this->types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() {
+
+				$manager = \Aimeos\MShop::create( $this->context, 'order' );
+				$list = $this->fields( $manager->getSearchAttributes( false ) );
+
+				$list['address'] = [
+					'type' => Type::listOf( $this->orderAddressOutputType() ),
+					'resolve' => function( $item ) {
+						return $item->getAddresses()->flat( 1 );
+					}
+				];
+
+				$list['product'] = [
+					'type' => Type::listOf( $this->orderProductOutputType() ),
+					'resolve' => function( $item ) {
+						return $item->getProducts();
+					}
+				];
+
+				$list['service'] = [
+					'type' => Type::listOf( $this->orderServiceOutputType() ),
+					'resolve' => function( $item ) {
+						return $item->getServices()->flat( 1 );
+					}
+				];
+
+				return $list;
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) {
+				return $this->resolve( $item, 'order', $info->fieldName );
+			}
+		] );
+	}
+
+
+	/**
+	 * Defines the GraphQL order address output types
+	 *
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
+	public function orderAddressOutputType() : ObjectType
+	{
+		$name = 'orderAddressOutput';
+
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
+		}
+
+		return $this->types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() {
+				$manager = \Aimeos\MShop::create( $this->context, 'order/address' );
+				return $this->fields( $manager->getSearchAttributes( false ) );
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) {
+				return $this->resolve( $item, 'order/address', $info->fieldName );
+			}
+		] );
+	}
+
+
+	/**
+	 * Defines the GraphQL order product output types
+	 *
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
+	public function orderProductOutputType() : ObjectType
+	{
+		$name = 'orderProductOutput';
+
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
+		}
+
+		return $this->types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() {
+				$manager = \Aimeos\MShop::create( $this->context, 'order/product' );
+				$list = $this->fields( $manager->getSearchAttributes( false ) );
+
+				$list['attribute'] = [
+					'type' => Type::listOf( $this->orderProductAttributeOutputType() ),
+					'args' => [
+						'type' => Type::String(),
+					],
+					'resolve' => function( $item, $args ) {
+						return $item->getAttributeItems( $args['type'] ?? null );
+					}
+				];
+
+				return $list;
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) {
+				return $this->resolve( $item, 'order/product', $info->fieldName );
+			}
+		] );
+	}
+
+
+	/**
+	 * Defines the GraphQL order product attribute output types
+	 *
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
+	public function orderProductAttributeOutputType() : ObjectType
+	{
+		$name = 'orderProductAttributeOutput';
+
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
+		}
+
+		return $this->types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() {
+				$manager = \Aimeos\MShop::create( $this->context, 'order/product/attribute' );
+				return $this->fields( $manager->getSearchAttributes( false ) );
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) {
+				return $this->resolve( $item, 'order/product/attribute', $info->fieldName );
+			}
+		] );
+	}
+
+
+	/**
+	 * Defines the GraphQL order service output types
+	 *
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
+	public function orderServiceOutputType() : ObjectType
+	{
+		$name = 'orderServiceOutput';
+
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
+		}
+
+		return $this->types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() {
+				$manager = \Aimeos\MShop::create( $this->context, 'order/service' );
+				$list = $this->fields( $manager->getSearchAttributes( false ) );
+
+				$list['attribute'] = [
+					'type' => Type::listOf( $this->orderServiceAttributeOutputType() ),
+					'args' => [
+						'type' => Type::String(),
+					],
+					'resolve' => function( $item, $args ) {
+						return $item->getAttributeItems( $args['type'] ?? null );
+					}
+				];
+
+				$list['transaction'] = [
+					'type' => Type::listOf( $this->orderServiceTransactionOutputType() ),
+					'args' => [
+						'type' => Type::String(),
+					],
+					'resolve' => function( $item, $args ) {
+						return $item->getTransactions( $args['type'] ?? null );
+					}
+				];
+
+				return $list;
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) {
+				return $this->resolve( $item, 'order/service', $info->fieldName );
+			}
+		] );
+	}
+
+
+	/**
+	 * Defines the GraphQL order service attribute output types
+	 *
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
+	public function orderServiceAttributeOutputType() : ObjectType
+	{
+		$name = 'orderServiceAttributeOutput';
+
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
+		}
+
+		return $this->types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() {
+				$manager = \Aimeos\MShop::create( $this->context, 'order/service/attribute' );
+				return $this->fields( $manager->getSearchAttributes( false ) );
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) {
+				return $this->resolve( $item, 'order/service/attribute', $info->fieldName );
+			}
+		] );
+	}
+
+
+	/**
+	 * Defines the GraphQL order service transaction output types
+	 *
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
+	public function orderServiceTransactionOutputType() : ObjectType
+	{
+		$name = 'orderServiceTransactionOutput';
+
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
+		}
+
+		return $this->types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() {
+				$manager = \Aimeos\MShop::create( $this->context, 'order/service/transaction' );
+				return $this->fields( $manager->getSearchAttributes( false ) );
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) {
+				return $this->resolve( $item, 'order/service/transaction', $info->fieldName );
+			}
+		] );
+	}
+
+
+	/**
 	 * Defines the GraphQL property output type
 	 *
 	 * @param string $domain Name of the domain which is using the property item
@@ -466,7 +706,7 @@ class Registry
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	public function searchOutputType( string $domain ) : ObjectType
+	public function searchOutputType( string $domain, string $method = 'outputType' ) : ObjectType
 	{
 		$name = 'search' . str_replace( '/', '', ucwords( $domain ) ) . 'Output';
 
@@ -476,12 +716,12 @@ class Registry
 
 		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
-			'fields' => function() use ( $domain ) {
+			'fields' => function() use ( $domain, $method ) {
 				return [
 					'items' => [
 						'name' => 'items',
 						'description' => 'List of items',
-						'type' => Type::listOf( $this->outputType( $domain ) ),
+						'type' => Type::listOf( $this->$method( $domain ) ),
 					],
 					'total' => [
 						'name' => 'total',
