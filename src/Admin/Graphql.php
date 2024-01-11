@@ -99,7 +99,7 @@ class Graphql
 		foreach( $domains as $domain )
 		{
 			$name = $context->config()->get( 'admin/graphql/' . $domain . '/name', 'Standard' );
-			$classname = '\Aimeos\Admin\Graphql\\' . ucfirst( $domain ) . '\\' . $name;
+			$classname = '\Aimeos\Admin\Graphql\\' . str_replace( '/', '\\', ucwords( $domain, '/' ) ) . '\\' . $name;
 
 			if( !class_exists( $classname ) ) {
 				$classname = '\Aimeos\Admin\Graphql\\' . $stdname;

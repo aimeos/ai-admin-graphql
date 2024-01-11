@@ -434,7 +434,7 @@ class Registry
 	 */
 	public function orderOutputType() : ObjectType
 	{
-		$name = 'specificOrderOutput';
+		$name = 'orderOutputType';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -732,6 +732,46 @@ class Registry
 			},
 			'resolveField' => function( array $map, array $args, $context, ResolveInfo $info ) {
 				return $map[$info->fieldName] ?? null;
+			}
+		] );
+	}
+
+
+	/**
+	 * Defines the GraphQL locale site output types
+	 *
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
+	public function siteOutputType() : ObjectType
+	{
+		$name = 'siteOutputType';
+
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
+		}
+
+		return $this->types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() {
+				$manager = \Aimeos\MShop::create( $this->context, 'locale/site' );
+
+				$list = $this->fields( $manager->getSearchAttributes( false ) );
+				$list['children'] = Type::listOf( $this->siteOutputType() );
+				$list['hasChildren'] = [
+					'name' => 'hasChildren',
+					'description' => 'If node has children',
+					'type' => Type::boolean(),
+				];
+
+				return $list;
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) {
+
+				if( $info->fieldName === 'children' && $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
+					return $item->getChildren();
+				}
+
+				return $this->resolve( $item, 'locale/site', $info->fieldName );
 			}
 		] );
 	}
