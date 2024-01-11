@@ -49,17 +49,6 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 	public function testGetLocaleSiteTree()
 	{
-		$body = '{"query":"query {\n  getLocaleSiteTree {\n id\n code\n children {\n id\n code\n children {\n id\n code\n}\n}\n}\n}\n","variables":{},"operationName":null}';
-		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
-
-		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
-
-		$this->assertStringContainsString( '"code":"unittest"', (string) $response->getBody() );
-	}
-
-
-	public function testGetLocaleSiteTreeId()
-	{
 		$id = \Aimeos\MShop::create( $this->context, 'locale/site' )->find( 'unittest' );
 
 		$body = '{"query":"query {\n  getLocaleSiteTree(id: \"' . $id . '\") {\n id\n code\n children {\n id\n code\n }\n}\n}\n","variables":{},"operationName":null}';
@@ -73,7 +62,9 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 	public function testGetLocaleSiteTreeLevel()
 	{
-		$body = '{"query":"query {\n  getLocaleSiteTree(level: 2) {\n id\n code\n children {\n id\n code\n }\n}\n}\n","variables":{},"operationName":null}';
+		$id = \Aimeos\MShop::create( $this->context, 'locale/site' )->find( 'unittest' );
+
+		$body = '{"query":"query {\n  getLocaleSiteTree(id: \"' . $id . '\", level: 2) {\n id\n code\n children {\n id\n code\n }\n}\n}\n","variables":{},"operationName":null}';
 		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
 
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
