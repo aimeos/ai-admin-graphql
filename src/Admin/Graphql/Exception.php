@@ -17,13 +17,4 @@ class Exception extends \Exception implements \GraphQL\Error\ClientAware
 	{
 		return true;
 	}
-
-
-	/**
-	 * @deprecated
-	 */
-	public function getCategory() : string
-	{
-		return 'aimeos';
-	}
 }
