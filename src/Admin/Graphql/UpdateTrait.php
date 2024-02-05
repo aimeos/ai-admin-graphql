@@ -82,6 +82,8 @@ trait UpdateTrait
 	protected function updateLists( \Aimeos\MShop\Common\Manager\Iface $manager,
 		\Aimeos\MShop\Common\Item\ListsRef\Iface $item, array $entries ) : \Aimeos\MShop\Common\Item\Iface
 	{
+		$resource = $item->getResourceType();
+
 		foreach( $entries as $domain => $list )
 		{
 			if( $domain === 'customergroup' ) {
@@ -89,13 +91,13 @@ trait UpdateTrait
 			}
 
 			$domainManager = \Aimeos\MShop::create( $this->context(), $domain );
-			$listItems = $item->getListItems( $domain );
+			$listItems = $item->getListItems( $domain, null, null, false );
 
 			foreach( $list as $subentry )
 			{
-				$listId = $subentry['id'] ?? '';
-				$listType = $subentry['type'] ?? 'default';
-				$refId = $subentry['item'][$domain.'.id'] ?? $subentry['refid'] ?? '';
+				$listId = $subentry[$resource . '.lists.id'] ?? '';
+				$listType = $subentry[$resource . '.lists.type'] ?? 'default';
+				$refId = $subentry['item'][$domain.'.id'] ?? $subentry[$resource . '.lists.refid'] ?? '';
 
 				$listItem = $listItems->get( $listId ) ?? $item->getListItem( $domain, $listType, $refId ) ?? $manager->createListItem();
 				$refItem = $listItem->getRefItem() ?? $domainManager->create();
