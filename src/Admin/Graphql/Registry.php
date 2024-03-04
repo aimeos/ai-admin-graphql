@@ -296,6 +296,34 @@ class Registry
 
 
 	/**
+	 * Defines the GraphQL tree output type
+	 *
+	 * @param string $path Path of the domain manager
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
+	public function aggregateOutputType( string $domain ) : ObjectType
+	{
+		$name = str_replace( '/', '', $domain ) . 'AggregateOutput';
+
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
+		}
+
+		return $this->types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() use ( $domain ) {
+				return [
+					'aggregates' => Type::string()
+				];
+			},
+			'resolveField' => function( array $entry, array $args, $context, ResolveInfo $info ) use ( $domain ) {
+				return json_encode( $entry, JSON_FORCE_OBJECT );
+			}
+		] );
+	}
+
+
+	/**
 	 * Defines the GraphQL config output type
 	 *
 	 * @param string $domain Name of the domain to retrieve the configuration

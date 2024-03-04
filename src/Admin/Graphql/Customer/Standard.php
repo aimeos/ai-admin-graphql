@@ -40,6 +40,19 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			'resolve' => $this->findItem( $domain ),
 		];
 
+		$list['aggregateCustomers'] = [
+			'type' => $this->types()->aggregateOutputType( $domain ),
+			'args' => [
+				['name' => 'key', 'type' => Type::listOf( Type::string() ), 'description' => 'Aggregation key to group results by, e.g. "customer.status"'],
+				['name' => 'value', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'Aggregate values from that column, e.g "customer.status" (optional, only if type is passed)'],
+				['name' => 'type', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'Type of aggregation like "sum" or "avg" (default: null for count)'],
+				['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
+				['name' => 'sort', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Sort keys'],
+				['name' => 'limit', 'type' => Type::int(), 'defaultValue' => 10000, 'description' => 'Slice size'],
+			],
+			'resolve' => $this->aggregateItems( $domain ),
+		];
+
 		return $list;
 	}
 }

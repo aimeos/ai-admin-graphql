@@ -39,6 +39,33 @@ abstract class Base
 
 
 	/**
+	 * Returns a closure for aggregating items
+	 *
+	 * @param string $domain Domain path of the manager
+	 * @return \Closure Anonymous method aggregating several items
+	 */
+	protected function aggregateItems( string $domain ) : \Closure
+	{
+		return function( $root, $args, $context ) use ( $domain ) {
+
+			$context = $this->context();
+			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
+
+			if( $context->view()->access( $groups ) !== true ) {
+				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
+			}
+
+			$manager = \Aimeos\MShop::create( $context, $domain );
+
+			$filter = $manager->filter()->order( $args['sort'] )->slice( 0, $args['limit'] );
+			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
+
+			return $manager->aggregate( $filter, $args['key'], $args['value'], $args['type'] )->all();
+		};
+	}
+
+
+	/**
 	 * Returns the context object
 	 *
 	 * @return \Aimeos\MShop\ContextIface Context object
