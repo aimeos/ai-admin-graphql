@@ -94,7 +94,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 			->getMock();
 
 		$item = $stub->create( ['catalog.code' => 'test-graphql'] );
-		$stub->expects( $this->once() )->method( 'insert' )->will( $this->returnValue( $item ) );
+		$stub->expects( $this->once() )->method( 'insert' )->willReturn( $item );
 
 		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Catalog\\Manager\\Standard', $stub );
 

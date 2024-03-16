@@ -127,7 +127,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 			->getMock();
 
 		$item = $stub->create( ['product.id' => 123, 'product.code' => 'test-graphql'] );
-		$stub->expects( $this->once() )->method( 'save' )->will( $this->returnValue( $item ) );
+		$stub->expects( $this->once() )->method( 'save' )->willReturn( $item );
 
 		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Product\\Manager\\Standard', $stub );
 
@@ -148,7 +148,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 			->getMock();
 
 		$item = $stub->create( ['product.id' => 123, 'product.code' => 'test-graphql'] );
-		$stub->expects( $this->once() )->method( 'save' )->will( $this->returnValue( [$item] ) );
+		$stub->expects( $this->once() )->method( 'save' )->willReturn( [$item] );
 
 		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Product\\Manager\\Standard', $stub );
 
