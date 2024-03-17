@@ -11,8 +11,8 @@
     </report>
   </coverage>
   <testsuites>
-    <testsuite name="Tests">
-      <directory suffix=".php">./</directory>
+    <testsuite name="Admin">
+      <directory>Admin/</directory>
     </testsuite>
   </testsuites>
 </phpunit>
