@@ -48,7 +48,7 @@ class Registry
 	 */
 	public function inputType( string $path ) : InputObjectType
 	{
-		$name = str_replace( '/', '', $path ) . 'Input';
+		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'Input';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -91,7 +91,7 @@ class Registry
 	 */
 	public function addressInputType( string $path ) : InputObjectType
 	{
-		$name = str_replace( '/', '', $path ) . 'Input';
+		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'Input';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -119,7 +119,7 @@ class Registry
 	 */
 	public function listsInputType( string $path ) : InputObjectType
 	{
-		$name = str_replace( '/', '', $path ) . 'refInput';
+		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'refInput';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -132,7 +132,7 @@ class Registry
 				if( $domains = $this->context->config()->get( 'admin/graphql/lists-domains', [] ) )
 				{
 					foreach( $domains as $domain ) {
-						$list[str_replace( '/', '', $domain )] = Type::listOf( $this->listsRefInputType( $path, $domain ) );
+						$list[str_replace( '/', '', ucwords( $domain, '/' ) )] = Type::listOf( $this->listsRefInputType( $path, $domain ) );
 					}
 				}
 
@@ -151,7 +151,7 @@ class Registry
 	 */
 	public function listsRefInputType( string $path, string $domain ) : InputObjectType
 	{
-		$name = str_replace( '/', '', $path . $domain ) . 'Input';
+		$name = str_replace( '/', '', ucwords( $path . '/' . $domain, '/' ) ) . 'Input';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -181,9 +181,9 @@ class Registry
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\InputObjectType Input type definition
 	 */
-	public function propertyInputType( string $domain ) : ObjectType
+	public function propertyInputType( string $path ) : ObjectType
 	{
-		$name = str_replace( '/', '', $domain ) . 'Input';
+		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'Input';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -191,9 +191,9 @@ class Registry
 
 		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
-			'fields' => function() use ( $domain ) {
+			'fields' => function() use ( $path ) {
 
-				$manager = \Aimeos\MShop::create( $this->context, $domain );
+				$manager = \Aimeos\MShop::create( $this->context, $path );
 				return $this->fields( $manager->getSearchAttributes( false ) );
 			}
 		] );
@@ -206,9 +206,9 @@ class Registry
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	public function outputType( string $domain ) : ObjectType
+	public function outputType( string $path ) : ObjectType
 	{
-		$name = str_replace( '/', '', $domain ) . 'Output';
+		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'Output';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -216,24 +216,24 @@ class Registry
 
 		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
-			'fields' => function() use ( $domain ) {
+			'fields' => function() use ( $path ) {
 
-				$manager = \Aimeos\MShop::create( $this->context, $domain );
+				$manager = \Aimeos\MShop::create( $this->context, $path );
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$item = $manager->create();
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
-					$list['address'] = Type::listOf( $this->addressOutputType( $domain . '/address' ) );
+					$list['address'] = Type::listOf( $this->addressOutputType( $path . '/address' ) );
 				}
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
-					$list['children'] = Type::listOf( $this->treeOutputType( $domain ) );
+					$list['children'] = Type::listOf( $this->treeOutputType( $path ) );
 				}
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface )
 				{
 					$list['property'] = [
-						'type' => Type::listOf( $this->propertyOutputType( $domain . '/property' ) ),
+						'type' => Type::listOf( $this->propertyOutputType( $path . '/property' ) ),
 						'args' => [
 							'type' => Type::listOf( Type::String() ),
 						],
@@ -246,7 +246,7 @@ class Registry
 				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface )
 				{
 					$list['lists'] = [
-						'type' => $this->listsOutputType( $domain . '/lists' ),
+						'type' => $this->listsOutputType( $path . '/lists' ),
 						'resolve' => function( ItemIface $item, array $args ) {
 							return $item;
 						}
@@ -255,8 +255,8 @@ class Registry
 
 				return $list;
 			},
-			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
-				return $this->resolve( $item, $domain, $info->fieldName );
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $path ) {
+				return $this->resolve( $item, $path, $info->fieldName );
 			}
 		] );
 	}
@@ -268,9 +268,9 @@ class Registry
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	public function addressOutputType( string $domain ) : ObjectType
+	public function addressOutputType( string $path ) : ObjectType
 	{
-		$name = str_replace( '/', '', $domain ) . 'Output';
+		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'Output';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -278,18 +278,18 @@ class Registry
 
 		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
-			'fields' => function() use ( $domain ) {
+			'fields' => function() use ( $path ) {
 
-				$manager = \Aimeos\MShop::create( $this->context, $domain );
+				$manager = \Aimeos\MShop::create( $this->context, $path );
 				return $this->fields( $manager->getSearchAttributes( false ) );
 			},
-			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $path ) {
 
 				if( $info->fieldName === 'address' && $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
 					return $item->getAddressItems();
 				}
 
-				return $this->resolve( $item, $domain, $info->fieldName );
+				return $this->resolve( $item, $path, $info->fieldName );
 			}
 		] );
 	}
@@ -301,9 +301,9 @@ class Registry
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	public function aggregateOutputType( string $domain ) : ObjectType
+	public function aggregateOutputType( string $path ) : ObjectType
 	{
-		$name = str_replace( '/', '', $domain ) . 'AggregateOutput';
+		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'AggregateOutput';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -311,12 +311,12 @@ class Registry
 
 		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
-			'fields' => function() use ( $domain ) {
+			'fields' => function() use ( $path ) {
 				return [
 					'aggregates' => Type::string()
 				];
 			},
-			'resolveField' => function( array $entry, array $args, $context, ResolveInfo $info ) use ( $domain ) {
+			'resolveField' => function( array $entry, array $args, $context, ResolveInfo $info ) use ( $path ) {
 				return json_encode( $entry, JSON_FORCE_OBJECT );
 			}
 		] );
@@ -326,12 +326,12 @@ class Registry
 	/**
 	 * Defines the GraphQL config output type
 	 *
-	 * @param string $domain Name of the domain to retrieve the configuration
+	 * @param string $path Path of the domain to retrieve the configuration
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	public function configOutputType( string $domain ) : ObjectType
+	public function configOutputType( string $path ) : ObjectType
 	{
-		$name = str_replace( '/', '', $domain ) . 'ConfigOutput';
+		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'ConfigOutput';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -363,7 +363,7 @@ class Registry
 					],
 				];
 			},
-			'resolveField' => function( $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
+			'resolveField' => function( $item, array $args, $context, ResolveInfo $info ) use ( $path ) {
 				switch( $info->fieldName ) {
 					case 'code': return $item->getCode();
 					case 'label': return $item->getLabel();
@@ -384,7 +384,7 @@ class Registry
 	 */
 	public function listsOutputType( string $path ) : ObjectType
 	{
-		$name = str_replace( '/', '', $path ) . 'refOutput';
+		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'refOutput';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -398,7 +398,7 @@ class Registry
 				{
 					foreach( $domains as $domain )
 					{
-						$list[str_replace( '/', '', $domain )] = [
+						$list[str_replace( '/', '', ucwords( $domain, '/' ) )] = [
 							'type' => Type::listOf( $this->listsRefOutputType( $path, $domain ) ),
 							'args' => [
 								'listtype' => Type::listOf( Type::String() ),
@@ -426,7 +426,7 @@ class Registry
 	 */
 	public function listsRefOutputType( string $path, string $domain ) : ObjectType
 	{
-		$name = str_replace( '/', '', $path ) . $domain . 'Output';
+		$name = str_replace( '/', '', ucwords( $path . '/' . $domain, '/' ) ) . 'Output';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -698,12 +698,12 @@ class Registry
 	/**
 	 * Defines the GraphQL property output type
 	 *
-	 * @param string $domain Name of the domain which is using the property item
+	 * @param string $path Path of the manager which is using the property item
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	public function propertyOutputType( string $domain ) : ObjectType
+	public function propertyOutputType( string $path ) : ObjectType
 	{
-		$name = str_replace( '/', '', $domain ) . 'Output';
+		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'Output';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -711,18 +711,18 @@ class Registry
 
 		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
-			'fields' => function() use ( $domain ) {
+			'fields' => function() use ( $path ) {
 
-				$manager = \Aimeos\MShop::create( $this->context, $domain );
+				$manager = \Aimeos\MShop::create( $this->context, $path );
 				return $this->fields( $manager->getSearchAttributes( false ) );
 			},
-			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $path ) {
 
 				if( $info->fieldName === 'property' && $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
 					return $item->getPropertyItems();
 				}
 
-				return $this->resolve( $item, $domain, $info->fieldName );
+				return $this->resolve( $item, $path, $info->fieldName );
 			}
 		] );
 	}
@@ -734,9 +734,9 @@ class Registry
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	public function searchOutputType( string $domain, string $method = 'outputType' ) : ObjectType
+	public function searchOutputType( string $path, string $method = 'outputType' ) : ObjectType
 	{
-		$name = 'search' . str_replace( '/', '', ucwords( $domain ) ) . 'Output';
+		$name = 'search' . str_replace( '/', '', ucwords( $path ) ) . 'Output';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -744,12 +744,12 @@ class Registry
 
 		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
-			'fields' => function() use ( $domain, $method ) {
+			'fields' => function() use ( $path, $method ) {
 				return [
 					'items' => [
 						'name' => 'items',
 						'description' => 'List of items',
-						'type' => Type::listOf( $this->$method( $domain ) ),
+						'type' => Type::listOf( $this->$method( $path ) ),
 					],
 					'total' => [
 						'name' => 'total',
@@ -811,9 +811,9 @@ class Registry
 	 * @param string $path Path of the domain manager
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	public function treeOutputType( string $domain ) : ObjectType
+	public function treeOutputType( string $path ) : ObjectType
 	{
-		$name = str_replace( '/', '', $domain ) . 'TreeOutput';
+		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'TreeOutput';
 
 		if( isset( $this->types[$name] ) ) {
 			return $this->types[$name];
@@ -821,22 +821,22 @@ class Registry
 
 		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
-			'fields' => function() use ( $domain ) {
+			'fields' => function() use ( $path ) {
 
-				$manager = \Aimeos\MShop::create( $this->context, $domain );
+				$manager = \Aimeos\MShop::create( $this->context, $path );
 
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
-				$list['children'] = Type::listOf( $this->treeOutputType( $domain ) );
+				$list['children'] = Type::listOf( $this->treeOutputType( $path ) );
 
 				return $list;
 			},
-			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $path ) {
 
 				if( $info->fieldName === 'children' && $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
 					return $item->getChildren();
 				}
 
-				return $this->resolve( $item, $domain, $info->fieldName );
+				return $this->resolve( $item, $path, $info->fieldName );
 			}
 		] );
 	}
