@@ -824,9 +824,20 @@ class Registry
 			'fields' => function() use ( $path ) {
 
 				$manager = \Aimeos\MShop::create( $this->context, $path );
+				$item = $manager->create();
 
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$list['children'] = Type::listOf( $this->treeOutputType( $path ) );
+
+				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface )
+				{
+					$list['lists'] = [
+						'type' => $this->listsOutputType( $domain . '/lists' ),
+						'resolve' => function( ItemIface $item, array $args ) {
+							return $item;
+						}
+					];
+				}
 
 				return $list;
 			},
