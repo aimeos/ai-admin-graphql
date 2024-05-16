@@ -15,6 +15,7 @@ return [
 			'customer/group' => 'customer/group',
 			'customer/lists/type' => 'customer/lists/type',
 			'customer/property/type' => 'customer/property/type',
+			'index' => 'index',
 			'locale' => 'locale',
 			'locale/currency' => 'locale/currency',
 			'locale/language' => 'locale/language',
