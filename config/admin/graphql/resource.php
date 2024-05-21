@@ -289,7 +289,7 @@ return [
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'delete' => ['admin', 'editor', 'super'],
+		'delete' => ['admin', 'super'],
 
 		/** admin/graphql/resource/customer/save
 		 * List of user groups that are allowed to create and update customer items
