@@ -732,9 +732,10 @@ class Registry
 	 * Defines the GraphQL search output types
 	 *
 	 * @param string $path Path of the domain manager
+	 * @param Closure|null Output type method (default: outputType())
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	public function searchOutputType( string $path, string $method = 'outputType' ) : ObjectType
+	public function searchOutputType( string $path, \Closure $method = null ) : ObjectType
 	{
 		$name = 'search' . str_replace( '/', '', ucwords( $path ) ) . 'Output';
 
@@ -749,7 +750,7 @@ class Registry
 					'items' => [
 						'name' => 'items',
 						'description' => 'List of items',
-						'type' => Type::listOf( $this->$method( $path ) ),
+						'type' => Type::listOf( $method ? $method( $path ) : $this->outputType( $path ) ),
 					],
 					'total' => [
 						'name' => 'total',
@@ -859,7 +860,7 @@ class Registry
 	 * @param array $attrs List of search attribute items implementing \Aimeos\Base\Criteria\Attribute\Iface
 	 * @return array Associative list of codes as keys and entries defining the field as values
 	 */
-	protected function fields( array $attrs ) : array
+	public function fields( array $attrs ) : array
 	{
 		$list = [];
 
@@ -882,26 +883,13 @@ class Registry
 
 
 	/**
-	 * Returns the name of the field without prefix
-	 *
-	 * @param string $value Search property name
-	 * @return string Field name without prefix
-	 */
-	protected function name( string $value ) : string
-	{
-		$pos = strrpos( $value, '.' );
-		return substr( $value, $pos ? $pos + 1 : 0 );
-	}
-
-
-	/**
 	 * Adds the prefix for the passed domain
 	 *
 	 * @param string $domain Domain name of the item the entry is for
 	 * @param array $entry Associative list of key/value pairs of the item
 	 * @return array Associative list of prefixed key/value pairs of the item
 	 */
-	protected function prefix( string $domain, array $entry ) : array
+	public function prefix( string $domain, array $entry ) : array
 	{
 		$map = [];
 		$domain = str_replace( '/', '.', $domain );
@@ -927,7 +915,7 @@ class Registry
 	 * @param string $name Name of the requested value
 	 * @return string|null Requested value
 	 */
-	protected function resolve( ItemIface $item, string $domain, string $name )
+	public function resolve( ItemIface $item, string $domain, string $name )
 	{
 		return $item->get( str_replace( '/', '.', $domain ) . '.' . $name ) ?? $item->get( $name );
 	}
@@ -939,7 +927,7 @@ class Registry
 	 * @param string $name Name of the Aimeos type
 	 * @return \GraphQL\Type\Definition\Type GraphQL type
 	 */
-	protected function type( string $name ) : Type
+	public function type( string $name ) : Type
 	{
 		switch( $name )
 		{
@@ -952,5 +940,18 @@ class Registry
 		}
 
 		return Type::string();
+	}
+
+
+	/**
+	 * Returns the name of the field without prefix
+	 *
+	 * @param string $value Search property name
+	 * @return string Field name without prefix
+	 */
+	protected function name( string $value ) : string
+	{
+		$pos = strrpos( $value, '.' );
+		return substr( $value, $pos ? $pos + 1 : 0 );
 	}
 }
