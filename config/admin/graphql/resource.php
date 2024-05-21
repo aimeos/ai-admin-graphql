@@ -492,7 +492,7 @@ return [
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'delete' => ['admin', 'super'],
+			'delete' => ['super'],
 
 			/** admin/graphql/resource/locale/site/save
 			 * List of user groups that are allowed to create and update locale site items
@@ -500,7 +500,7 @@ return [
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'save' => ['admin', 'super'],
+			'save' => ['super'],
 
 			/** admin/graphql/resource/locale/site/get
 			 * List of user groups that are allowed to retrieve locale site items
@@ -508,7 +508,7 @@ return [
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'get' => ['admin', 'super'],
+			'get' => ['super'],
 		],
 		'language' => [
 			/** admin/graphql/resource/locale/language/delete
