@@ -25,7 +25,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 	public function testFindCustomer()
 	{
-		$body = '{"query":"query {\n  findCustomer(code: \"test@example.com\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$body = '{"query":"query {\n  findCustomer(code: \"test@example.com\") {\n    id\n    code    groups\n  }\n}\n","variables":{},"operationName":null}';
 		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
 
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
