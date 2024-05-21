@@ -232,12 +232,12 @@ error_log(print_r($groups, true));
 				$ref = array_merge( $ref, $this->getRefs( $entry, $domain ) );
 			}
 
-			$products = $manager->search( $filter, array_unique( $ref ) );
+			$map = $manager->search( $filter, array_unique( $ref ) );
 			$items = [];
 
 			foreach( $entries as $entry )
 			{
-				$item = $products->get( $entry[$domain . '.id'] ?? null ) ?: $manager->create();
+				$item = $map->get( $entry[$domain . '.id'] ?? null ) ?: $manager->create();
 				$items[] = $this->updateItem( $manager, $item, $entry );
 			}
 
