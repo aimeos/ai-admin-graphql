@@ -1154,7 +1154,7 @@ return [
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'delete' => ['admin', 'editor', 'super'],
+		'delete' => ['admin', 'super'],
 
 		/** admin/graphql/resource/service/save
 		 * List of user groups that are allowed to create and update service items
@@ -1162,7 +1162,7 @@ return [
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'save' => ['admin', 'editor', 'super'],
+		'save' => ['admin', 'super'],
 
 		/** admin/graphql/resource/service/get
 		 * List of user groups that are allowed to retrieve service items
@@ -1170,7 +1170,7 @@ return [
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
-		'get' => ['admin', 'editor', 'super'],
+		'get' => ['admin', 'super'],
 
 		'lists' => [
 			/** admin/graphql/resource/service/lists/delete
@@ -1179,7 +1179,7 @@ return [
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'delete' => ['admin', 'editor', 'super'],
+			'delete' => ['admin', 'super'],
 
 			/** admin/graphql/resource/service/lists/save
 			 * List of user groups that are allowed to create and update service lists items
@@ -1187,7 +1187,7 @@ return [
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'save' => ['admin', 'editor', 'super'],
+			'save' => ['admin', 'super'],
 
 			/** admin/graphql/resource/service/lists/get
 			 * List of user groups that are allowed to retrieve service lists items
@@ -1195,7 +1195,7 @@ return [
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
-			'get' => ['admin', 'editor', 'super'],
+			'get' => ['admin', 'super'],
 
 			'type' => [
 				/** admin/graphql/resource/service/lists/type/delete
