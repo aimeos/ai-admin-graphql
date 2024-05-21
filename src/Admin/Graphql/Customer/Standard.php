@@ -42,4 +42,44 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 		return $list;
 	}
+
+
+	/**
+	 * Updates the item
+	 *
+	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
+	 * @param \Aimeos\MShop\Common\Item\AdddressRef\Iface $item Item to update
+	 * @param array $entry Associative list of key/value pairs of the item data
+	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
+	 */
+	protected function updateItem( \Aimeos\MShop\Common\Manager\Iface $manager,
+		\Aimeos\MShop\Common\Item\Iface $item, array $entry ) : \Aimeos\MShop\Common\Item\Iface
+	{
+		$view = $this->context()->view();
+		$item = $item->fromArray( $entry );
+
+		if( $view->access( ['super', 'admin'] ) ) {
+			$item->setGroups( array_unique( $entry['groups'] ?? [] ) );
+		}
+
+		if( $view->access( ['super', 'admin'] ) || $item->getId() === $this->context()->user() )
+		{
+			!isset( $entry['customer.password'] ) ?: $item->setPassword( $entry['customer.password'] );
+			!isset( $entry['customer.code'] ) ?: $item->setCode( $entry['customer.code'] );
+		}
+
+		if( isset( $entry['address'] ) && $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
+			$item = $this->updateAddresses( $manager, $item, $entry['address'] );
+		}
+
+		if( isset( $entry['lists'] ) && $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
+			$item = $this->updateLists( $manager, $item, $entry['lists'] );
+		}
+
+		if( isset( $entry['property'] ) && $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
+			$item = $this->updateProperties( $manager, $item, $entry['property'] );
+		}
+
+		return $item;
+	}
 }
