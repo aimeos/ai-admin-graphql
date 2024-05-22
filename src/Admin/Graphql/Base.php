@@ -39,6 +39,25 @@ abstract class Base
 
 
 	/**
+	 * Checks if the user has access to the given domain and action
+	 *
+	 * @param string $domain Domain path of the manager
+	 * @param string $action Action name
+	 * @return bool True if access is allowed, false if not
+	 */
+	protected function access( string $domain, string $action ) : bool
+	{
+		$groups = $this->context->config()->get( 'admin/graphql/resource/' . $domain . '/' . $action, [] );
+
+		if( $this->context->view()->access( $groups ) === true ) {
+			return true;
+		}
+
+		throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
+	}
+
+
+	/**
 	 * Returns a closure for aggregating items
 	 *
 	 * @param string $domain Domain path of the manager
@@ -48,14 +67,8 @@ abstract class Base
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 
-			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
-
-			if( $context->view()->access( $groups ) !== true ) {
-				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
-			}
-
-			$manager = \Aimeos\MShop::create( $context, $domain );
+			$this->access( $domain, 'get' );
+			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 
 			$filter = $manager->filter()->order( $args['sort'] )->slice( 0, $args['limit'] );
 			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
@@ -86,14 +99,8 @@ abstract class Base
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 
-			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/delete', [] );
-
-			if( $context->view()->access( $groups ) !== true ) {
-				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
-			}
-
-			\Aimeos\MShop::create( $context, $domain )->delete( $args['id'] );
+			$this->access( $domain, 'delete' );
+			\Aimeos\MShop::create( $this->context(), $domain )->delete( $args['id'] );
 			return $args['id'];
 		};
 	}
@@ -109,15 +116,33 @@ abstract class Base
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 
-			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
-
-			if( $context->view()->access( $groups ) !== true ) {
-				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
-			}
-
-			return \Aimeos\MShop::create( $context, $domain )->get( $args['id'], $args['include'] );
+			$this->access( $domain, 'get' );
+			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->get( $args['id'], $args['include'] ) );
 		};
+	}
+
+
+	/**
+	 * Returns the item if not removed for security reasons
+	 *
+	 * @param \Aimeos\MShop\Common\Item\Iface $item Item to check
+	 * @return \Aimeos\MShop\Common\Item\Iface Item if not removed
+	 */
+	protected function filter( \Aimeos\MShop\Common\Item\Iface $item ) : \Aimeos\MShop\Common\Item\Iface
+	{
+		return $item;
+	}
+
+
+	/**
+	 * Returns the items if not removed for security reasons
+	 *
+	 * @param iterable $items List of items to check
+	 * @return iterable List of items not removed
+	 */
+	protected function filters( iterable $items ) : iterable
+	{
+		return $items;
 	}
 
 
@@ -131,14 +156,8 @@ abstract class Base
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 
-			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
-
-			if( $context->view()->access( $groups ) !== true ) {
-				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
-			}
-
-			return \Aimeos\MShop::create( $context, $domain )->find( $args['code'], $args['include'] );
+			$this->access( $domain, 'get' );
+			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'], $args['include'] ) );
 		};
 	}
 
@@ -153,14 +172,8 @@ abstract class Base
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 
-			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
-
-			if( $context->view()->access( $groups ) !== true ) {
-				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
-			}
-
-			return \Aimeos\MShop::create( $context, $domain )->find( $args['code'], [], $args['domain'] );
+			$this->access( $domain, 'get' );
+			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'], [], $args['domain'] ) );
 		};
 	}
 
@@ -175,20 +188,14 @@ abstract class Base
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 
-			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
-
-			if( $context->view()->access( $groups ) !== true ) {
-				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
-			}
-
-			$manager = \Aimeos\MShop::create( $context, $domain );
+			$this->access( $domain, 'get' );
+			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 
 			$filter = $manager->filter()->order( $args['sort'] )->slice( $args['offset'], $args['limit'] );
 			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
 
 			$total = 0;
-			$items = $manager->search( $filter, $args['include'], $total )->all();
+			$items = $this->filters( $manager->search( $filter, $args['include'], $total )->all() );
 
 			return [
 				'items' => $items,
@@ -208,19 +215,13 @@ abstract class Base
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 
-			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/save', [] );
-
-			if( $context->view()->access( $groups ) !== true ) {
-				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
-			}
-
 			if( empty( $entry = $args['input'] ) ) {
 				throw new \Aimeos\Admin\Graphql\Exception( 'Parameter "input" must not be empty' );
 			}
 
+			$this->access( $domain, 'save' );
 			$ref = $this->getRefs( $entry, $domain );
-			$manager = \Aimeos\MShop::create( $context, $domain );
+			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 
 			if( isset( $entry[$domain . '.id'] ) ) {
 				$item = $manager->get( $entry[$domain . '.id'], $ref );
@@ -229,7 +230,7 @@ abstract class Base
 			}
 
 			return $manager->save( $this->updateItem( $manager, $item, $entry ) );
-	};
+		};
 	}
 
 
@@ -243,15 +244,12 @@ abstract class Base
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 
-			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/save', [] );
-
-			if( $context->view()->access( $groups ) !== true ) {
-				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
+			if( empty( $entries = (array) $args['input'] ) ) {
+				throw new \Aimeos\Admin\Graphql\Exception( 'Parameter "input" must not be empty' );
 			}
 
-			$entries = (array) $args['input'];
-			$manager = \Aimeos\MShop::create( $context, $domain );
+			$this->access( $domain, 'save' );
+			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 
 			$ids = array_filter( array_column( $entries, $domain . '.id' ) );
 			$filter = $manager->filter()->add( $domain . '.id', '==', $ids )->slice( 0, count( $entries ) );
