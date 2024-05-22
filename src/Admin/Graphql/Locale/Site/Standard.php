@@ -139,6 +139,46 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 
 	/**
+	 * Returns the item if not removed for security reasons
+	 *
+	 * @param \Aimeos\MShop\Common\Item\Iface $item Item to check
+	 * @return \Aimeos\MShop\Common\Item\Iface Item if not removed
+	 */
+	protected function filter( \Aimeos\MShop\Common\Item\Iface $item ) : \Aimeos\MShop\Common\Item\Iface
+	{
+		$siteid = (string) $this->context()->user()?->getSiteId();
+
+		if( $item->getSiteId() && strncmp( $item->getSiteId(), $siteid, strlen( $siteid ) ) ) {
+			throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
+		}
+
+		return $item;
+	}
+
+
+	/**
+	 * Returns the items if not removed for security reasons
+	 *
+	 * @param iterable $items List of items to check
+	 * @return iterable List of items not removed
+	 */
+	protected function filters( iterable $items ) : iterable
+	{
+		$list = [];
+		$siteid = (string) $this->context()->user()?->getSiteId();
+
+		foreach( $items as $id => $item )
+		{
+			if( !( $item->getSiteId() && strncmp( $item->getSiteId(), $siteid, strlen( $siteid ) ) ) ) {
+				$list[$id] = $item;
+			}
+		}
+
+		return $list;
+	}
+
+
+	/**
 	 * Returns a closure for returning the nodes from the passed ID up to the root node
 	 *
 	 * @param string $domain Domain path of the manager
@@ -147,7 +187,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function getPath( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
-			return \Aimeos\MShop::create( $this->context(), $domain )->getPath( $args['id'], $args['include'] );
+			return $this->filters( \Aimeos\MShop::create( $this->context(), $domain )->getPath( $args['id'], $args['include'] ) );
 		};
 	}
 
@@ -161,7 +201,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function getTree( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
-			return \Aimeos\MShop::create( $this->context(), $domain )->getTree( $args['id'], $args['include'], $args['level'] );
+			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->getTree( $args['id'], $args['include'], $args['level'] ) );
 		};
 	}
 
@@ -180,6 +220,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				throw new \Aimeos\Admin\Graphql\Exception( 'Parameter "input" must not be empty' );
 			}
 
+			$this->access( $domain, 'insert' );
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 			$item = $this->updateItem( $manager, $manager->create(), $entry );
 
@@ -197,8 +238,32 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function moveItem( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
+
+			$this->access( $domain, 'move' );
 			\Aimeos\MShop::create( $this->context(), $domain )->move( $args['id'], $args['parentid'], $args['targetid'], $args['refid'] );
+
 			return $args['id'];
 		};
+	}
+
+
+	/**
+	 * Updates the item
+	 *
+	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
+	 * @param \Aimeos\MShop\Common\Item\AdddressRef\Iface $item Item to update
+	 * @param array $entry Associative list of key/value pairs of the item data
+	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
+	 */
+	protected function updateItem( \Aimeos\MShop\Common\Manager\Iface $manager,
+		\Aimeos\MShop\Common\Item\Iface $item, array $entry ) : \Aimeos\MShop\Common\Item\Iface
+	{
+		$siteid = (string) $this->context()->user()?->getSiteId();
+
+		if( $item->getSiteId() && strncmp( $item->getSiteId(), $siteid, strlen( $siteid ) ) ){
+			throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
+		}
+
+		return $item->fromArray( $entry, true );
 	}
 }
