@@ -21,6 +21,11 @@ use GraphQL\Type\Definition\Type;
  */
 trait ProviderTrait
 {
+	abstract protected function access( string $domain, string $action ) : bool;
+	abstract protected function context() : \Aimeos\MShop\Context\Item\Iface;
+	abstract protected function types() : \Aimeos\Admin\Graphql\Types;
+
+
 	/**
 	 * Returns GraphQL schema definition for the available queries
 	 *
@@ -54,14 +59,8 @@ trait ProviderTrait
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 
-			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
-
-			if( $context->view()->access( $groups ) !== true ) {
-				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
-			}
-
-			$manager = \Aimeos\MShop::create( $context, $domain );
+			$this->access( $domain, 'get' );
+			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 			$item = $manager->create()->setProvider( $args['provider'] );
 
 			return $manager->getProvider( $item, $args['type'] )->getConfigBE();
