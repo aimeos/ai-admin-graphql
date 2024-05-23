@@ -460,6 +460,15 @@ return [
 		 */
 		'get' => ['admin', 'editor', 'super'],
 	],
+	'index' => [
+		/** admin/graphql/resource/index/get
+		 * List of user groups that are allowed to retrieve index data
+		 *
+		 * @param array List of user group names
+		 * @since 2022.10
+		 */
+		'get' => ['admin', 'editor', 'super'],
+	],
 	'locale' => [
 		/** admin/graphql/resource/locale/delete
 		 * List of user groups that are allowed to delete locale items
