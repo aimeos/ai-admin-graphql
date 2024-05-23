@@ -359,7 +359,7 @@ class Registry
 					],
 					'default' => [
 						'name' => 'default',
-						'type' => Type::String(),
+						'type' => \Aimeos\GraphQL\Type\Definition\Json::type(),
 					],
 				];
 			},
@@ -369,7 +369,7 @@ class Registry
 					case 'label': return $item->getLabel();
 					case 'type': return $item->getType();
 					case 'required': return $item->isRequired();
-					case 'default': return (string) $item->getDefault();
+					case 'default': return $item->getDefault();
 				}
 			}
 		] );
