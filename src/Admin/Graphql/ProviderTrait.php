@@ -22,8 +22,8 @@ use GraphQL\Type\Definition\Type;
 trait ProviderTrait
 {
 	abstract protected function access( string $domain, string $action ) : bool;
-	abstract protected function context() : \Aimeos\MShop\Context\Item\Iface;
-	abstract protected function types() : \Aimeos\Admin\Graphql\Types;
+	abstract protected function context() : \Aimeos\MShop\ContextIface;
+	abstract protected function types() : \Aimeos\Admin\Graphql\Registry;
 
 
 	/**
