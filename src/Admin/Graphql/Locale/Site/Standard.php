@@ -124,7 +124,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				'resolve' => $this->getTree( $domain ),
 			],
 			'search' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 's' => [
-				'type' => $this->types()->searchOutputType( $domain, fn() => $this->types( $path )->siteOutputType( $path ) ),
+				'type' => $this->types()->searchOutputType( $domain, fn( $path ) => $this->types( $path )->siteOutputType( $path ) ),
 				'args' => [
 					['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
 					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
