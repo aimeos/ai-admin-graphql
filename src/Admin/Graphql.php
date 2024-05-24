@@ -91,14 +91,15 @@ class Graphql
 	protected static function schema( \Aimeos\MShop\ContextIface $context ) : \GraphQL\Type\Schema
 	{
 		$query = $mutation = [];
+		$config = $context->config();
 		$registry = new \Aimeos\Admin\Graphql\Registry( $context );
 
-		$stdname = $context->config()->get( 'admin/graphql/name', 'Standard' );
-		$domains = $context->config()->get( 'admin/graphql/domains', [] );
+		$stdname = $config->get( 'admin/graphql/name', 'Standard' );
+		$domains = $config->get( 'admin/graphql/domains', [] );
 
 		foreach( $domains as $domain )
 		{
-			$name = $context->config()->get( 'admin/graphql/' . $domain . '/name', 'Standard' );
+			$name = $config->get( 'admin/graphql/' . $domain . '/name', 'Standard' );
 			$classname = '\Aimeos\Admin\Graphql\\' . str_replace( '/', '\\', ucwords( $domain, '/' ) ) . '\\' . $name;
 
 			if( !class_exists( $classname ) ) {
