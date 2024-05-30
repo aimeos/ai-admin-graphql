@@ -833,7 +833,7 @@ class Registry
 				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface )
 				{
 					$list['lists'] = [
-						'type' => $this->listsOutputType( $domain . '/lists' ),
+						'type' => $this->listsOutputType( $path . '/lists' ),
 						'resolve' => function( ItemIface $item, array $args ) {
 							return $item;
 						}
