@@ -222,6 +222,17 @@ class Registry
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$item = $manager->create();
 
+				if( $item instanceof \Aimeos\MShop\Customer\Item\Iface )
+				{
+					$list['groups'] = [
+						'type' => Type::listOf( Type::String() ),
+						'description' => 'List of group IDs assigned to the account',
+						'resolve' => function( $item, $args ) {
+							return $item->getGroups();
+						}
+					];
+				}
+
 				if( $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
 					$list['address'] = Type::listOf( $this->addressOutputType( $path . '/address' ) );
 				}
