@@ -75,28 +75,33 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		\Aimeos\MShop\Common\Item\Iface $item, array $entry ) : \Aimeos\MShop\Common\Item\Iface
 	{
 		$view = $this->context()->view();
-		$item = $item->fromArray( $entry );
+		$siteId = (string) $this->context()->user()?->getSiteId();
 
-		if( $view->access( ['super', 'admin'] ) ) {
-			$item->setGroups( array_unique( $entry['groups'] ?? [] ) );
-		}
-
-		if( $view->access( ['super', 'admin'] ) || $item->getId() === $this->context()->user() )
+		if( $view->access( ['super'] ) || strlen( $siteId ) > 0 && !strncmp( $item->getSiteId(), $siteId, strlen( $siteId ) ) )
 		{
-			!isset( $entry['customer.password'] ) ?: $item->setPassword( $entry['customer.password'] );
-			!isset( $entry['customer.code'] ) ?: $item->setCode( $entry['customer.code'] );
-		}
+			$item = $item->fromArray( $entry );
 
-		if( isset( $entry['address'] ) && $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
-			$item = $this->updateAddresses( $manager, $item, $entry['address'] );
-		}
+			if( $view->access( ['super', 'admin'] ) ) {
+				$item->setGroups( array_unique( $entry['groups'] ?? [] ) );
+			}
 
-		if( isset( $entry['lists'] ) && $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
-			$item = $this->updateLists( $manager, $item, $entry['lists'] );
-		}
+			if( $view->access( ['super', 'admin'] ) || $item->getId() === $this->context()->user() )
+			{
+				!isset( $entry['customer.password'] ) ?: $item->setPassword( $entry['customer.password'] );
+				!isset( $entry['customer.code'] ) ?: $item->setCode( $entry['customer.code'] );
+			}
 
-		if( isset( $entry['property'] ) && $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
-			$item = $this->updateProperties( $manager, $item, $entry['property'] );
+			if( isset( $entry['address'] ) && $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
+				$item = $this->updateAddresses( $manager, $item, $entry['address'] );
+			}
+
+			if( isset( $entry['lists'] ) && $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
+				$item = $this->updateLists( $manager, $item, $entry['lists'] );
+			}
+
+			if( isset( $entry['property'] ) && $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
+				$item = $this->updateProperties( $manager, $item, $entry['property'] );
+			}
 		}
 
 		return $item;
