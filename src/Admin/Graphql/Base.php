@@ -150,7 +150,6 @@ abstract class Base
 
 			$context = $this->context();
 			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
-error_log(print_r($groups, true));
 
 			if( $context->view()->access( $groups ) !== true ) {
 				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
@@ -261,11 +260,11 @@ error_log(print_r($groups, true));
 				$ref = array_merge( $ref, $this->getRefs( $subItem['item'] ?? [], $listDomain ) );
 			}
 		}
-		
+
 		if( isset( $entry['property'] ) ) {
 			$ref[] = $domain . '/property';
 		}
-		
+
 		return array_unique( $ref );
 	}
 
