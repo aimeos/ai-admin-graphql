@@ -98,10 +98,10 @@ class TestHelper
 		$file = __DIR__ . DIRECTORY_SEPARATOR . 'confdoc.ser';
 		$local = array( 'resource' => array( 'fs' => array( 'adapter' => 'Standard', 'basedir' => __DIR__ . '/tmp' ) ) );
 
-		$conf = new \Aimeos\Base\Config\PHPArray( $local, $paths );
+		$conf = new \Aimeos\Base\Config\PHPArray( [], $paths );
 		$conf = new \Aimeos\Base\Config\Decorator\Memory( $conf );
 		$conf = new \Aimeos\Base\Config\Decorator\Documentor( $conf, $file );
-		$ctx->setConfig( $conf );
+		$ctx->setConfig( $conf->apply( $local ) );
 
 
 		$logger = new \Aimeos\Base\Logger\File( $site . '.log', \Aimeos\Base\Logger\Iface::DEBUG );

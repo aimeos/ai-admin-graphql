@@ -53,17 +53,37 @@ class Graphql
 			 */
 			$debug = $context->config()->get( 'admin/graphql/debug', false );
 
-			if( empty( $input = json_decode( (string) $request->getBody(), true ) ) ) {
-				throw new \Aimeos\Admin\Graphql\Exception( 'Invalid input' );
+			if( !is_array( $input = $request->getParsedBody() ) )
+			{
+				if( empty( $input = json_decode( $request->getBody()->getContents() ?? '', true ) ) ) {
+					throw new \Aimeos\Admin\Graphql\Exception( 'Invalid input' );
+				}
+			}
+
+			if( isset( $input['operations'] ) )
+			{
+				$map = json_decode( $input['map'] ?? '[]', true );
+				$operations = json_decode( $input['operations'], true );
+				$operations = self::files( $request->getUploadedFiles(), $operations, $map );
+
+				$opname = $operations['operationName'] ?? null;
+				$variables = $operations['variables'] ?? [];
+				$query = $operations['query'] ?? '';
+			}
+			else
+			{
+				$opname = $input['operationName'] ?? null;
+				$variables = $input['variables'] ?? [];
+				$query = $input['query'] ?? '';
 			}
 
 			$result = GraphQLBase::executeQuery(
 				self::schema( $context ),
-				$input['query'] ?? null,
+				$query,
 				[], // root
 				null, // context
-				$input['variables'] ?? null,
-				$input['operationName'] ?? null
+				$variables,
+				$opname
 			)->toArray( $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : 0 );
 		}
 		catch( \Throwable $t )
@@ -79,6 +99,47 @@ class Graphql
 
 		$body = \Nyholm\Psr7\Stream::create( json_encode( $result ) );
 		return ( new Psr17Factory )->createResponse()->withBody( $body );
+	}
+
+
+	/**
+	 * Maps the files to the corresponding variables
+	 *
+	 * @param array $files List of \Psr\Http\Message\UploadedFileInterface objects
+	 * @param array $operations GraphQL operations with "variables" section
+	 * @param array $map GraphQL variable mapping
+	 * @return array Mapped operations array
+	 * @see https://github.com/Ecodev/graphql-upload
+	 */
+	protected static function files( array $files, array $operations, array $map ) : array
+	{
+		foreach( $map as $fileKey => $locations )
+		{
+			foreach( $locations as $location )
+			{
+				$items = &$operations;
+
+				foreach( explode( '.', $location ) as $key )
+				{
+					if( !isset( $items[$key] ) || !is_array( $items[$key] ) ) {
+						$items[$key] = [];
+					}
+
+					$items = &$items[$key];
+				}
+
+				if( !array_key_exists( $fileKey, $files ) )
+				{
+					throw new \Aimeos\Admin\Graphql\Exception(
+						"GraphQL query declared an upload in `$location`, but no corresponding file were actually uploaded"
+					);
+				}
+
+				$items = $files[$fileKey];
+			}
+		}
+
+		return $operations;
 	}
 
 

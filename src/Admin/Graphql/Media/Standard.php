@@ -110,8 +110,8 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	{
 		$item = $item->fromArray( $entry, true );
 
-		if( isset( $entry['file'] ) ) {
-			$item = $manager->upload( $item, $entry['file'], $entry['filepreview'] ?? null );
+		if( isset( $entry['media.file'] ) ) {
+			$item = $manager->upload( $item, $entry['media.file'], $entry['media.filepreview'] ?? null );
 		}
 
 		if( isset( $entry['lists'] ) && $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {

@@ -23,23 +23,28 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function testInsertMedia()
+	public function testSaveMedia()
 	{
+		$content = file_get_contents( __DIR__ . '/upload.gif' );
+		$stream = \Nyholm\Psr7\Stream::create( $content );
+		$file = new \Nyholm\Psr7\UploadedFile( $stream, strlen( $content ), \UPLOAD_ERR_OK, 'upload.gif' );
+
 		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Media\\Manager\\Standard' )
-			->setConstructorArgs( array( $this->context ) )
+			->setConstructorArgs( [$this->context] )
 			->onlyMethods( ['save'] )
 			->getMock();
 
-		$item = $stub->create();
-		// $stub->expects( $this->once() )->method( 'save' )->willReturn( $item );
+		$stub->expects( $this->once() )->method( 'save' )->willReturnArgument( 0 );
 
-		// \Aimeos\MShop::inject( '\\Aimeos\\MShop\\Media\\Manager\\Standard', $stub );
+		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Media\\Manager\\Standard', $stub );
 
-		$body = '{"query":"mutation($file: Upload, $preview: Upload) {\n  saveMedia(input: {\n    label: \"test-graphql\"\n    file: $file\n    filepreview: $preview\n  }) {\n    id\n    label\n    url\n    preview\n  }\n}\n","variables":{ "file": null, "preview": null },"operationName":null}';
-		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+		$body = '{"query":"mutation($file: Upload, $preview: Upload) {\n  saveMedia(input: {\n    domain: \"product\"\n    file: $file\n    filepreview: $preview\n  }) {\n    id\n    label\n    url\n    preview\n  }\n}\n","variables":{ "file": null, "preview": null },"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost' );
+		$request = $request->withParsedBody( ['operations' => $body, 'map' => json_encode( [1 => ['variables.file']] )] );
+		$request = $request->withUploadedFiles( [1 => $file] );
 
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
 
-		$this->assertStringContainsString( '"label":"test-graphql"', (string) $response->getBody() );
+		$this->assertStringContainsString( '"label":"upload.gif"', (string) $response->getBody() );
 	}
 }
