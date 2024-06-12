@@ -48,7 +48,7 @@ class Json extends ScalarType
 	 */
 	public function serialize( $value ) : string
 	{
-		return json_encode( $value, JSON_THROW_ON_ERROR|JSON_FORCE_OBJECT );
+		return json_encode( $value, JSON_THROW_ON_ERROR );
 	}
 
 
