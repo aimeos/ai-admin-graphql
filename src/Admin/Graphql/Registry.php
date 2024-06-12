@@ -132,7 +132,7 @@ class Registry
 				if( $domains = $this->context->config()->get( 'admin/graphql/lists-domains', [] ) )
 				{
 					foreach( $domains as $domain ) {
-						$list[str_replace( '/', '', ucwords( $domain, '/' ) )] = Type::listOf( $this->listsRefInputType( $path, $domain ) );
+						$list[str_replace( '/', '', $domain )] = Type::listOf( $this->listsRefInputType( $path, $domain ) );
 					}
 				}
 
@@ -409,7 +409,7 @@ class Registry
 				{
 					foreach( $domains as $domain )
 					{
-						$list[str_replace( '/', '', ucwords( $domain, '/' ) )] = [
+						$list[str_replace( '/', '', $domain )] = [
 							'type' => Type::listOf( $this->listsRefOutputType( $path, $domain ) ),
 							'args' => [
 								'listtype' => Type::listOf( Type::String() ),
