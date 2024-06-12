@@ -928,7 +928,7 @@ class Registry
 	 */
 	public function resolve( ItemIface $item, string $domain, string $name )
 	{
-		return $item->get( str_replace( '/', '.', $domain ) . '.' . $name ) ?? $item->get( $name );
+		return $item->get( $name ) ?? $item->get( str_replace( '/', '.', $domain ) . '.' . $name );
 	}
 
 
