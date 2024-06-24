@@ -91,15 +91,15 @@ trait UpdateTrait
 
 			foreach( $list as $subentry )
 			{
+				$refItem = null;
 				$listId = $subentry[$resource . '.lists.id'] ?? '';
 				$listType = $subentry[$resource . '.lists.type'] ?? 'default';
 				$refId = $subentry['item'][$domain.'.id'] ?? $subentry[$resource . '.lists.refid'] ?? '';
 
 				$listItem = $listItems->get( $listId ) ?? $item->getListItem( $domain, $listType, $refId ) ?? $manager->createListItem();
-				$refItem = $listItem->getRefItem() ?? $domainManager->create();
 
 				if ( isset( $subentry['item'] ) ) {
-					$refItem->fromArray( $subentry['item'], true );
+					$refItem = ( $listItem->getRefItem() ?? $domainManager->create() )->fromArray( $subentry['item'], true );
 				}
 
 				if( isset( $subentry['item']['address'] ) && $refItem instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
