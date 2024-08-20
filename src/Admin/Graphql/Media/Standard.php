@@ -11,7 +11,6 @@
 namespace Aimeos\Admin\Graphql\Media;
 
 use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InputObjectType;
 use Aimeos\GraphQL\Type\Definition\Upload;
 
@@ -24,7 +23,7 @@ use Aimeos\GraphQL\Type\Definition\Upload;
  */
 class Standard extends \Aimeos\Admin\Graphql\Standard
 {
-	private $type;
+	private InputObjectType $type;
 
 
 	/**
@@ -96,6 +95,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			}
 		] );
 	}
+
 
 	/**
 	 * Updates the item
