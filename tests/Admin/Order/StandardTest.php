@@ -58,11 +58,42 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 	public function testSearchOrders()
 	{
-		$body = '{"query":"query {\n  searchOrders(filter: \"{}\", include: [\"order/address\",\"order/product\",\"order/service\"]) {\n    items {\n      id\n      sitecode\n      address {\n        id\n      }\n      product {\n        id\n      }\n      service {\n        id\n      }\n    }\n  }\n}\n","variables":{},"operationName":null}';
+		$body = '{"query":"query {\n  searchOrders(filter: \"{}\", include: [\"order/address\",\"order/coupon\",\"order/product\",\"order/service\",\"order/status\"]) {\n    items {\n      id\n      sitecode\n      address {\n        id\n      }\n      coupon {\n        code\n      }\n      product {\n        id\n        attribute {\n          id\n        }\n        product {\n          id\n          attribute {\n            id\n          }\n        }\n      }\n      service {\n        id\n        attribute {\n          id\n        }\n        transaction {\n          id\n        }\n      }\n      status {\n        id\n      }\n    }\n  total\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+		$result = json_decode( (string) $response->getBody(), true );
+		$items = $result['data']['searchOrders']['items'] ?? [];
+
+		$this->assertEquals( $result['data']['searchOrders']['total'], count( $items ) );
+		$this->assertEquals( 'unittest', $items[0]['sitecode'] );
+		$this->assertEquals( 2, count( $items[0]['address'] ) );
+		$this->assertEquals( 2, count( $items[0]['coupon'] ) );
+		$this->assertEquals( 4, count( $items[0]['product'] ) );
+		$this->assertEquals( 3, count( $items[0]['product'][0]['attribute'] ) );
+		$this->assertEquals( 0, count( $items[0]['product'][0]['product'] ) );
+		$this->assertEquals( 2, count( $items[0]['service'] ) );
+		$this->assertEquals( 0, count( $items[0]['service'][0]['attribute'] ) );
+		$this->assertEquals( 1, count( $items[0]['status'] ) );
+	}
+
+
+	public function testSaveOrder()
+	{
+		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Order\\Manager\\Standard' )
+			->setConstructorArgs( array( $this->context ) )
+			->onlyMethods( ['save'] )
+			->getMock();
+
+		$stub->expects( $this->once() )->method( 'save' )->willReturn( $stub->create( ['order.id' => 123, 'order.channel' => 'unittest'] ) );
+
+		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Order\\Manager\\Standard', $stub );
+
+		$body = '{"query":"mutation {\n  saveOrder(input: {\n    channel: \"unittest\"\n  }) {\n    id\n    channel\n  }\n}\n","variables":{},"operationName":null}';
 		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
 
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
 
-		$this->assertStringContainsString( '"sitecode":"unittest"', (string) $response->getBody() );
+		$this->assertStringContainsString( '"channel":"unittest"', (string) $response->getBody() );
 	}
 }
