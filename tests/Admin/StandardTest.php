@@ -144,12 +144,12 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	{
 		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Product\\Manager\\Standard' )
 			->setConstructorArgs( array( $this->context ) )
-			->onlyMethods( ['save', 'domain'] )
+			->onlyMethods( ['save', 'type'] )
 			->getMock();
 
 		$item = $stub->create( ['product.id' => 123, 'product.code' => 'test-graphql'] );
 		$stub->expects( $this->once() )->method( 'save' )->willReturn( [$item] );
-		$stub->method( 'domain' )->willReturn( 'product' );
+		$stub->method( 'type' )->willReturn( ['product'] );
 
 		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Product\\Manager\\Standard', $stub );
 

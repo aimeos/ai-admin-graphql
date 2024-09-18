@@ -31,10 +31,10 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Media\\Manager\\Standard' )
 			->setConstructorArgs( [$this->context] )
-			->onlyMethods( ['save', 'domain'] )
+			->onlyMethods( ['save', 'type'] )
 			->getMock();
 
-		$stub->method( 'domain' )->willReturn( 'media' );
+		$stub->method( 'type' )->willReturn( ['media'] );
 		$stub->expects( $this->once() )->method( 'save' )->willReturnArgument( 0 );
 
 		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Media\\Manager\\Standard', $stub );
