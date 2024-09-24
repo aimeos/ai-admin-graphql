@@ -222,7 +222,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 			$this->access( $domain, 'insert' );
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
-			$item = $this->updateItem( $manager, $manager->create(), $entry );
+			$item = $manager->create()->fromArray( $entry, true );
 
 			return $manager->insert( $item, $args['parentid'], $args['refid'] );
 		};
@@ -260,7 +260,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	{
 		$siteid = (string) $this->context()->user()?->getSiteId();
 
-		if( $item->getSiteId() && strncmp( $item->getSiteId(), $siteid, strlen( $siteid ) ) ){
+		if( !$siteid || !$item->getSiteId() || strncmp( $item->getSiteId(), $siteid, strlen( $siteid ) ) ){
 			throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
 		}
 
