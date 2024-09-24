@@ -222,9 +222,10 @@ abstract class Base
 			$this->access( $domain, 'save' );
 			$ref = $this->getRefs( $entry, $domain );
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
+			$key = str_replace( '/', '.', $domain ) . '.id';
 
-			if( !empty( $entry[$domain . '.id'] ) ) {
-				$item = $manager->get( $entry[$domain . '.id'], $ref );
+			if( !empty( $entry[$key] ) ) {
+				$item = $manager->get( $entry[$key], $ref );
 			} else {
 				$item = $manager->create();
 			}
