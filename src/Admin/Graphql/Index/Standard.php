@@ -53,6 +53,17 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 					['name' => 'limit', 'type' => Type::int(), 'defaultValue' => 10000, 'description' => 'Slice size'],
 				],
 				'resolve' => $this->aggregateItems( $domain ),
+			],
+			'searchIndex' => [
+				'type' => $this->types()->searchOutputType( 'product' ),
+				'args' => [
+					['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
+					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
+					['name' => 'sort', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Sort keys'],
+					['name' => 'offset', 'type' => Type::int(), 'defaultValue' => 0, 'description' => 'Slice offset'],
+					['name' => 'limit', 'type' => Type::int(), 'defaultValue' => 100, 'description' => 'Slice size'],
+				],
+				'resolve' => $this->searchItems( $domain ),
 			]
 		];
 	}

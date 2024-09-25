@@ -35,4 +35,19 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$this->assertStringContainsString( ':3,', (string) $response->getBody() );
 		$this->assertStringContainsString( ':2,', (string) $response->getBody() );
 	}
+
+
+	public function testSearchIndex()
+	{
+		$id = \Aimeos\MShop::create( $this->context, 'catalog' )->find( 'internet' )->getId;
+
+		$search = addslashes( addslashes( json_encode( ['==' => ['index.catalog.id' => $id]] ) ) );
+		$body = '{"query":"query {\n  searchIndex(filter: \"' . $search . '\", sort: [\"sort:index.catalog:position()\"]) {\n    items {\n      id\n      code\n    }\n    total\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"code":"EFGH"', (string) $response->getBody() );
+		$this->assertStringContainsString( '"total":19', (string) $response->getBody() );
+	}
 }
