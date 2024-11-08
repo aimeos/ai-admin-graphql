@@ -506,7 +506,7 @@ class Registry
 	 * @param Closure|null Output type method (default: outputType())
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
-	public function searchOutputType( string $path, \Closure $method = null ) : ObjectType
+	public function searchOutputType( string $path, ?\Closure $method = null ) : ObjectType
 	{
 		$name = 'search' . str_replace( '/', '', ucwords( $path ) ) . 'Output';
 
