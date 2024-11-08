@@ -80,7 +80,7 @@ class Upload extends ScalarType
 	 * @param array|null $variables Additional variable data
 	 * @return string Deserialized value from JSON
 	 */
-	public function parseLiteral( $node, array $variables = null )
+	public function parseLiteral( $node, ?array $variables = null )
 	{
 		throw new Error( '"Upload" cannot be hardcoded in a query. Be sure to conform to the GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec.' );
 	}
