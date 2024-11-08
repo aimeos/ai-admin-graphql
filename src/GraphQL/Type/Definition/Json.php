@@ -71,7 +71,7 @@ class Json extends ScalarType
 	 * @param array|null $variables Additional variable data
 	 * @return string Deserialized value from JSON
 	 */
-	public function parseLiteral( $node, array $variables = null )
+	public function parseLiteral( $node, ?array $variables = null )
 	{
 		if( !property_exists( $node, 'value' ) ) {
 			throw new Error("Can not parse literals without a value: {" . Printer::doPrint( $node ) . "}.");
