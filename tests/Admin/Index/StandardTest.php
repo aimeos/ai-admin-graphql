@@ -31,7 +31,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
 
 		$this->assertStringContainsString( '"aggregates":', (string) $response->getBody() );
-		$this->assertStringContainsString( ':5,', (string) $response->getBody() );
+		$this->assertStringContainsString( ':4,', (string) $response->getBody() );
 		$this->assertStringContainsString( ':3,', (string) $response->getBody() );
 		$this->assertStringContainsString( ':2,', (string) $response->getBody() );
 	}
@@ -48,6 +48,6 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
 
 		$this->assertStringContainsString( '"code":"EFGH"', (string) $response->getBody() );
-		$this->assertStringContainsString( '"total":19', (string) $response->getBody() );
+		$this->assertStringContainsString( '"total":20', (string) $response->getBody() );
 	}
 }
