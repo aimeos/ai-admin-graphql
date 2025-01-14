@@ -52,6 +52,7 @@ return [
 			'text' => 'text',
 			'text/type' => 'text/type',
 			'text/lists/type' => 'text/lists/type',
+			'type' => 'type',
 		],
 		'lists-domains' => [
 			'attribute' => 'attribute',

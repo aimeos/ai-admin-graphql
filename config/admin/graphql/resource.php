@@ -1555,4 +1555,29 @@ return [
 			'get' => ['admin', 'editor', 'super'],
 		],
 	],
+	'type' => [
+		/** admin/graphql/resource/type/delete
+		 * List of user groups that are allowed to delete type items
+		 *
+		 * @param array List of user group names
+		 * @since 2025.04
+		 */
+		'delete' => ['admin', 'super'],
+
+		/** admin/graphql/resource/type/save
+		 * List of user groups that are allowed to create and update type items
+		 *
+		 * @param array List of user group names
+		 * @since 2025.04
+		 */
+		'save' => ['admin', 'super'],
+
+		/** admin/graphql/resource/type/get
+		 * List of user groups that are allowed to retrieve type items
+		 *
+		 * @param array List of user group names
+		 * @since 2025.04
+		 */
+		'get' => ['admin', 'editor', 'super'],
+	],
 ];
