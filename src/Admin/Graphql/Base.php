@@ -251,9 +251,10 @@ abstract class Base
 
 			$this->access( $domain, 'save' );
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
+			$key = str_replace( '/', '.', $domain ) . '.id';
 
-			$ids = array_filter( array_column( $entries, $domain . '.id' ) );
-			$filter = $manager->filter()->add( $domain . '.id', '==', $ids )->slice( 0, count( $entries ) );
+			$ids = array_filter( array_column( $entries, $key ) );
+			$filter = $manager->filter()->add( $key, '==', $ids )->slice( 0, count( $entries ) );
 
 			$ref = [];
 			foreach( $entries as $entry ) {
@@ -265,7 +266,7 @@ abstract class Base
 
 			foreach( $entries as $entry )
 			{
-				$item = $map->get( $entry[$domain . '.id'] ?? null ) ?: $manager->create();
+				$item = $map->get( $entry[$key] ?? null ) ?: $manager->create();
 				$items[] = $this->updateItem( $manager, $item, $entry );
 			}
 
