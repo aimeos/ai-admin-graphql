@@ -83,7 +83,7 @@ jobs:
 
   "php84-mysql":
     docker:
-      - image: aimeos/ci-php:8.3
+      - image: aimeos/ci-php:8.4
       - image: mysql:latest
         environment:
           MYSQL_ROOT_PASSWORD: rootpw
