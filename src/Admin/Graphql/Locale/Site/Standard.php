@@ -21,6 +21,9 @@ use GraphQL\Type\Definition\Type;
  */
 class Standard extends \Aimeos\Admin\Graphql\Standard
 {
+	private \Aimeos\MShop\Common\Manager\Iface $manager;
+
+
 	/**
 	 * Returns GraphQL schema definition for the available mutations
 	 *
@@ -187,7 +190,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function getPath( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
-			return $this->filters( \Aimeos\MShop::create( $this->context(), $domain )->getPath( $args['id'], $args['include'] ) );
+			return $this->filters( $this->manager()->getPath( $args['id'], $args['include'] ) );
 		};
 	}
 
@@ -201,7 +204,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function getTree( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
-			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->getTree( $args['id'], $args['include'], $args['level'] ) );
+			return $this->filter( $this->manager()->getTree( $args['id'], $args['include'], $args['level'] ) );
 		};
 	}
 
@@ -221,11 +224,26 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			}
 
 			$this->access( $domain, 'insert' );
-			$manager = \Aimeos\MShop::create( $this->context(), $domain );
+			$manager = $this->manager();
 			$item = $manager->create()->fromArray( $entry, true );
 
 			return $manager->insert( $item, $args['parentid'], $args['refid'] );
 		};
+	}
+
+
+	/**
+	 * Returns the manager for the site items
+	 *
+	 * @return \Aimeos\MShop\Common\Manager\Iface Manager object
+	 */
+	protected function manager() : \Aimeos\MShop\Common\Manager\Iface
+	{
+		if( !isset( $this->manager ) ) {
+			$this->manager = \Aimeos\MShop::create( $this->context(), 'locale/site' );
+		}
+
+		return $this->manager;
 	}
 
 
@@ -240,7 +258,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$this->access( $domain, 'move' );
-			\Aimeos\MShop::create( $this->context(), $domain )->move( $args['id'], $args['parentid'], $args['targetid'], $args['refid'] );
+			$this->manager()->move( $args['id'], $args['parentid'], $args['targetid'], $args['refid'] );
 
 			return $args['id'];
 		};
