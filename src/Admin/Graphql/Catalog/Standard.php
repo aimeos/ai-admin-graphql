@@ -21,6 +21,9 @@ use GraphQL\Type\Definition\Type;
  */
 class Standard extends \Aimeos\Admin\Graphql\Standard
 {
+	private \Aimeos\MShop\Common\Manager\Iface $manager;
+
+
 	/**
 	 * Returns GraphQL schema definition for the available mutations
 	 *
@@ -94,7 +97,54 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			'resolve' => $this->findItem( $domain ),
 		];
 
+		$list['searchCatalogTree'] = [
+			'type' => Type::listOf( $this->types()->outputType( $domain ) ),
+			'args' => [
+				['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
+				['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
+				['name' => 'limit', 'type' => Type::int(), 'defaultValue' => 100, 'description' => 'Slice size'],
+			],
+			'resolve' => $this->searchTree( $domain ),
+		];
+
 		return $list;
+	}
+
+
+	/**
+	 * Returns the tree of parents including the given items as leaf nodes
+	 *
+	 * @param \Aimeos\Map $items List of items (with numeric indexes)
+	 * @param array $refs List of domains to fetch in addition
+	 * @return \Aimeos\Map List of parent items
+	 */
+	protected function getParents( \Aimeos\Map $items, array $refs ) : \Aimeos\Map
+	{
+		if( ( $parentIds = $items->getParentId()->filter() )->isEmpty() ) {
+			return $items;
+		}
+
+		$manager = $this->manager();
+		$filter = $manager->filter()
+			->add( 'catalog.id', '==', $parentIds->unique() )
+			->order( ['-catalog.level', 'sort:catalog:position'] )
+			->slice( 0, 0x7fffffff );
+
+		$parents = $manager->search( $filter, $refs );
+		$indexes = $parentIds->unique()->flip();
+		$itemkeys = $items->getId()->flip();
+
+		foreach( $parents as $pid => $parent )
+		{
+			if( isset( $itemkeys[$pid] ) ) {
+				$items[$itemkeys[$pid]]->addChild( $items[$indexes[$pid]] );
+				unset( $items[$indexes[$pid]] );
+			} else {
+				$items[$indexes[$pid]] = $parent->addChild( $items[$indexes[$pid]] );
+			}
+		}
+
+		return $this->getParents( $items, $refs );
 	}
 
 
@@ -107,7 +157,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function getPath( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
-			return \Aimeos\MShop::create( $this->context(), $domain )->getPath( $args['id'], $args['include'] );
+			return $this->manager()->getPath( $args['id'], $args['include'] );
 		};
 	}
 
@@ -121,7 +171,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function getTree( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
-			return \Aimeos\MShop::create( $this->context(), $domain )->getTree( $args['id'], $args['include'], $args['level'] );
+			return $this->manager()->getTree( $args['id'], $args['include'], $args['level'] );
 		};
 	}
 
@@ -140,11 +190,26 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				throw new \Aimeos\Admin\Graphql\Exception( 'Parameter "input" must not be empty' );
 			}
 
-			$manager = \Aimeos\MShop::create( $this->context(), $domain );
+			$manager = $this->manager();
 			$item = $this->updateItem( $manager, $manager->create(), $entry );
 
 			return $manager->insert( $item, $args['parentid'], $args['refid'] );
 		};
+	}
+
+
+	/**
+	 * Returns the manager for the site items
+	 *
+	 * @return \Aimeos\MShop\Common\Manager\Iface Manager object
+	 */
+	protected function manager() : \Aimeos\MShop\Common\Manager\Iface
+	{
+		if( !isset( $this->manager ) ) {
+			$this->manager = \Aimeos\MShop::create( $this->context(), 'catalog' );
+		}
+
+		return $this->manager;
 	}
 
 
@@ -157,8 +222,39 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function moveItem( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
-			\Aimeos\MShop::create( $this->context(), $domain )->move( $args['id'], $args['parentid'], $args['targetid'], $args['refid'] );
+			$this->manager()->move( $args['id'], $args['parentid'], $args['targetid'], $args['refid'] );
 			return $args['id'];
+		};
+	}
+
+
+	/**
+	 * Returns a closure for searching the tree
+	 *
+	 * @param string $domain Domain path of the manager
+	 * @return \Closure Anonymous method returning one item
+	 */
+	protected function searchTree( string $domain ) : \Closure
+	{
+		return function( $root, $args, $context ) use ( $domain ) {
+
+			$this->access( $domain, 'get' );
+			$manager = $this->manager();
+
+			$filter = $manager->filter()->order( ['-catalog.level', 'sort:catalog:position'] );
+			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
+
+			$items = $manager->search( $filter->slice( 0, $args['limit'] ), $args['include'] );
+
+			foreach( $items as $key => $item )
+			{
+				if( isset( $items[$item->getParentId()] ) ) {
+					$items[$item->getParentId()]->addChild( $item );
+					unset( $items[$key] );
+				}
+			}
+
+			return $this->getParents( $items->values(), $args['include'] );
 		};
 	}
 }

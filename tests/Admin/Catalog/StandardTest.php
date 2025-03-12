@@ -126,4 +126,49 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$this->assertStringContainsString( '"moveCatalog":"1"', (string) $response->getBody() );
 	}
 
+
+	public function testSearchCatalog()
+	{
+		$search = addslashes( addslashes( json_encode( ['~=' => ['catalog.code' => 'c']] ) ) );
+		$body = '{"query":"query {\n  searchCatalogs(filter: \"' . $search . '\") {\n    items {\n      id\n      code\n    }\n    total\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"total":3', (string) $response->getBody() );
+		$this->assertStringContainsString( '"code":"categories"', (string) $response->getBody() );
+		$this->assertStringContainsString( '"code":"cafe"', (string) $response->getBody() );
+		$this->assertStringContainsString( '"code":"misc"', (string) $response->getBody() );
+	}
+
+
+	public function testSearchCatalogTree()
+	{
+		$filter = ['||' => [
+			['~=' => ['catalog.code' => 'c']],
+			['==' => ['catalog.code' => 'new']],
+			['==' => ['catalog.code' => 'internet']],
+			['==' => ['catalog.code' => 'root']]
+		]];
+
+		$search = addslashes( addslashes( json_encode( $filter ) ) );
+		$body = '{"query":"query {\n  searchCatalogTree(filter: \"' . $search . '\") {\n id\n code\n children {\n id\n code\n children {\n id\n code\n}}}\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+		$result = json_decode( (string) $response->getBody(), true );
+
+		$this->assertEquals( 1, count( $result['data']['searchCatalogTree'] ) );
+		$this->assertEquals( 'root', $result['data']['searchCatalogTree'][0]['code'] );
+		$this->assertEquals( 2, count( $result['data']['searchCatalogTree'][0]['children'] ) );
+		$this->assertEquals( 'categories', $result['data']['searchCatalogTree'][0]['children'][0]['code'] );
+		$this->assertEquals( 2, count( $result['data']['searchCatalogTree'][0]['children'][0]['children'] ) );
+		$this->assertEquals( 'cafe', $result['data']['searchCatalogTree'][0]['children'][0]['children'][0]['code'] );
+		$this->assertEquals( 'misc', $result['data']['searchCatalogTree'][0]['children'][0]['children'][1]['code'] );
+		$this->assertEquals( 'group', $result['data']['searchCatalogTree'][0]['children'][1]['code'] );
+		$this->assertEquals( 2, count( $result['data']['searchCatalogTree'][0]['children'][1]['children'] ) );
+		$this->assertEquals( 'new', $result['data']['searchCatalogTree'][0]['children'][1]['children'][0]['code'] );
+		$this->assertEquals( 'internet', $result['data']['searchCatalogTree'][0]['children'][1]['children'][1]['code'] );
+	}
+
 }
