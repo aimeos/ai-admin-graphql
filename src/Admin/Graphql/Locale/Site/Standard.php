@@ -136,6 +136,15 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 					['name' => 'limit', 'type' => Type::int(), 'defaultValue' => 100, 'description' => 'Slice size'],
 				],
 				'resolve' => $this->searchItems( $domain ),
+			],
+			'search' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 'Tree' => [
+				'type' => Type::listOf( $this->types()->siteOutputType( $domain ) ),
+				'args' => [
+					['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
+					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
+					['name' => 'limit', 'type' => Type::int(), 'defaultValue' => 100, 'description' => 'Slice size'],
+				],
+				'resolve' => $this->searchTree( $domain ),
 			]
 		];
 	}
@@ -178,6 +187,44 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		}
 
 		return $list;
+	}
+
+
+	/**
+	 * Returns the tree of parents including the given items as leaf nodes
+	 *
+	 * @param \Aimeos\Map $items List of items (with numeric indexes)
+	 * @param array $refs List of domains to fetch in addition
+	 * @return \Aimeos\Map List of parent items
+	 */
+	protected function getParents( \Aimeos\Map $items, array $refs ) : \Aimeos\Map
+	{
+		if( ( $parentIds = $items->getParentId()->filter() )->isEmpty() ) {
+			return $items;
+		}
+
+		$manager = $this->manager();
+		$filter = $manager->filter()
+			->add( 'locale.site.siteid', '=~', (string) $this->context()->user()?->getSiteId() )
+			->add( 'locale.site.id', '==', $parentIds->unique() )
+			->order( ['-locale.site.level', 'sort:locale.site:position'] )
+			->slice( 0, 0x7fffffff );
+
+		$parents = $manager->search( $filter, $refs );
+		$indexes = $parentIds->unique()->flip();
+		$itemkeys = $items->getId()->flip();
+
+		foreach( $parents as $pid => $parent )
+		{
+			if( isset( $itemkeys[$pid] ) ) {
+				$items[$itemkeys[$pid]]->addChild( $items[$indexes[$pid]] );
+				unset( $items[$indexes[$pid]] );
+			} else {
+				$items[$indexes[$pid]] = $parent->addChild( $items[$indexes[$pid]] );
+			}
+		}
+
+		return $this->getParents( $items, $refs );
 	}
 
 
@@ -291,6 +338,38 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				'items' => $items,
 				'total' => $total
 			];
+		};
+	}
+
+
+	/**
+	 * Returns a closure for searching the tree
+	 *
+	 * @param string $domain Domain path of the manager
+	 * @return \Closure Anonymous method returning one item
+	 */
+	protected function searchTree( string $domain ) : \Closure
+	{
+		return function( $root, $args, $context ) use ( $domain ) {
+
+			$this->access( $domain, 'get' );
+			$manager = $this->manager();
+
+			$filter = $manager->filter()->order( ['-locale.site.level', 'sort:locale.site:position'] );
+			$filter->add( 'locale.site.siteid', '=~', (string) $this->context()->user()?->getSiteId() );
+			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
+
+			$items = $manager->search( $filter->slice( 0, $args['limit'] ), $args['include'] );
+
+			foreach( $items as $key => $item )
+			{
+				if( isset( $items[$item->getParentId()] ) ) {
+					$items[$item->getParentId()]->addChild( $item );
+					unset( $items[$key] );
+				}
+			}
+
+			return $this->getParents( $items->values(), $args['include'] );
 		};
 	}
 

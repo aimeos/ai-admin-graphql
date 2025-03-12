@@ -127,4 +127,18 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$this->assertStringContainsString( '"code":"unittest"', (string) $response->getBody() );
 	}
 
+
+	public function testSearchLocaleSiteTree()
+	{
+		$search = addslashes( addslashes( json_encode( ['==' => ['locale.site.code' => 'unittest']] ) ) );
+		$body = '{"query":"query {\n  searchLocaleSiteTree(filter: \"' . $search . '\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+		$result = json_decode( (string) $response->getBody(), true );
+
+		$this->assertEquals( 1, count( $result['data']['searchLocaleSiteTree'] ) );
+		$this->assertEquals( 'unittest', $result['data']['searchLocaleSiteTree'][0]['code'] );
+	}
+
 }
