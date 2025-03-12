@@ -115,4 +115,16 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$this->assertStringContainsString( '"moveLocaleSite":"1"', (string) $response->getBody() );
 	}
 
+
+	public function testSearchLocaleSite()
+	{
+		$search = addslashes( addslashes( json_encode( ['==' => ['locale.site.code' => 'unittest']] ) ) );
+		$body = '{"query":"query {\n  searchLocaleSites(filter: \"' . $search . '\") {\n    items {\n      id\n      code\n    }\n    total\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"code":"unittest"', (string) $response->getBody() );
+	}
+
 }

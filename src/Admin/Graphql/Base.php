@@ -195,7 +195,7 @@ abstract class Base
 			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
 
 			$total = 0;
-			$items = $this->filters( $manager->search( $filter, $args['include'], $total )->all() );
+			$items = $this->filters( $manager->search( $filter, $args['include'], $total )->toArray() );
 
 			return [
 				'items' => $items,

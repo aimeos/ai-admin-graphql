@@ -248,6 +248,36 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 
 	/**
+	 * Returns a closure for returning several items
+	 *
+	 * @param string $domain Domain path of the manager
+	 * @return \Closure Anonymous method returning several items
+	 */
+	protected function searchItems( string $domain ) : \Closure
+	{
+		return function( $root, $args, $context ) use ( $domain ) {
+
+			$this->access( $domain, 'get' );
+
+			$manager = \Aimeos\MShop::create( $this->context(), $domain );
+			$prefix = str_replace( '/', '.', $domain );
+
+			$filter = $manager->filter()->order( $args['sort'] )->slice( $args['offset'], $args['limit'] );
+			$filter->add( $prefix . '.siteid', '=~', (string) $this->context()->user()?->getSiteId() );
+			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
+
+			$total = 0;
+			$items = $manager->search( $filter, $args['include'], $total )->toArray();
+
+			return [
+				'items' => $items,
+				'total' => $total
+			];
+		};
+	}
+
+
+	/**
 	 * Updates the item
 	 *
 	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
