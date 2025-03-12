@@ -29,11 +29,13 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
 
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+		$result = json_decode( (string) $response->getBody(), true );
+		$counts = json_decode( $result['data']['aggregateIndex']['aggregates'], true );
 
-		$this->assertStringContainsString( '"aggregates":', (string) $response->getBody() );
-		$this->assertStringContainsString( ':4,', (string) $response->getBody() );
-		$this->assertStringContainsString( ':3,', (string) $response->getBody() );
-		$this->assertStringContainsString( ':2,', (string) $response->getBody() );
+		$this->assertEquals( 4, count( $counts ) );
+		$this->assertContains( 4, $counts );
+		$this->assertContains( 3, $counts );
+		$this->assertContains( 2, $counts );
 	}
 
 
