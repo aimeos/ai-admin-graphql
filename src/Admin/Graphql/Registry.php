@@ -567,8 +567,13 @@ class Registry
 			},
 			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) {
 
-				if( $info->fieldName === 'children' && $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
-					return $item->getChildren();
+				if( $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface )
+				{
+					if( $info->fieldName === 'children' ) {
+						return $item->getChildren();
+					} elseif( $info->fieldName === 'hasChildren' ) {
+						return $item->hasChildren();
+					}
 				}
 
 				return $this->resolve( $item, 'locale/site', $info->fieldName );
@@ -600,6 +605,11 @@ class Registry
 
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$list['children'] = Type::listOf( $this->treeOutputType( $path ) );
+				$list['hasChildren'] = [
+					'name' => 'hasChildren',
+					'description' => 'If node has children',
+					'type' => Type::boolean(),
+				];
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface )
 				{
@@ -615,8 +625,10 @@ class Registry
 			},
 			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $path ) {
 
-				if( $info->fieldName === 'children' && $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
+				if( $info->fieldName === 'children' ) {
 					return $item->getChildren();
+				} elseif( $info->fieldName === 'hasChildren' ) {
+					return $item->hasChildren();
 				}
 
 				return $this->resolve( $item, $path, $info->fieldName );
