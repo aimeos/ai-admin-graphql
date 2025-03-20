@@ -48,7 +48,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				'resolve' => $this->deleteItems( $domain ),
 			],
 			'insert' . str_replace( '/', '', ucwords( $domain, '/' ) ) => [
-				'type' => $this->types()->siteOutputType( $domain ),
+				'type' => $this->types()->siteOutputType(),
 				'args' => [
 					['name' => 'input', 'type' => Type::nonNull( $this->types()->inputType( $domain ) ), 'description' => 'Item object'],
 					['name' => 'parentid', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'ID of the parent site'],
@@ -67,14 +67,14 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				'resolve' => $this->moveItem( $domain ),
 			],
 			'save' . str_replace( '/', '', ucwords( $domain, '/' ) ) => [
-				'type' => $this->types()->siteOutputType( $domain ),
+				'type' => $this->types()->siteOutputType(),
 				'args' => [
 					['name' => 'input', 'type' => $this->types()->inputType( $domain ), 'description' => 'Item object'],
 				],
 				'resolve' => $this->saveItem( $domain ),
 			],
 			'save' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 's' => [
-				'type' => Type::listOf( $this->types()->siteOutputType( $domain ) ),
+				'type' => Type::listOf( $this->types()->siteOutputType() ),
 				'args' => [
 					['name' => 'input', 'type' => Type::listOf( $this->types()->inputType( $domain ) ), 'description' => 'Item objects'],
 				],
@@ -94,7 +94,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	{
 		return [
 			'find' . str_replace( '/', '', ucwords( $domain, '/' ) ) => [
-				'type' => $this->types()->siteOutputType( $domain ),
+				'type' => $this->types()->siteOutputType(),
 				'args' => [
 					['name' => 'code', 'type' => Type::nonNull( Type::string() ), 'description' => 'Unique code'],
 					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
@@ -102,7 +102,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				'resolve' => $this->findItem( $domain ),
 			],
 			'get' . str_replace( '/', '', ucwords( $domain, '/' ) ) => [
-				'type' => $this->types()->siteOutputType( $domain ),
+				'type' => $this->types()->siteOutputType(),
 				'args' => [
 					['name' => 'id', 'type' => Type::string(), 'description' => 'Unique ID'],
 					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
@@ -110,7 +110,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				'resolve' => $this->getItem( $domain ),
 			],
 			'get' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 'Path' => [
-				'type' => Type::listOf( $this->types()->siteOutputType( $domain ) ),
+				'type' => Type::listOf( $this->types()->siteOutputType() ),
 				'args' => [
 					['name' => 'id', 'type' => Type::nonNull( Type::string() ), 'description' => 'Unique site ID'],
 					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
@@ -118,7 +118,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				'resolve' => $this->getPath( $domain ),
 			],
 			'get' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 'Tree' => [
-				'type' => $this->types()->siteOutputType( $domain ),
+				'type' => $this->types()->siteOutputType(),
 				'args' => [
 					['name' => 'id', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'Unique site ID'],
 					['name' => 'level', 'type' => Type::int(), 'defaultValue' => 3, 'description' => '1 = node only, 2 = with children, 3 = whole subtree'],
@@ -127,7 +127,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				'resolve' => $this->getTree( $domain ),
 			],
 			'search' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 's' => [
-				'type' => $this->types()->searchOutputType( $domain, fn( $path ) => $this->types( $path )->siteOutputType( $path ) ),
+				'type' => $this->types()->searchOutputType( $domain, fn( $path ) => $this->types()->siteOutputType() ),
 				'args' => [
 					['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
 					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
@@ -138,7 +138,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				'resolve' => $this->searchItems( $domain ),
 			],
 			'search' . str_replace( '/', '', ucwords( $domain, '/' ) ) . 'Tree' => [
-				'type' => Type::listOf( $this->types()->siteOutputType( $domain ) ),
+				'type' => Type::listOf( $this->types()->siteOutputType() ),
 				'args' => [
 					['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
 					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
