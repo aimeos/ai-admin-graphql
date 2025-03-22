@@ -32,30 +32,55 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	 */
 	public function mutation( string $domain ) : array
 	{
-		$list = parent::mutation( $domain );
-
-		$list['insertCatalog'] = [
-			'type' => $this->types()->outputType( $domain ),
-			'args' => [
-				['name' => 'input', 'type' => Type::nonNull( $this->types()->inputType( $domain ) ), 'description' => 'Item object'],
-				['name' => 'parentid', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'ID of the parent category'],
-				['name' => 'refid', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'Category ID the new item should be inserted before'],
+		return [
+			'deleteCatalog' => [
+				'type' => Type::string(),
+				'args' => [
+					['name' => 'id', 'type' => Type::string(), 'description' => 'Item ID'],
+				],
+				'resolve' => $this->deleteItems( $domain ),
 			],
-			'resolve' => $this->insertItem( $domain ),
-		];
-
-		$list['moveCatalog'] = [
-			'type' => Type::String(),
-			'args' => [
-				['name' => 'id', 'type' => Type::nonNull( Type::string() ), 'description' => 'ID of the category to move'],
-				['name' => 'parentid', 'type' => Type::string(), 'description' => 'ID of the old parent category'],
-				['name' => 'targetid', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'ID of the new parent category'],
-				['name' => 'refid', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'Category ID the new item should be inserted before'],
+			'deleteCatalogs' => [
+				'type' => Type::listOf( Type::string() ),
+				'args' => [
+					['name' => 'id', 'type' => Type::listOf( Type::string() ), 'description' => 'List of item IDs'],
+				],
+				'resolve' => $this->deleteItems( $domain ),
 			],
-			'resolve' => $this->moveItem( $domain ),
+			'saveCatalog' => [
+				'type' => $this->types()->treeOutputType( $domain ),
+				'args' => [
+					['name' => 'input', 'type' => $this->types()->inputType( $domain ), 'description' => 'Item object'],
+				],
+				'resolve' => $this->saveItem( $domain ),
+			],
+			'saveCatalogs' => [
+				'type' => Type::listOf( $this->types()->treeOutputType( $domain ) ),
+				'args' => [
+					['name' => 'input', 'type' => Type::listOf( $this->types()->inputType( $domain ) ), 'description' => 'Item objects'],
+				],
+				'resolve' => $this->saveItems( $domain ),
+			],
+			'insertCatalog' => [
+				'type' => $this->types()->treeOutputType( $domain ),
+				'args' => [
+					['name' => 'input', 'type' => Type::nonNull( $this->types()->inputType( $domain ) ), 'description' => 'Item object'],
+					['name' => 'parentid', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'ID of the parent category'],
+					['name' => 'refid', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'Category ID the new item should be inserted before'],
+				],
+				'resolve' => $this->insertItem( $domain ),
+			],
+			'moveCatalog' => [
+				'type' => Type::String(),
+				'args' => [
+					['name' => 'id', 'type' => Type::nonNull( Type::string() ), 'description' => 'ID of the category to move'],
+					['name' => 'parentid', 'type' => Type::string(), 'description' => 'ID of the old parent category'],
+					['name' => 'targetid', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'ID of the new parent category'],
+					['name' => 'refid', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'Category ID the new item should be inserted before'],
+				],
+				'resolve' => $this->moveItem( $domain ),
+			]
 		];
-
-		return $list;
 	}
 
 
@@ -67,47 +92,61 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	 */
 	public function query( string $domain ) : array
 	{
-		$list = parent::query( $domain );
-
-		$list['getCatalogPath'] = [
-			'type' => Type::listOf( $this->types()->outputType( $domain ) ),
-			'args' => [
-				['name' => 'id', 'type' => Type::nonNull( Type::string() ), 'description' => 'Unique category ID'],
-				['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
+		return [
+			'getCatalog' => [
+				'type' => $this->types()->treeOutputType( $domain ),
+				'args' => [
+					['name' => 'id', 'type' => Type::string(), 'description' => 'Unique ID'],
+					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
+				],
+				'resolve' => $this->getItem( $domain ),
 			],
-			'resolve' => $this->getPath( $domain ),
-		];
-
-		$list['getCatalogTree'] = [
-			'type' => $this->types()->treeOutputType( $domain ),
-			'args' => [
-				['name' => 'id', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'Unique category ID'],
-				['name' => 'level', 'type' => Type::int(), 'defaultValue' => 3, 'description' => '1 = node only, 2 = with children, 3 = whole subtree'],
-				['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
+			'getCatalogPath' => [
+				'type' => Type::listOf( $this->types()->treeOutputType( $domain ) ),
+				'args' => [
+					['name' => 'id', 'type' => Type::nonNull( Type::string() ), 'description' => 'Unique category ID'],
+					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
+				],
+				'resolve' => $this->getPath( $domain ),
 			],
-			'resolve' => $this->getTree( $domain ),
-		];
-
-		$list['findCatalog'] = [
-			'type' => $this->types()->outputType( $domain ),
-			'args' => [
-				['name' => 'code', 'type' => Type::nonNull( Type::string() ), 'description' => 'Unique code'],
-				['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
+			'getCatalogTree' => [
+				'type' => $this->types()->treeOutputType( $domain ),
+				'args' => [
+					['name' => 'id', 'type' => Type::string(), 'defaultValue' => null, 'description' => 'Unique category ID'],
+					['name' => 'level', 'type' => Type::int(), 'defaultValue' => 3, 'description' => '1 = node only, 2 = with children, 3 = whole subtree'],
+					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
+				],
+				'resolve' => $this->getTree( $domain ),
 			],
-			'resolve' => $this->findItem( $domain ),
-		];
-
-		$list['searchCatalogTree'] = [
-			'type' => Type::listOf( $this->types()->outputType( $domain ) ),
-			'args' => [
-				['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
-				['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
-				['name' => 'limit', 'type' => Type::int(), 'defaultValue' => 100, 'description' => 'Slice size'],
+			'findCatalog' => [
+				'type' => $this->types()->treeOutputType( $domain ),
+				'args' => [
+					['name' => 'code', 'type' => Type::nonNull( Type::string() ), 'description' => 'Unique code'],
+					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
+				],
+				'resolve' => $this->findItem( $domain ),
 			],
-			'resolve' => $this->searchTree( $domain ),
+			'searchCatalogs' => [
+				'type' => $this->types()->searchOutputType( $domain, fn( $path ) => $this->types()->treeOutputType( $path ) ),
+				'args' => [
+					['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
+					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
+					['name' => 'sort', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Sort keys'],
+					['name' => 'offset', 'type' => Type::int(), 'defaultValue' => 0, 'description' => 'Slice offset'],
+					['name' => 'limit', 'type' => Type::int(), 'defaultValue' => 100, 'description' => 'Slice size'],
+				],
+				'resolve' => $this->searchItems( $domain ),
+			],
+			'searchCatalogTree' => [
+				'type' => Type::listOf( $this->types()->treeOutputType( $domain ) ),
+				'args' => [
+					['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
+					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
+					['name' => 'limit', 'type' => Type::int(), 'defaultValue' => 100, 'description' => 'Slice size'],
+				],
+				'resolve' => $this->searchTree( $domain ),
+			]
 		];
-
-		return $list;
 	}
 
 
