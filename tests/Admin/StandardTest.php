@@ -147,8 +147,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 			->onlyMethods( ['save', 'type'] )
 			->getMock();
 
-		$item = $stub->create( ['product.id' => 123, 'product.code' => 'test-graphql'] );
-		$stub->expects( $this->once() )->method( 'save' )->willReturn( [$item] );
+		$stub->expects( $this->once() )->method( 'save' )->willReturnArgument( 0 );
 		$stub->method( 'type' )->willReturn( ['product'] );
 
 		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Product\\Manager\\Standard', $stub );
@@ -160,4 +159,28 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 		$this->assertStringContainsString( '"code":"test-graphql"', (string) $response->getBody() );
 	}
+
+
+	public function testSaveProductLists()
+	{
+		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Product\\Manager\\Standard' )
+			->setConstructorArgs( array( $this->context ) )
+			->onlyMethods( ['save', 'type'] )
+			->getMock();
+
+		$stub->expects( $this->once() )->method( 'save' )->willReturnArgument( 0 );
+		$stub->method( 'type' )->willReturn( ['product'] );
+		$stub = new \Aimeos\MShop\Common\Manager\Decorator\Lists( $stub, $this->context );
+
+		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Product\\Manager\\Standard', $stub );
+
+		$body = '{"query":"mutation {\n saveProduct(input: {\n  code: \"test-graphql\"\n  lists: {\n   group: {\n    id: \"123\"\n    item: {\n     id: \"1\"\n     code: \"test-group\"\n    }\n   }\n  }\n }) {\n id\n code\n lists {\n  group {\n   id\n    item {\n     id\n     code\n    }\n   }\n  }\n }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$body = (string) \Aimeos\Admin\Graphql::execute( $this->context, $request )->getBody();
+
+		$this->assertStringContainsString( '"code":"test-graphql"', $body );
+		$this->assertStringContainsString( '"code":"test-group"', $body );
+		$this->assertStringContainsString( '"id":"123"', $body );
+		$this->assertStringContainsString( '"id":"1"', $body );}
 }

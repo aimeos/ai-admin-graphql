@@ -225,7 +225,7 @@ abstract class Base
 			$key = str_replace( '/', '.', $domain ) . '.id';
 
 			if( !empty( $entry[$key] ) ) {
-				$item = $manager->get( $entry[$key], $ref );
+				$item = $manager->get( $entry[$key], array_unique( $ref ) );
 			} else {
 				$item = $manager->create();
 			}
@@ -296,7 +296,7 @@ abstract class Base
 			$ref[] = $domain . '/property';
 		}
 
-		return array_unique( $ref );
+		return $ref;
 	}
 
 

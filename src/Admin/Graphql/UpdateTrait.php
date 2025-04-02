@@ -88,6 +88,7 @@ trait UpdateTrait
 		{
 			$domainManager = \Aimeos\MShop::create( $this->context(), $domain );
 			$listItems = $item->getListItems( $domain, null, null, false );
+			$refItems = $item->getRefItems( $domain, null, null, false );
 
 			foreach( $list as $subentry )
 			{
@@ -99,7 +100,7 @@ trait UpdateTrait
 				$listItem = $listItems->get( $listId ) ?? $item->getListItem( $domain, $listType, $refId ) ?? $manager->createListItem();
 
 				if ( isset( $subentry['item'] ) ) {
-					$refItem = ( $listItem->getRefItem() ?? $domainManager->create() )->fromArray( $subentry['item'], true );
+					$refItem = ( $listItem->getRefItem() ?? $refItems->get( $refId ) ?? $domainManager->create() )->fromArray( $subentry['item'], true );
 				}
 
 				if( isset( $subentry['item']['address'] ) && $refItem instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
