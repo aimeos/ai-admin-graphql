@@ -63,7 +63,7 @@ class Registry
 				$item = $manager->create();
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
-					$list['lists'] = $this->addressInputType( $path . '/address' );
+					$list['address'] = $this->addressInputType( $path . '/address' );
 				}
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
@@ -72,6 +72,9 @@ class Registry
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
 					$list['property'] = Type::listOf( $this->inputType( $path . '/property' ) );
+				}
+				if( $item instanceof \Aimeos\MShop\Product\Item\Iface ) {
+					$list['stock'] = Type::listOf( $this->inputType( 'stock' ) );
 				}
 
 				return $list;
@@ -176,31 +179,6 @@ class Registry
 
 
 	/**
-	 * Defines the GraphQL property input type
-	 *
-	 * @param string $path Path of the domain manager
-	 * @return \GraphQL\Type\Definition\InputObjectType Input type definition
-	 */
-	public function propertyInputType( string $path ) : ObjectType
-	{
-		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'Input';
-
-		if( isset( $this->types[$name] ) ) {
-			return $this->types[$name];
-		}
-
-		return $this->types[$name] = new ObjectType( [
-			'name' => $name,
-			'fields' => function() use ( $path ) {
-
-				$manager = \Aimeos\MShop::create( $this->context, $path );
-				return $this->fields( $manager->getSearchAttributes( false ) );
-			}
-		] );
-	}
-
-
-	/**
 	 * Defines the GraphQL output types
 	 *
 	 * @param string $path Path of the domain manager
@@ -241,6 +219,16 @@ class Registry
 					$list['children'] = Type::listOf( $this->treeOutputType( $path ) );
 				}
 
+				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface )
+				{
+					$list['lists'] = [
+						'type' => $this->listsOutputType( $path . '/lists' ),
+						'resolve' => function( ItemIface $item, array $args ) {
+							return $item;
+						}
+					];
+				}
+
 				if( $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface )
 				{
 					$list['property'] = [
@@ -254,12 +242,15 @@ class Registry
 					];
 				}
 
-				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface )
+				if( $item instanceof \Aimeos\MShop\Product\Item\Iface )
 				{
-					$list['lists'] = [
-						'type' => $this->listsOutputType( $path . '/lists' ),
-						'resolve' => function( ItemIface $item, array $args ) {
-							return $item;
+					$list['stock'] = [
+						'type' => Type::listOf( $this->stockOutputType() ),
+						'args' => [
+							'type' => Type::listOf( Type::String() ),
+						],
+						'resolve' => function( $item, $args ) {
+							return $item->getStockItems( $args['type'] ?? null, false );
 						}
 					];
 				}
@@ -577,6 +568,38 @@ class Registry
 				}
 
 				return $this->resolve( $item, 'locale/site', $info->fieldName );
+			}
+		] );
+	}
+
+
+	/**
+	 * Defines the GraphQL stock output type
+	 *
+	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
+	 */
+	protected function stockOutputType() : ObjectType
+	{
+		$name = 'StockOutputType';
+
+		if( isset( $this->types[$name] ) ) {
+			return $this->types[$name];
+		}
+
+		return $this->types[$name] = new ObjectType( [
+			'name' => $name,
+			'fields' => function() {
+
+				$manager = \Aimeos\MShop::create( $this->context, 'stock' );
+				return $this->fields( $manager->getSearchAttributes( false ) );
+			},
+			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) {
+
+				if( $info->fieldName === 'stock' && $item instanceof \Aimeos\MShop\Product\Item\Iface ) {
+					return $item->getStockItems();
+				}
+
+				return $this->resolve( $item, 'stock', $info->fieldName );
 			}
 		] );
 	}

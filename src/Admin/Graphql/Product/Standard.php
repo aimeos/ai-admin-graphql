@@ -42,4 +42,34 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 		return $list;
 	}
+
+
+	/**
+	 * Updates the item
+	 *
+	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
+	 * @param \Aimeos\MShop\Common\Item\AdddressRef\Iface $item Item to update
+	 * @param array $entry Associative list of key/value pairs of the item data
+	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
+	 */
+	protected function updateItem( \Aimeos\MShop\Common\Manager\Iface $manager,
+		\Aimeos\MShop\Common\Item\Iface $item, array $entry ) : \Aimeos\MShop\Common\Item\Iface
+	{
+		$item = parent::updateItem( $manager, $item, $entry );
+
+		if( isset( $entry['product.stock'] ) )
+		{
+			$stockItems = $item->getStockItems()->col( null, 'stock.type' );
+
+			foreach( $entry['product.stock'] as $subentry )
+			{
+				$stockItem = $stockItems->get( $subentry['stock.type'] ?? null ) ?: $manager->createStockItem();
+				$item->addStockItem( $stockItem->fromArray( $subentry ) );
+			}
+
+			$item->deleteStockItems( $stockItems );
+		}
+
+		return $item;
+	}
 }
