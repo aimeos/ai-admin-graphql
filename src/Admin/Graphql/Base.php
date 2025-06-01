@@ -296,6 +296,10 @@ abstract class Base
 			$ref[] = $domain . '/property';
 		}
 
+		if( isset( $entry['stock'] ) ) {
+			$ref[] = 'stock';
+		}
+
 		return $ref;
 	}
 
