@@ -740,24 +740,24 @@ return [
 		],
 	],
 	'order' => [
-		/** admin/graphql/resource/media/delete
-		 * List of user groups that are allowed to delete media items
+		/** admin/graphql/resource/order/delete
+		 * List of user groups that are allowed to delete order items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
 		'delete' => [],
 
-		/** admin/graphql/resource/media/save
-		 * List of user groups that are allowed to create and update media items
+		/** admin/graphql/resource/order/save
+		 * List of user groups that are allowed to create and update order items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
 		'save' => ['admin', 'editor', 'super'],
 
-		/** admin/graphql/resource/media/get
-		 * List of user groups that are allowed to retrieve media items
+		/** admin/graphql/resource/order/get
+		 * List of user groups that are allowed to retrieve order items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
