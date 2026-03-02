@@ -15,6 +15,9 @@ use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Validator\DocumentValidator;
+use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\QueryDepth;
 use Nyholm\Psr7\Factory\Psr17Factory;
 
 
@@ -77,13 +80,23 @@ class Graphql
 				$query = $input['query'] ?? '';
 			}
 
+			$maxDepth = (int) $context->config()->get( 'admin/graphql/max-query-depth', 10 );
+			$maxComplexity = (int) $context->config()->get( 'admin/graphql/max-query-complexity', 500 );
+
+			$validationRules = array_merge( DocumentValidator::allRules(), [
+				QueryDepth::class => new QueryDepth( $maxDepth ),
+				QueryComplexity::class => new QueryComplexity( $maxComplexity ),
+			] );
+
 			$result = GraphQLBase::executeQuery(
 				self::schema( $context ),
 				$query,
 				[], // root
 				null, // context
 				$variables,
-				$opname
+				$opname,
+				null, // fieldResolver
+				$validationRules
 			)->toArray( $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : 0 );
 		}
 		catch( \Throwable $t )
