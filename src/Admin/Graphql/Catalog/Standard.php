@@ -107,6 +107,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function getPath( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
+			$this->access( $domain, 'get' );
 			return \Aimeos\MShop::create( $this->context(), $domain )->getPath( $args['id'], $args['include'] );
 		};
 	}
@@ -121,6 +122,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function getTree( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
+			$this->access( $domain, 'get' );
 			return \Aimeos\MShop::create( $this->context(), $domain )->getTree( $args['id'], $args['include'], $args['level'] );
 		};
 	}
@@ -140,6 +142,8 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				throw new \Aimeos\Admin\Graphql\Exception( 'Parameter "input" must not be empty' );
 			}
 
+			$this->access( $domain, 'save' );
+
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 			$item = $this->updateItem( $manager, $manager->create(), $entry );
 
@@ -157,6 +161,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function moveItem( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
+			$this->access( $domain, 'save' );
 			\Aimeos\MShop::create( $this->context(), $domain )->move( $args['id'], $args['parentid'], $args['targetid'], $args['refid'] );
 			return $args['id'];
 		};

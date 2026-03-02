@@ -187,6 +187,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function getPath( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
+			$this->access( $domain, 'get' );
 			return $this->filters( \Aimeos\MShop::create( $this->context(), $domain )->getPath( $args['id'], $args['include'] ) );
 		};
 	}
@@ -201,6 +202,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function getTree( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
+			$this->access( $domain, 'get' );
 			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->getTree( $args['id'], $args['include'], $args['level'] ) );
 		};
 	}
@@ -258,9 +260,10 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function updateItem( \Aimeos\MShop\Common\Manager\Iface $manager,
 		\Aimeos\MShop\Common\Item\Iface $item, array $entry ) : \Aimeos\MShop\Common\Item\Iface
 	{
+		$super = $this->context()->view()->access( ['super'] );
 		$siteid = (string) $this->context()->user()?->getSiteId();
 
-		if( !$siteid || !$item->getSiteId() || strncmp( $item->getSiteId(), $siteid, strlen( $siteid ) ) ){
+		if( !$super && ( !$siteid || !$item->getSiteId() || strncmp( $item->getSiteId(), $siteid, strlen( $siteid ) ) ) ) {
 			throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
 		}
 
