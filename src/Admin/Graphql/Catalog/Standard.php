@@ -196,6 +196,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function getPath( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
+			$this->access( $domain, 'get' );
 			return $this->manager()->getPath( $args['id'], $args['include'] );
 		};
 	}
@@ -210,6 +211,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function getTree( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
+			$this->access( $domain, 'get' );
 			return $this->manager()->getTree( $args['id'], $args['include'], $args['level'] );
 		};
 	}
@@ -229,6 +231,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				throw new \Aimeos\Admin\Graphql\Exception( 'Parameter "input" must not be empty' );
 			}
 
+			$this->access( $domain, 'save' );
 			$manager = $this->manager();
 			$item = $this->updateItem( $manager, $manager->create(), $entry );
 
@@ -261,6 +264,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function moveItem( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
+			$this->access( $domain, 'save' );
 			$this->manager()->move( $args['id'], $args['parentid'], $args['targetid'], $args['refid'] );
 			return $args['id'];
 		};
