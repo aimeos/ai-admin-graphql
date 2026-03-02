@@ -85,7 +85,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				$item->setGroups( array_unique( $entry['groups'] ?? [] ) );
 			}
 
-			if( $view->access( ['super', 'admin'] ) || $item->getId() === $this->context()->user() )
+			if( $view->access( ['super', 'admin'] ) || $item->getId() === $this->context()->user()?->getId() )
 			{
 				!isset( $entry['customer.password'] ) ?: $item->setPassword( $entry['customer.password'] );
 				!isset( $entry['customer.code'] ) ?: $item->setCode( $entry['customer.code'] );
