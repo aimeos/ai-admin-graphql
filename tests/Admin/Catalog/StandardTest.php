@@ -90,9 +90,10 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	{
 		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Catalog\\Manager\\Standard' )
 			->setConstructorArgs( array( $this->context ) )
-			->onlyMethods( ['insert'] )
+			->onlyMethods( ['insert', 'type'] )
 			->getMock();
 
+		$stub->method( 'type' )->willReturn( ['catalog'] );
 		$item = $stub->create( ['catalog.code' => 'test-graphql'] );
 		$stub->expects( $this->once() )->method( 'insert' )->willReturn( $item );
 
@@ -111,9 +112,10 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	{
 		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Catalog\\Manager\\Standard' )
 			->setConstructorArgs( array( $this->context ) )
-			->onlyMethods( ['move'] )
+			->onlyMethods( ['move', 'type'] )
 			->getMock();
 
+		$stub->method( 'type' )->willReturn( ['catalog'] );
 		$stub->expects( $this->once() )->method( 'move' );
 
 		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Catalog\\Manager\\Standard', $stub );

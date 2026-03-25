@@ -77,9 +77,10 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	{
 		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Locale\\Manager\\Site\\Standard' )
 			->setConstructorArgs( array( $this->context ) )
-			->onlyMethods( ['insert'] )
+			->onlyMethods( ['insert', 'type'] )
 			->getMock();
 
+		$stub->method( 'type' )->willReturn( ['locale', 'site'] );
 		$item = $stub->create( ['locale.site.code' => 'test-graphql'] );
 		$stub->expects( $this->once() )->method( 'insert' )->willReturn( $item );
 
@@ -99,9 +100,10 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	{
 		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Locale\\Manager\\Site\\Standard' )
 			->setConstructorArgs( array( $this->context ) )
-			->onlyMethods( ['move'] )
+			->onlyMethods( ['move', 'type'] )
 			->getMock();
 
+		$stub->method( 'type' )->willReturn( ['locale', 'site'] );
 		$stub->expects( $this->once() )->method( 'move' );
 
 		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Locale\\Manager\\Site\\Standard', $stub );

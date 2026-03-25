@@ -266,7 +266,7 @@ abstract class Base
 
 			foreach( $entries as $entry )
 			{
-				$item = $map->get( $entry[$key] ?? null ) ?: $manager->create();
+				$item = ( isset( $entry[$key] ) ? $map->get( $entry[$key] ) : null ) ?: $manager->create();
 				$items[] = $this->updateItem( $manager, $item, $entry );
 			}
 
