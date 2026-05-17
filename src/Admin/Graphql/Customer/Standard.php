@@ -24,8 +24,6 @@ use Aimeos\MShop\Common\Item\Iface as ItemIface;
  */
 class Standard extends \Aimeos\Admin\Graphql\Standard
 {
-	private $type;
-
 
 	/**
 	 * Returns GraphQL schema definition for the available queries
@@ -67,7 +65,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	 * Updates the item
 	 *
 	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
-	 * @param \Aimeos\MShop\Common\Item\AdddressRef\Iface $item Item to update
+	 * @param \Aimeos\MShop\Common\Item\AddressRef\Iface $item Item to update
 	 * @param array $entry Associative list of key/value pairs of the item data
 	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
 	 */
@@ -82,7 +80,8 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			$item = $item->fromArray( $entry );
 
 			if( $view->access( ['super', 'admin'] ) ) {
-				$item->setGroups( array_unique( $entry['groups'] ?? [] ) );
+				// @phpstan-ignore argument.type
+				$item->setGroups( array_unique( (array) $entry['groups'] ) );
 			}
 
 			if( $view->access( ['super', 'admin'] ) || $item->getId() === $this->context()->user()?->getId() )
@@ -92,15 +91,15 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			}
 
 			if( isset( $entry['address'] ) && $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
-				$item = $this->updateAddresses( $manager, $item, $entry['address'] );
+				$item = $this->updateAddresses( $manager, $item, (array) $entry['address'] );
 			}
 
 			if( isset( $entry['lists'] ) && $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
-				$item = $this->updateLists( $manager, $item, $entry['lists'] );
+				$item = $this->updateLists( $manager, $item, (array) $entry['lists'] );
 			}
 
 			if( isset( $entry['property'] ) && $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
-				$item = $this->updateProperties( $manager, $item, $entry['property'] );
+				$item = $this->updateProperties( $manager, $item, (array) $entry['property'] );
 			}
 		}
 

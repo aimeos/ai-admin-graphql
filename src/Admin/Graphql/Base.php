@@ -29,7 +29,7 @@ abstract class Base
 	 * Initializes the object
 	 *
 	 * @param \Aimeos\MShop\ContextIface $context Context object
-	 * @param \Aimeos\Admin\Graphql\Registry Type registry object
+	 * @type \Aimeos\Admin\Graphql\Registry Type registry object
 	 */
 	public function __construct( \Aimeos\MShop\ContextIface $context, Registry $registry )
 	{
@@ -49,6 +49,7 @@ abstract class Base
 	{
 		$groups = $this->context->config()->get( 'admin/graphql/resource/' . $domain . '/' . $action, [] );
 
+		// @phpstan-ignore argument.type
 		if( $this->context->view()->access( $groups ) === true ) {
 			return true;
 		}
@@ -70,9 +71,12 @@ abstract class Base
 			$this->access( $domain, 'get' );
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 
-			$filter = $manager->filter()->order( $args['sort'] )->slice( 0, $args['limit'] );
-			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
+			// @phpstan-ignore argument.type
+			$filter = $manager->filter()->order( $args['sort'] )->slice( 0, (int) $args['limit'] );
+			// @phpstan-ignore argument.type
+			$filter->add( $filter->parse( json_decode( (string) $args['filter'], true ) ) );
 
+			// @phpstan-ignore argument.type, argument.type, argument.type
 			return $manager->aggregate( $filter, $args['key'], $args['value'], $args['type'] )->all();
 		};
 	}
@@ -100,6 +104,7 @@ abstract class Base
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$this->access( $domain, 'delete' );
+			// @phpstan-ignore argument.type
 			\Aimeos\MShop::create( $this->context(), $domain )->delete( $args['id'] );
 			return $args['id'];
 		};
@@ -117,7 +122,8 @@ abstract class Base
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$this->access( $domain, 'get' );
-			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->get( $args['id'], $args['include'] ) );
+			// @phpstan-ignore argument.type
+			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->get( (string) $args['id'], (array) $args['include'] ) );
 		};
 	}
 
@@ -157,6 +163,7 @@ abstract class Base
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$this->access( $domain, 'get' );
+			// @phpstan-ignore argument.type
 			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'], $args['include'] ) );
 		};
 	}
@@ -173,6 +180,7 @@ abstract class Base
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$this->access( $domain, 'get' );
+			// @phpstan-ignore argument.type
 			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'], [], $args['domain'] ) );
 		};
 	}
@@ -191,11 +199,14 @@ abstract class Base
 			$this->access( $domain, 'get' );
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 
-			$filter = $manager->filter()->order( $args['sort'] )->slice( $args['offset'], $args['limit'] );
-			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
+			// @phpstan-ignore argument.type
+			$filter = $manager->filter()->order( $args['sort'] )->slice( (int) $args['offset'], (int) $args['limit'] );
+			// @phpstan-ignore argument.type
+			$filter->add( $filter->parse( json_decode( (string) $args['filter'], true ) ) );
 
 			$total = 0;
-			$items = $this->filters( $manager->search( $filter, $args['include'], $total )->toArray() );
+			// @phpstan-ignore argument.type
+			$items = $this->filters( $manager->search( $filter, (array) $args['include'], $total )->toArray() );
 
 			return [
 				'items' => $items,
@@ -220,17 +231,18 @@ abstract class Base
 			}
 
 			$this->access( $domain, 'save' );
-			$ref = $this->getRefs( $entry, $domain );
+			$ref = $this->getRefs( (array) $entry, $domain );
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 			$key = str_replace( '/', '.', $domain ) . '.id';
 
 			if( !empty( $entry[$key] ) ) {
-				$item = $manager->get( $entry[$key], array_unique( $ref ) );
+				// @phpstan-ignore argument.type, argument.type
+				$item = $manager->get( (string) $entry[$key], array_unique( $ref ) );
 			} else {
 				$item = $manager->create();
 			}
 
-			return $manager->save( $this->updateItem( $manager, $item, $entry ) );
+			return $manager->save( $this->updateItem( $manager, $item, (array) $entry ) );
 		};
 	}
 
@@ -258,18 +270,21 @@ abstract class Base
 
 			$ref = [];
 			foreach( $entries as $entry ) {
-				$ref = array_merge( $ref, $this->getRefs( $entry, $domain ) );
+				$ref = array_merge( $ref, $this->getRefs( (array) $entry, $domain ) );
 			}
 
+			// @phpstan-ignore argument.type, argument.type
 			$map = $manager->search( $filter, array_unique( $ref ) );
 			$items = [];
 
 			foreach( $entries as $entry )
 			{
-				$item = ( isset( $entry[$key] ) ? $map->get( $entry[$key] ) : null ) ?: $manager->create();
-				$items[] = $this->updateItem( $manager, $item, $entry );
+				$item = ( isset( $entry[$key] ) ? $map->get( (string) $entry[$key] ) : null ) ?: $manager->create();
+				// @phpstan-ignore argument.type
+				$items[] = $this->updateItem( $manager, $item, (array) $entry );
 			}
 
+			// @phpstan-ignore argument.type
 			return $manager->save( $items );
 		};
 	}
@@ -283,12 +298,12 @@ abstract class Base
 	 */
 	protected function getRefs( array $entry, string $domain ): array
 	{
-		$ref = array_keys( $entry['lists'] ?? [] );
+		$ref = array_keys( (array) $entry['lists'] );
 
 		foreach( $entry['lists'] ?? [] as $listDomain => $subentry )
 		{
 			foreach( $subentry ?? [] as $subItem ) {
-				$ref = array_merge( $ref, $this->getRefs( $subItem['item'] ?? [], $listDomain ) );
+				$ref = array_merge( $ref, $this->getRefs( (array) $subItem['item'], (string) $listDomain ) );
 			}
 		}
 

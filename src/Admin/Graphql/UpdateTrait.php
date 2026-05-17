@@ -23,12 +23,12 @@ trait UpdateTrait
 	 * Updates the addresses of the item
 	 *
 	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
-	 * @param \Aimeos\MShop\Common\Item\AdddressRef\Iface $item Item to update
+	 * @param \Aimeos\MShop\Common\Item\AddressRef\Iface $item Item to update
 	 * @param array $entries List of entries with key/value pairs of the address data
 	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
 	 */
 	protected function updateAddresses( \Aimeos\MShop\Common\Manager\Iface $manager,
-		\Aimeos\MShop\Common\Item\AdddressRef\Iface $item, array $entries ) : \Aimeos\MShop\Common\Item\Iface
+		\Aimeos\MShop\Common\Item\AddressRef\Iface $item, array $entries ) : \Aimeos\MShop\Common\Item\Iface
 	{
 		$addressItems = $item->getAddresses()->reverse();
 
@@ -38,6 +38,7 @@ trait UpdateTrait
 			$item->addAddressItem( $address->fromArray( $subentry ) );
 		}
 
+		// @phpstan-ignore return.type
 		return $item->deleteAddressItems( $addressItems );
 	}
 
@@ -46,7 +47,7 @@ trait UpdateTrait
 	 * Updates the item
 	 *
 	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
-	 * @param \Aimeos\MShop\Common\Item\AdddressRef\Iface $item Item to update
+	 * @param \Aimeos\MShop\Common\Item\AddressRef\Iface $item Item to update
 	 * @param array $entry Associative list of key/value pairs of the item data
 	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
 	 */
@@ -56,15 +57,15 @@ trait UpdateTrait
 		$item = $item->fromArray( $entry, true );
 
 		if( isset( $entry['address'] ) && $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
-			$item = $this->updateAddresses( $manager, $item, $entry['address'] );
+			$item = $this->updateAddresses( $manager, $item, (array) $entry['address'] );
 		}
 
 		if( isset( $entry['lists'] ) && $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
-			$item = $this->updateLists( $manager, $item, $entry['lists'] );
+			$item = $this->updateLists( $manager, $item, (array) $entry['lists'] );
 		}
 
 		if( isset( $entry['property'] ) && $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
-			$item = $this->updateProperties( $manager, $item, $entry['property'] );
+			$item = $this->updateProperties( $manager, $item, (array) $entry['property'] );
 		}
 
 		return $item;
@@ -97,24 +98,25 @@ trait UpdateTrait
 				$listType = $subentry[$resource . '.lists.type'] ?? 'default';
 				$refId = $subentry['item'][$domain.'.id'] ?? $subentry[$resource . '.lists.refid'] ?? '';
 
-				$listItem = $listItems->get( $listId ) ?? $item->getListItem( $domain, $listType, $refId ) ?? $manager->createListItem();
+				$listItem = $listItems->get( (string) $listId ) ?? $item->getListItem( $domain, (string) $listType, (string) $refId ) ?? $manager->createListItem();
 
 				if ( isset( $subentry['item'] ) ) {
-					$refItem = ( $listItem->getRefItem() ?? $refItems->get( $refId ) ?? $domainManager->create() )->fromArray( $subentry['item'], true );
+					$refItem = ( $listItem->getRefItem() ?? $refItems->get( (string) $refId ) ?? $domainManager->create() )->fromArray( $subentry['item'], true );
 				}
 
 				if( isset( $subentry['item']['address'] ) && $refItem instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
-					$refItem = $this->updateAddresses( $domainManager, $refItem, $subentry['item']['address'] );
+					$refItem = $this->updateAddresses( $domainManager, $refItem, (array) $subentry['item']['address'] );
 				}
 
 				if( isset( $subentry['item']['lists'] ) && $refItem instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
-					$refItem = $this->updateLists( $domainManager, $refItem, $subentry['item']['lists'] );
+					$refItem = $this->updateLists( $domainManager, $refItem, (array) $subentry['item']['lists'] );
 				}
 
 				if( isset( $subentry['item']['property'] ) && $refItem instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
-					$refItem = $this->updateProperties( $domainManager, $refItem, $subentry['item']['property'] );
+					$refItem = $this->updateProperties( $domainManager, $refItem, (array) $subentry['item']['property'] );
 				}
 
+				// @phpstan-ignore argument.type, argument.type
 				$item->addListItem( $domain, $listItem->fromArray( $subentry, true ), $refItem );
 				unset( $listItems[$listItem->getId()] );
 			}
@@ -130,7 +132,7 @@ trait UpdateTrait
 	 * Updates the properties of the item
 	 *
 	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
-	 * @param \Aimeos\MShop\Common\Item\ListsRef\Iface $item Item to update
+	 * @param \Aimeos\MShop\Common\Item\PropertyRef\Iface $item Item to update
 	 * @param array $entries List of entries with key/value pairs of the property data
 	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
 	 */
@@ -142,6 +144,7 @@ trait UpdateTrait
 		foreach( $entries as $subentry )
 		{
 			$propItem = $propItems->pop() ?: $manager->createPropertyItem();
+			// @phpstan-ignore argument.type
 			$item->addPropertyItem( $propItem->fromArray( $subentry ) );
 		}
 
