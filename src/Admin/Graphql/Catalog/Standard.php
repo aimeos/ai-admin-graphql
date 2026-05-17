@@ -145,7 +145,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			$this->access( $domain, 'save' );
 
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
-			$item = $this->updateItem( $manager, $manager->create(), $entry );
+			$item = $this->updateItem( $manager, $manager->create(), (array) $entry );
 
 			return $manager->insert( $item, $args['parentid'], $args['refid'] );
 		};

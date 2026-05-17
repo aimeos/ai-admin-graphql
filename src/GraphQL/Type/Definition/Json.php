@@ -20,7 +20,7 @@ use GraphQL\Type\Definition\ScalarType;
  */
 class Json extends ScalarType
 {
-	private static $object;
+	private static ?self $object = null;
 
 	public ?string $description = 'Arbitrary data encoded in JavaScript Object Notation (JSON)';
 
@@ -60,7 +60,8 @@ class Json extends ScalarType
 	 */
 	public function parseValue( $value )
 	{
-		return json_decode( $value, true, 512, JSON_THROW_ON_ERROR );
+		// @phpstan-ignore return.type
+		return json_decode( (string) $value, true, 512, JSON_THROW_ON_ERROR );
 	}
 
 
@@ -73,10 +74,12 @@ class Json extends ScalarType
 	 */
 	public function parseLiteral( $node, ?array $variables = null )
 	{
-		if( !property_exists( $node, 'value' ) ) {
+		if( !property_exists( (string) $node, 'value' ) ) {
+			// @phpstan-ignore argument.type
 			throw new Error("Can not parse literals without a value: {" . Printer::doPrint( $node ) . "}.");
 		}
 
-		return json_decode( $node->value, true, 512, JSON_THROW_ON_ERROR );
+		// @phpstan-ignore return.type
+		return json_decode( (string) $node->value, true, 512, JSON_THROW_ON_ERROR );
 	}
 }

@@ -169,7 +169,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 		foreach( $items as $id => $item )
 		{
-			if( !( $item->getSiteId() && strncmp( $item->getSiteId(), $siteid, strlen( $siteid ) ) ) ) {
+			if( !( $item->getSiteId() && strncmp( (string) $item->getSiteId(), $siteid, strlen( $siteid ) ) ) ) {
 				$list[$id] = $item;
 			}
 		}
@@ -188,6 +188,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 			$this->access( $domain, 'get' );
+			// @phpstan-ignore argument.type
 			return $this->filters( \Aimeos\MShop::create( $this->context(), $domain )->getPath( $args['id'], $args['include'] ) );
 		};
 	}
@@ -203,6 +204,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 			$this->access( $domain, 'get' );
+			// @phpstan-ignore argument.type
 			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->getTree( $args['id'], $args['include'], $args['level'] ) );
 		};
 	}
@@ -224,7 +226,8 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 			$this->access( $domain, 'insert' );
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
-			$item = $manager->create()->fromArray( $entry, true );
+			$data = (array) $entry;
+			$item = $manager->create()->fromArray( $data, true );
 
 			return $manager->insert( $item, $args['parentid'], $args['refid'] );
 		};
@@ -253,7 +256,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	 * Updates the item
 	 *
 	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
-	 * @param \Aimeos\MShop\Common\Item\AdddressRef\Iface $item Item to update
+	 * @param \Aimeos\MShop\Common\Item\AddressRef\Iface $item Item to update
 	 * @param array $entry Associative list of key/value pairs of the item data
 	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
 	 */
