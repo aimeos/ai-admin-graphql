@@ -157,8 +157,10 @@ abstract class Base
 
 			$manager = \Aimeos\MShop::create( $context, $domain );
 
-			$filter = $manager->filter()->order( $args['sort'] )->slice( $args['offset'], $args['limit'] );
-			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
+			// @phpstan-ignore argument.type
+			$filter = $manager->filter()->order( $args['sort'] )->slice( (int) $args['offset'], (int) $args['limit'] );
+			// @phpstan-ignore argument.type
+			$filter->add( $filter->parse( json_decode( (string) $args['filter'], true ) ) );
 
 			return $manager->search( $filter, $args['include'] )->all();
 		};
@@ -225,9 +227,10 @@ abstract class Base
 
 			$ref = [];
 			foreach( $entries as $entry ) {
-				$ref = array_merge( $ref, $this->getRefs( $entry, $domain ) );
+				$ref = array_merge( $ref, $this->getRefs( (array) $entry, $domain ) );
 			}
 
+			// @phpstan-ignore argument.type, argument.type
 			$map = $manager->search( $filter, array_unique( $ref ) );
 			$items = [];
 
@@ -237,6 +240,7 @@ abstract class Base
 				$items[] = $this->updateItem( $manager, $item, $entry );
 			}
 
+			// @phpstan-ignore argument.type
 			return $manager->save( $items );
 		};
 	}
@@ -250,7 +254,7 @@ abstract class Base
 	 */
 	protected function getRefs( array $entry, string $domain ): array
 	{
-		$ref = array_keys( $entry['lists'] ?? [] );
+		$ref = array_keys( (array) ( $entry['lists'] ?? [] ) );
 
 		if( ( $key = array_search( 'customergroup', $ref ) ) !== false ) {
 			$ref[$key] = 'customer/group';
@@ -259,7 +263,7 @@ abstract class Base
 		foreach( $entry['lists'] ?? [] as $listDomain => $subentry )
 		{
 			foreach( $subentry ?? [] as $subItem ) {
-				$ref = array_merge( $ref, $this->getRefs( $subItem['item'] ?? [], $listDomain ) );
+				$ref = array_merge( $ref, $this->getRefs( (array) ( $subItem['item'] ?? [] ), (string) $listDomain ) );
 			}
 		}
 

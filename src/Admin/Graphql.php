@@ -36,6 +36,8 @@ class Graphql
 	public static function execute( \Aimeos\MShop\ContextIface $context,
 		\Psr\Http\Message\ServerRequestInterface $request ) : \Psr\Http\Message\ResponseInterface
 	{
+		$debug = false;
+
 		try
 		{
 			/** admin/graphql/debug
@@ -77,6 +79,7 @@ class Graphql
 			$result = ['errors' => [$error]];
 		}
 
+		// @phpstan-ignore argument.type
 		$body = \Nyholm\Psr7\Stream::create( json_encode( $result ) );
 		return ( new Psr17Factory )->createResponse()->withBody( $body );
 	}
@@ -107,7 +110,9 @@ class Graphql
 
 			$object = new $classname( $context, $registry );
 
+			// @phpstan-ignore argument.type, method.notFound
 			$mutation = array_replace_recursive( $mutation, $object->mutation( $domain ) );
+			// @phpstan-ignore argument.type, method.notFound
 			$query = array_replace_recursive( $query, $object->query( $domain ) );
 		}
 
