@@ -127,7 +127,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				'resolve' => $this->findItem( $domain ),
 			],
 			'searchCatalogs' => [
-				'type' => $this->types()->searchOutputType( $domain, fn( $path ) => $this->types()->treeOutputType( $path ) ),
+				'type' => $this->types()->searchOutputType( $domain, fn( $path ) => $this->types()->treeOutputType( (string) $path ) ),
 				'args' => [
 					['name' => 'filter', 'type' => Type::string(), 'defaultValue' => '{}', 'description' => 'Filter conditions'],
 					['name' => 'include', 'type' => Type::listOf( Type::string() ), 'defaultValue' => [], 'description' => 'Domains to include'],
@@ -169,6 +169,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			->order( ['-catalog.level', 'sort:catalog:position'] )
 			->slice( 0, 0x7fffffff );
 
+		// @phpstan-ignore argument.type
 		$parents = $manager->search( $filter, $refs );
 		$indexes = $parentIds->unique()->flip();
 		$itemkeys = $items->getId()->flip();
@@ -233,7 +234,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 			$this->access( $domain, 'save' );
 			$manager = $this->manager();
-			$item = $this->updateItem( $manager, $manager->create(), $entry );
+			$item = $this->updateItem( $manager, $manager->create(), (array) $entry );
 
 			return $manager->insert( $item, $args['parentid'], $args['refid'] );
 		};
@@ -285,9 +286,10 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			$manager = $this->manager();
 
 			$filter = $manager->filter()->order( ['-catalog.level', 'sort:catalog:position'] );
-			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
+			$filter->add( $filter->parse( (array) json_decode( (string) $args['filter'], true ) ) );
 
-			$items = $manager->search( $filter->slice( 0, $args['limit'] ), $args['include'] );
+			// @phpstan-ignore argument.type
+			$items = $manager->search( $filter->slice( 0, (int) $args['limit'] ), (array) $args['include'] );
 
 			foreach( $items as $key => $item )
 			{
@@ -297,7 +299,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				}
 			}
 
-			return $this->getParents( $items->values(), $args['include'] );
+			return $this->getParents( $items->values(), (array) $args['include'] );
 		};
 	}
 }

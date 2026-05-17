@@ -56,7 +56,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			$context = $this->context();
 			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
 
-			if( $context->view()->access( $groups ) !== true ) {
+			if( $context->view()->access( (string) $groups ) !== true ) {
 				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
 			}
 

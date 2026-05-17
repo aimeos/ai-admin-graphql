@@ -109,6 +109,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderInput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -143,6 +144,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderProductInput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -176,6 +178,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderSubProductInput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -208,6 +211,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderServiceInput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -240,6 +244,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderOutputType';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -304,6 +309,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderAddressOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -330,6 +336,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderCouponOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -361,6 +368,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderProductOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -406,6 +414,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderSubProductOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -444,6 +453,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderProductAttributeOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -470,6 +480,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderServiceOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -518,6 +529,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderServiceAttributeOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -544,6 +556,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderServiceTransactionOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -570,6 +583,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		$name = 'orderStatusOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 

@@ -101,7 +101,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	 * Updates the item
 	 *
 	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
-	 * @param \Aimeos\MShop\Common\Item\AdddressRef\Iface $item Item to update
+	 * @param \Aimeos\MShop\Common\Item\AddressRef\Iface $item Item to update
 	 * @param array $entry Associative list of key/value pairs of the item data
 	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
 	 */
@@ -115,13 +115,14 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		}
 
 		if( isset( $entry['lists'] ) && $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
-			$item = $this->updateLists( $manager, $item, $entry['lists'] );
+			$item = $this->updateLists( $manager, $item, (array) $entry['lists'] );
 		}
 
 		if( isset( $entry['property'] ) && $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
-			$item = $this->updateProperties( $manager, $item, $entry['property'] );
+			$item = $this->updateProperties( $manager, $item, (array) $entry['property'] );
 		}
 
+		// @phpstan-ignore return.type
 		return $item;
 	}
 }

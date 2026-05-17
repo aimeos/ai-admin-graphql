@@ -23,7 +23,7 @@ use Psr\Http\Message\UploadedFileInterface;
  */
 class Upload extends ScalarType
 {
-	private static $object;
+	private static ?self $object = null;
 
 	public ?string $description = 'File upload type';
 

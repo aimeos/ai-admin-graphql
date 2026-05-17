@@ -48,7 +48,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	 * Updates the item
 	 *
 	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
-	 * @param \Aimeos\MShop\Common\Item\AdddressRef\Iface $item Item to update
+	 * @param \Aimeos\MShop\Common\Item\AddressRef\Iface $item Item to update
 	 * @param array $entry Associative list of key/value pairs of the item data
 	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
 	 */

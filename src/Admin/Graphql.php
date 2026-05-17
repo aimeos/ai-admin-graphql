@@ -39,6 +39,8 @@ class Graphql
 	public static function execute( \Aimeos\MShop\ContextIface $context,
 		\Psr\Http\Message\ServerRequestInterface $request ) : \Psr\Http\Message\ResponseInterface
 	{
+		$debug = false;
+
 		try
 		{
 			/** admin/graphql/debug
@@ -50,7 +52,7 @@ class Graphql
 			 * your requests it's helpful to see the stack strace. If you set this
 			 * configuration option to true, the stack trace will be returned too.
 			 *
-			 * @param boolean True to return the stack trace in response, false for error message only
+			 * @type boolean True to return the stack trace in response, false for error message only
 			 * @since 2022.10
 			 * @category Developer
 			 */
@@ -58,16 +60,16 @@ class Graphql
 
 			if( !is_array( $input = $request->getParsedBody() ) )
 			{
-				if( empty( $input = json_decode( $request->getBody()->getContents() ?? '', true ) ) ) {
+				if( empty( $input = json_decode( $request->getBody()->getContents(), true ) ) ) {
 					throw new \Aimeos\Admin\Graphql\Exception( 'Invalid input' );
 				}
 			}
 
 			if( isset( $input['operations'] ) )
 			{
-				$map = json_decode( $input['map'] ?? '[]', true );
-				$operations = json_decode( $input['operations'], true );
-				$operations = self::files( $request->getUploadedFiles(), $operations, $map );
+				$map = json_decode( (string) $input['map'], true );
+				$operations = json_decode( (string) $input['operations'], true );
+				$operations = self::files( $request->getUploadedFiles(), (array) $operations, (array) $map );
 
 				$opname = $operations['operationName'] ?? null;
 				$variables = $operations['variables'] ?? [];
@@ -90,10 +92,13 @@ class Graphql
 
 			$result = GraphQLBase::executeQuery(
 				self::schema( $context ),
+				// @phpstan-ignore argument.type
 				$query,
 				[], // root
 				null, // context
+				// @phpstan-ignore argument.type
 				$variables,
+				// @phpstan-ignore argument.type
 				$opname,
 				null, // fieldResolver
 				$validationRules
@@ -110,6 +115,7 @@ class Graphql
 			$result = ['errors' => [$error]];
 		}
 
+		// @phpstan-ignore argument.type
 		$body = \Nyholm\Psr7\Stream::create( json_encode( $result ) );
 		return ( new Psr17Factory )->createResponse()->withBody( $body );
 	}
@@ -132,7 +138,7 @@ class Graphql
 			{
 				$items = &$operations;
 
-				foreach( explode( '.', $location ) as $key )
+				foreach( explode( '.', (string) $location ) as $key )
 				{
 					if( !isset( $items[$key] ) || !is_array( $items[$key] ) ) {
 						$items[$key] = [];
@@ -144,7 +150,7 @@ class Graphql
 				if( !array_key_exists( $fileKey, $files ) )
 				{
 					throw new \Aimeos\Admin\Graphql\Exception(
-						"GraphQL query declared an upload in `$location`, but no corresponding file were actually uploaded"
+						'GraphQL query declared an upload in `' . $location . '`, but no corresponding file were actually uploaded'
 					);
 				}
 
@@ -152,7 +158,7 @@ class Graphql
 			}
 		}
 
-		return $operations;
+		return (array) $operations;
 	}
 
 
@@ -174,7 +180,7 @@ class Graphql
 		foreach( $domains as $domain )
 		{
 			$name = $config->get( 'admin/graphql/' . $domain . '/name', 'Standard' );
-			$classname = '\Aimeos\Admin\Graphql\\' . str_replace( '/', '\\', ucwords( $domain, '/' ) ) . '\\' . $name;
+			$classname = '\Aimeos\Admin\Graphql\\' . str_replace( '/', '\\', ucwords( (string) $domain, '/' ) ) . '\\' . $name;
 
 			if( !class_exists( $classname ) ) {
 				$classname = '\Aimeos\Admin\Graphql\\' . $stdname;
@@ -182,7 +188,9 @@ class Graphql
 
 			$object = new $classname( $context, $registry );
 
+			// @phpstan-ignore argument.type, method.notFound
 			$mutation = array_replace_recursive( $mutation, $object->mutation( $domain ) );
+			// @phpstan-ignore argument.type, method.notFound
 			$query = array_replace_recursive( $query, $object->query( $domain ) );
 		}
 
