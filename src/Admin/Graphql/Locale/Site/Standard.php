@@ -181,7 +181,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 		foreach( $items as $id => $item )
 		{
-			if( !( $item->getSiteId() && strncmp( $item->getSiteId(), $siteid, strlen( $siteid ) ) ) ) {
+			if( !( $item->getSiteId() && strncmp( (string) $item->getSiteId(), $siteid, strlen( $siteid ) ) ) ) {
 				$list[$id] = $item;
 			}
 		}
@@ -210,6 +210,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			->order( ['-locale.site.level', 'sort:locale.site:position'] )
 			->slice( 0, 0x7fffffff );
 
+		// @phpstan-ignore argument.type
 		$parents = $manager->search( $filter, $refs );
 		$indexes = $parentIds->unique()->flip();
 		$itemkeys = $items->getId()->flip();
@@ -238,6 +239,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 			$this->access( $domain, 'get' );
+			// @phpstan-ignore argument.type
 			return $this->filters( $this->manager()->getPath( $args['id'], $args['include'] ) );
 		};
 	}
@@ -253,6 +255,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 			$this->access( $domain, 'get' );
+			// @phpstan-ignore argument.type
 			return $this->filter( $this->manager()->getTree( $args['id'], $args['include'], $args['level'] ) );
 		};
 	}
@@ -274,7 +277,8 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 			$this->access( $domain, 'insert' );
 			$manager = $this->manager();
-			$item = $manager->create()->fromArray( $entry, true );
+			$data = (array) $entry;
+			$item = $manager->create()->fromArray( $data, true );
 
 			return $manager->insert( $item, $args['parentid'], $args['refid'] );
 		};
@@ -329,12 +333,14 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
 			$prefix = str_replace( '/', '.', $domain );
 
-			$filter = $manager->filter()->order( $args['sort'] )->slice( $args['offset'], $args['limit'] );
+			// @phpstan-ignore argument.type
+			$filter = $manager->filter()->order( $args['sort'] )->slice( (int) $args['offset'], (int) $args['limit'] );
 			$filter->add( $prefix . '.siteid', '=~', (string) $this->context()->user()?->getSiteId() );
-			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
+			$filter->add( $filter->parse( (array) json_decode( (string) $args['filter'], true ) ) );
 
 			$total = 0;
-			$items = $manager->search( $filter, $args['include'], $total )->toArray();
+			// @phpstan-ignore argument.type
+			$items = $manager->search( $filter, (array) $args['include'], $total )->toArray();
 
 			return [
 				'items' => $items,
@@ -359,9 +365,10 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 			$filter = $manager->filter()->order( ['-locale.site.level', 'sort:locale.site:position'] );
 			$filter->add( 'locale.site.siteid', '=~', (string) $this->context()->user()?->getSiteId() );
-			$filter->add( $filter->parse( json_decode( $args['filter'], true ) ) );
+			$filter->add( $filter->parse( (array) json_decode( (string) $args['filter'], true ) ) );
 
-			$items = $manager->search( $filter->slice( 0, $args['limit'] ), $args['include'] );
+			// @phpstan-ignore argument.type
+			$items = $manager->search( $filter->slice( 0, (int) $args['limit'] ), (array) $args['include'] );
 
 			foreach( $items as $key => $item )
 			{
@@ -371,7 +378,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				}
 			}
 
-			return $this->getParents( $items->values(), $args['include'] );
+			return $this->getParents( $items->values(), (array) $args['include'] );
 		};
 	}
 
@@ -380,7 +387,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	 * Updates the item
 	 *
 	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
-	 * @param \Aimeos\MShop\Common\Item\AdddressRef\Iface $item Item to update
+	 * @param \Aimeos\MShop\Common\Item\AddressRef\Iface $item Item to update
 	 * @param array $entry Associative list of key/value pairs of the item data
 	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
 	 */

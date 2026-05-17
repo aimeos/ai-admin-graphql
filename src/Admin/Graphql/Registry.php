@@ -51,6 +51,7 @@ class Registry
 		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'Input';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -97,6 +98,7 @@ class Registry
 		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'Input';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -125,17 +127,19 @@ class Registry
 		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'refInput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
 		return $this->types[$name] = new InputObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $path ) {
+				$list = [];
 
 				if( $domains = $this->context->config()->get( 'admin/graphql/lists-domains', [] ) )
 				{
 					foreach( $domains as $domain ) {
-						$list[str_replace( '/', '', $domain )] = Type::listOf( $this->listsRefInputType( $path, $domain ) );
+						$list[str_replace( '/', '', (string) $domain )] = Type::listOf( $this->listsRefInputType( $path, (string) $domain ) );
 					}
 				}
 
@@ -157,6 +161,7 @@ class Registry
 		$name = str_replace( '/', '', ucwords( $path . '/' . $domain, '/' ) ) . 'Input';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -189,6 +194,7 @@ class Registry
 		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'Output';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -275,6 +281,7 @@ class Registry
 		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'Output';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -308,17 +315,18 @@ class Registry
 		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'AggregateOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
 		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
-			'fields' => function() use ( $path ) {
+			'fields' => function() {
 				return [
 					'aggregates' => Type::string()
 				];
 			},
-			'resolveField' => function( array $entry, array $args, $context, ResolveInfo $info ) use ( $path ) {
+			'resolveField' => function( array $entry, array $args, $context, ResolveInfo $info ) {
 				return json_encode( $entry, JSON_FORCE_OBJECT );
 			}
 		] );
@@ -336,6 +344,7 @@ class Registry
 		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'ConfigOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -365,7 +374,7 @@ class Registry
 					],
 				];
 			},
-			'resolveField' => function( $item, array $args, $context, ResolveInfo $info ) use ( $path ) {
+			'resolveField' => function( $item, array $args, $context, ResolveInfo $info ) {
 				switch( $info->fieldName ) {
 					case 'code': return $item->getCode();
 					case 'label': return $item->getLabel();
@@ -389,19 +398,21 @@ class Registry
 		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'refOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
 		return $this->types[$name] = new ObjectType( [
 			'name' => $name,
 			'fields' => function() use ( $path ) {
+				$list = [];
 
 				if( $domains = $this->context->config()->get( 'admin/graphql/lists-domains', [] ) )
 				{
 					foreach( $domains as $domain )
 					{
-						$list[str_replace( '/', '', $domain )] = [
-							'type' => Type::listOf( $this->listsRefOutputType( $path, $domain ) ),
+						$list[str_replace( '/', '', (string) $domain )] = [
+							'type' => Type::listOf( $this->listsRefOutputType( $path, (string) $domain ) ),
 							'args' => [
 								'listtype' => Type::listOf( Type::String() ),
 								'type' => Type::listOf( Type::String() ),
@@ -431,6 +442,7 @@ class Registry
 		$name = str_replace( '/', '', ucwords( $path . '/' . $domain, '/' ) ) . 'Output';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -468,6 +480,7 @@ class Registry
 		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'Output';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -494,7 +507,7 @@ class Registry
 	 * Defines the GraphQL search output types
 	 *
 	 * @param string $path Path of the domain manager
-	 * @param Closure|null Output type method (default: outputType())
+	 * @param \Closure|null $method Output type method (default: outputType())
 	 * @return \GraphQL\Type\Definition\ObjectType Output type definition
 	 */
 	public function searchOutputType( string $path, ?\Closure $method = null ) : ObjectType
@@ -502,6 +515,7 @@ class Registry
 		$name = 'search' . str_replace( '/', '', ucwords( $path ) ) . 'Output';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -512,6 +526,7 @@ class Registry
 					'items' => [
 						'name' => 'items',
 						'description' => 'List of items',
+						// @phpstan-ignore argument.type, argument.templateType
 						'type' => Type::listOf( $method ? $method( $path ) : $this->outputType( $path ) ),
 					],
 					'total' => [
@@ -538,6 +553,7 @@ class Registry
 		$name = 'siteOutputType';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -583,6 +599,7 @@ class Registry
 		$name = 'StockOutputType';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -616,6 +633,7 @@ class Registry
 		$name = str_replace( '/', '', ucwords( $path, '/' ) ) . 'TreeOutput';
 
 		if( isset( $this->types[$name] ) ) {
+			// @phpstan-ignore return.type
 			return $this->types[$name];
 		}
 
@@ -672,14 +690,14 @@ class Registry
 
 		foreach( $attrs as $attr )
 		{
-			if( strpos( $attr->getCode(), ':' ) === false )
+			if( strpos( (string) $attr->getCode(), ':' ) === false )
 			{
-				$code = $this->name( $attr->getCode() );
+				$code = $this->name( (string) $attr->getCode() );
 
 				$list[$code] = [
 					'name' => $code,
 					'description' => $attr->getLabel(),
-					'type' => $code !== 'id' ? $this->type( $attr->getType() ) : Type::String(),
+					'type' => $code !== 'id' ? $this->type( (string) $attr->getType() ) : Type::String(),
 				];
 			}
 		}
@@ -723,6 +741,7 @@ class Registry
 	 */
 	public function resolve( ItemIface $item, string $domain, string $name )
 	{
+		// @phpstan-ignore return.type
 		return $item->get( $name ) ?? $item->get( str_replace( '/', '.', $domain ) . '.' . $name );
 	}
 
