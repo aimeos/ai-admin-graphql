@@ -1,6 +1,12 @@
 <?php
 
 return [
+	'ai' => [
+		'write' => ['admin', 'editor', 'super'],
+		'translate' => ['admin', 'editor', 'super'],
+		'imagine' => ['admin', 'editor', 'super'],
+		'isolate' => ['admin', 'editor', 'super'],
+	],
 	'attribute' => [
 		/** admin/graphql/resource/attribute/delete
 		 * List of user groups that are allowed to delete attribute items

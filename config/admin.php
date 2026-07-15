@@ -3,6 +3,7 @@
 return [
 	'graphql' => [
 		'domains' => [
+			'ai' => 'ai',
 			'attribute' => 'attribute',
 			'attribute/type' => 'attribute/type',
 			'attribute/lists/type' => 'attribute/lists/type',
