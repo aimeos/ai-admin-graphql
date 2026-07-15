@@ -13,8 +13,9 @@
 	"prefer-stable": true,
 	"minimum-stability": "dev",
 	"require": {
-		"php": "~8.1",
+		"php": "^8.2",
 		"aimeos/aimeos-core": "dev-master",
+		"aimeos/prisma": "dev-master",
 		"webonyx/graphql-php": "~15.0",
 		"nyholm/psr7": "~1.2"
 	},

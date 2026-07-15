@@ -11,4 +11,9 @@ return [
 	'include' => [
 		'src',
 	],
+	'template' => [
+		'admin/graphql/templates' => [
+			'templates/admin/graphql',
+		],
+	],
 ];
