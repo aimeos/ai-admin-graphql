@@ -1,6 +1,22 @@
 <?php
 
 return [
+	'ai' => [
+		'write' => [
+			'provider' => 'openai',
+			'model' => 'gpt-5.6-sol',
+		],
+		'translate' => [
+			'provider' => 'deepl',
+		],
+		'imagine' => [
+			'provider' => 'openai',
+			'model' => 'gpt-image-1.5',
+		],
+		'isolate' => [
+			'provider' => 'removebg',
+		],
+	],
 	'graphql' => [
 		'domains' => [
 			'ai' => 'ai',
