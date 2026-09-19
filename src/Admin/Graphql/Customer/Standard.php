@@ -79,7 +79,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		{
 			$item = $item->fromArray( $entry );
 
-			if( $view->access( ['super', 'admin'] ) ) {
+			if( $view->access( ['super', 'admin'] ) && isset( $entry['groups'] ) ) {
 				// @phpstan-ignore argument.type
 				$item->setGroups( array_unique( (array) $entry['groups'] ) );
 			}
@@ -94,8 +94,16 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				$item = $this->updateAddresses( $manager, $item, (array) $entry['address'] );
 			}
 
-			if( isset( $entry['lists'] ) && $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
-				$item = $this->updateLists( $manager, $item, (array) $entry['lists'] );
+			if( isset( $entry['lists'] ) && $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface )
+			{
+				$lists = (array) $entry['lists'];
+
+				// Group membership is privileged and must not be writable through nested lists by editors
+				if( !$view->access( ['super', 'admin'] ) ) {
+					unset( $lists['group'] );
+				}
+
+				$item = $this->updateLists( $manager, $item, $lists );
 			}
 
 			if( isset( $entry['property'] ) && $item instanceof \Aimeos\MShop\Common\Item\PropertyRef\Iface ) {
