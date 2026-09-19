@@ -298,7 +298,7 @@ abstract class Base
 	 */
 	protected function getRefs( array $entry, string $domain ): array
 	{
-		$ref = array_keys( (array) $entry['lists'] );
+		$ref = array_keys( (array) ( $entry['lists'] ?? [] ) );
 
 		foreach( $entry['lists'] ?? [] as $listDomain => $subentry )
 		{

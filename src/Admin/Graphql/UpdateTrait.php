@@ -87,6 +87,22 @@ trait UpdateTrait
 
 		foreach( $entries as $domain => $list )
 		{
+			// Referenced items are created/updated with their own manager, so the caller
+			// needs the same permission as for a direct write on that domain. Group
+			// memberships are granted through list references, so linking a group is
+			// privileged too and always requires the "save" permission.
+			$perm = ( (string) $domain === 'group' ) ? 'save' : 'get';
+
+			foreach( $list as $subentry )
+			{
+				if( isset( $subentry['item'] ) ) {
+					$perm = 'save';
+					break;
+				}
+			}
+
+			$this->access( (string) $domain, $perm );
+
 			$domainManager = \Aimeos\MShop::create( $this->context(), $domain );
 			$listItems = $item->getListItems( $domain, null, null, false );
 			$refItems = $item->getRefItems( $domain, null, null, false );
@@ -101,7 +117,8 @@ trait UpdateTrait
 				$listItem = $listItems->get( (string) $listId ) ?? $item->getListItem( $domain, (string) $listType, (string) $refId ) ?? $manager->createListItem();
 
 				if ( isset( $subentry['item'] ) ) {
-					$refItem = ( $listItem->getRefItem() ?? $refItems->get( (string) $refId ) ?? $domainManager->create() )->fromArray( $subentry['item'], true );
+					$refBase = $listItem->getRefItem() ?? $refItems->get( (string) $refId ) ?? $domainManager->create();
+					$refItem = $this->fromArrayRef( $refBase, (array) $subentry['item'], (string) $domain );
 				}
 
 				if( isset( $subentry['item']['address'] ) && $refItem instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
@@ -125,6 +142,36 @@ trait UpdateTrait
 		}
 
 		return $item;
+	}
+
+
+	/**
+	 * Updates a referenced item while enforcing the field-level permissions of privileged domains
+	 *
+	 * The generic nested writer stores referenced items in private mode, which unlocks
+	 * privileged fields (e.g. customer password, group membership and account status).
+	 * This method strips those fields unless the current user is allowed to change them,
+	 * so editors cannot escalate privileges through nested list references.
+	 *
+	 * @param \Aimeos\MShop\Common\Item\Iface $item Referenced item to update
+	 * @param array $entry Associative list of key/value pairs of the referenced item data
+	 * @param string $domain Domain of the referenced item
+	 * @return \Aimeos\MShop\Common\Item\Iface Updated referenced item
+	 */
+	protected function fromArrayRef( \Aimeos\MShop\Common\Item\Iface $item, array $entry, string $domain ) : \Aimeos\MShop\Common\Item\Iface
+	{
+		if( $item instanceof \Aimeos\MShop\Customer\Item\Iface && !$this->context()->view()->access( ['super', 'admin'] ) )
+		{
+			// Group membership, account status and verification are admin-only
+			unset( $entry['customer.groups'], $entry['customer.status'], $entry['customer.dateverified'] );
+
+			// Credentials and login code may only be changed for the own account
+			if( $item->getId() === null || $item->getId() !== $this->context()->user()?->getId() ) {
+				unset( $entry['customer.password'], $entry['customer.code'] );
+			}
+		}
+
+		return $item->fromArray( $entry, true );
 	}
 
 
