@@ -62,6 +62,26 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 
 	/**
+	 * Recursively collect all referenced domains
+	 *
+	 * @param array $entry Entry or subentry with input data
+	 * @param string $domain Domain of subentry
+	 * @return array Array with all domains collected
+	 */
+	protected function getRefs( array $entry, string $domain ) : array
+	{
+		$ref = parent::getRefs( $entry, $domain );
+
+		// Existing group memberships must be loaded, otherwise they are added again
+		if( isset( $entry['customer.groups'] ) ) {
+			$ref[] = 'group';
+		}
+
+		return $ref;
+	}
+
+
+	/**
 	 * Updates the item
 	 *
 	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Manager object for the passed item
@@ -77,18 +97,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 		if( $view->access( ['super'] ) || strlen( $siteId ) > 0 && !strncmp( $item->getSiteId(), $siteId, strlen( $siteId ) ) )
 		{
-			$item = $item->fromArray( $entry );
-
-			if( $view->access( ['super', 'admin'] ) && isset( $entry['groups'] ) ) {
-				// @phpstan-ignore argument.type
-				$item->setGroups( array_unique( (array) $entry['groups'] ) );
-			}
-
-			if( $view->access( ['super', 'admin'] ) || $item->getId() === $this->context()->user()?->getId() )
-			{
-				!isset( $entry['customer.password'] ) ?: $item->setPassword( $entry['customer.password'] );
-				!isset( $entry['customer.code'] ) ?: $item->setCode( $entry['customer.code'] );
-			}
+			$item = $this->fromArrayRef( $item, $entry, 'customer' );
 
 			if( isset( $entry['address'] ) && $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
 				$item = $this->updateAddresses( $manager, $item, (array) $entry['address'] );
