@@ -30,7 +30,7 @@ trait UpdateTrait
 	protected function updateAddresses( \Aimeos\MShop\Common\Manager\Iface $manager,
 		\Aimeos\MShop\Common\Item\AddressRef\Iface $item, array $entries ) : \Aimeos\MShop\Common\Item\Iface
 	{
-		$addressItems = $item->getAddresses()->reverse();
+		$addressItems = $item->getAddressItems()->reverse();
 
 		foreach( $entries as $subentry )
 		{
@@ -151,7 +151,8 @@ trait UpdateTrait
 	 * The generic nested writer stores referenced items in private mode, which unlocks
 	 * privileged fields (e.g. customer password, group membership and account status).
 	 * This method strips those fields unless the current user is allowed to change them,
-	 * so editors cannot escalate privileges through nested list references.
+	 * so editors cannot escalate privileges through nested list references. It's also
+	 * used for customer items saved directly to apply the same rules.
 	 *
 	 * @param \Aimeos\MShop\Common\Item\Iface $item Referenced item to update
 	 * @param array $entry Associative list of key/value pairs of the referenced item data
