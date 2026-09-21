@@ -119,6 +119,37 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	}
 
 
+	public function testSaveCustomerEditorNestedRepoint()
+	{
+		$user = $this->customer( 'graphql-editor' );
+		$victim = $this->customer( 'graphql-victim' );
+		$this->editor( $user );
+
+		// Create a self-referencing customer list row so the base item for the nested
+		// write is the editor's own account (whose ID passes the ownership check)
+		$this->save( 'id: "' . $user->getId() . '", lists: {customer: [{'
+			. 'refid: "' . $user->getId() . '", type: "default", '
+			. 'item: {id: "' . $user->getId() . '", label: "editor"}'
+			. '}]}' );
+
+		$listId = $this->manager->get( $user->getId(), ['customer'] )
+			->getListItems( 'customer', 'default' )->firstKey();
+
+		// Reuse that row but point the nested item at the victim with new credentials.
+		// The ID re-point via "customer.id" must not let the credential write land there.
+		$this->save( 'id: "' . $user->getId() . '", lists: {customer: [{'
+			. 'id: "' . $listId . '", refid: "' . $user->getId() . '", type: "default", '
+			. 'item: {id: "' . $victim->getId() . '", code: "victim-changed", email: "attacker@example.com", password: "pwned"}'
+			. '}]}' );
+
+		$result = $this->manager->get( $victim->getId() );
+
+		$this->assertEquals( 'graphql-victim', $result->getCode() );
+		$this->assertEquals( '', $result->getPaymentAddress()->getEmail() );
+		$this->assertTrue( $this->context->password()->verify( 'old', $this->password( $victim->getId() ) ) );
+	}
+
+
 	public function testSearchCustomersPassword()
 	{
 		$body = json_encode( ['query' => 'query { searchCustomers(filter: "{}") { items { id password } } }'] );
