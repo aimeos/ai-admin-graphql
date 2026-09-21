@@ -63,8 +63,15 @@ class Registry
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$item = $manager->create();
 
+				if( $item instanceof \Aimeos\MShop\Customer\Item\Iface )
+				{
+					// The password hash is write-only and therefore not a search attribute
+					$list['password'] = Type::string();
+					$list['groups'] = Type::listOf( Type::string() );
+				}
+
 				if( $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
-					$list['lists'] = $this->addressInputType( $path . '/address' );
+					$list['address'] = Type::listOf( $this->addressInputType( $path . '/address' ) );
 				}
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\ListsRef\Iface ) {
@@ -228,8 +235,25 @@ class Registry
 				$list = $this->fields( $manager->getSearchAttributes( false ) );
 				$item = $manager->create();
 
-				if( $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
-					$list['address'] = Type::listOf( $this->addressOutputType( $domain . '/address' ) );
+				if( $item instanceof \Aimeos\MShop\Customer\Item\Iface )
+				{
+					$list['groups'] = [
+						'type' => Type::listOf( Type::String() ),
+						'description' => 'List of group IDs assigned to the account',
+						'resolve' => function( $item, $args ) {
+							return $item->getGroups();
+						}
+					];
+				}
+
+				if( $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface )
+				{
+					$list['address'] = [
+						'type' => Type::listOf( $this->addressOutputType( $domain . '/address' ) ),
+						'resolve' => function( $item, $args ) {
+							return $item->getAddressItems();
+						}
+					];
 				}
 
 				if( $item instanceof \Aimeos\MShop\Common\Item\Tree\Iface ) {
@@ -291,11 +315,6 @@ class Registry
 				return $this->fields( $manager->getSearchAttributes( false ) );
 			},
 			'resolveField' => function( ItemIface $item, array $args, $context, ResolveInfo $info ) use ( $domain ) {
-
-				if( $info->fieldName === 'address' && $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
-					return $item->getAddressItems();
-				}
-
 				return $this->resolve( $item, $domain, $info->fieldName );
 			}
 		] );
@@ -511,7 +530,7 @@ class Registry
 
 		foreach( $entry as $key => $value )
 		{
-			if( !in_array( $key, ['property', 'lists', 'item'] ) ) {
+			if( !in_array( $key, ['address', 'property', 'lists', 'item'] ) ) {
 				$map[$domain . '.' . $key] = $value;
 			} else {
 				$map[$key] = $value;
