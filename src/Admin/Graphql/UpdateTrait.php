@@ -166,9 +166,18 @@ trait UpdateTrait
 			// Group membership, account status and verification are admin-only
 			unset( $entry['customer.groups'], $entry['customer.status'], $entry['customer.dateverified'] );
 
-			// Credentials and login code may only be changed for the own account
-			if( $item->getId() === null || $item->getId() !== $this->context()->user()?->getId() ) {
-				unset( $entry['customer.password'], $entry['customer.code'] );
+			// In private mode "customer.id" re-points the item to another row when fromArray()
+			// is applied below, so the ownership check must use the ID that will actually be
+			// written and not the one the base item currently carries. Otherwise an editor
+			// could pass the check with their own row and redirect the write to a foreign one.
+			$target = array_key_exists( 'customer.id', $entry )
+				? ( $entry['customer.id'] !== null ? (string) $entry['customer.id'] : null )
+				: $item->getId();
+
+			// Credentials, login code and login e-mail (the login identifier that getCode()
+			// falls back to) may only be changed for the own account
+			if( $target === null || $target !== $this->context()->user()?->getId() ) {
+				unset( $entry['customer.password'], $entry['customer.code'], $entry['customer.email'] );
 			}
 		}
 
