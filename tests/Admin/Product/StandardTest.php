@@ -79,29 +79,23 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 	public function testSaveProduct()
 	{
-		$stockStub = $this->getMockBuilder( '\\Aimeos\\MShop\\Stock\\Manager\\Standard' )
+		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Product\\Manager\\Standard' )
 			->setConstructorArgs( array( $this->context ) )
 			->onlyMethods( ['save', 'type'] )
 			->getMock();
 
-		$stockStub->method( 'type' )->willReturn( ['stock'] );
-		$stockStub->expects( $this->once() )->method( 'save' )->willReturnCallback( fn( $item ) => $item->setId( 123 ) );
+		$stub->expects( $this->once() )->method( 'save' )->willReturnCallback( fn( $item ) => $item->setId( 123 ) );
+		$stub->method( 'type' )->willReturn( ['product'] );
 
-		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Stock\\Manager\\Standard', $stockStub );
+		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Product\\Manager\\Standard', $stub );
 
-		$body = '{"query":"mutation {\n  saveProduct(input: {\n  code: \"test-graphql\"\n, stock: {\n    type: \"default\"    stocklevel: 100\n}\n  }) {\n  id\n  code\n  stock {\n    id\n    type\n    stocklevel\n  }\n  }\n}\n","variables":{},"operationName":null}';
+		$body = '{"query":"mutation {\n  saveProduct(input: {\n  code: \"test-graphql\"\n  }) {\n  id\n  code\n  }\n}\n","variables":{},"operationName":null}';
 		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
 
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
-		$result = json_decode( (string) $response->getBody(), true );
 
-		$this->assertTrue( isset( $result['data']['saveProduct']['id'] ) );
-		\Aimeos\MShop::create( $this->context, 'product' )->delete( $result['data']['saveProduct']['id'] );
-
-		$this->assertStringContainsString( '"code":"test-graphql"', (string) $response->getBody() );
 		$this->assertStringContainsString( '"id":"123"', (string) $response->getBody() );
-		$this->assertStringContainsString( '"type":"default"', (string) $response->getBody() );
-		$this->assertStringContainsString( '"stocklevel":100', (string) $response->getBody() );
+		$this->assertStringContainsString( '"code":"test-graphql"', (string) $response->getBody() );
 	}
 
 

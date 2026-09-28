@@ -68,10 +68,6 @@ trait UpdateTrait
 			$item = $this->updateProperties( $manager, $item, (array) $entry['property'] );
 		}
 
-		if( isset( $entry['stock'] ) && $item instanceof \Aimeos\MShop\Product\Item\Iface ) {
-			$item = $this->updateStocks( $manager, $item, (array) $entry['stock'] );
-		}
-
 		return $item;
 	}
 
@@ -209,37 +205,5 @@ trait UpdateTrait
 		}
 
 		return $item->deletePropertyItems( $propItems );
-	}
-
-
-	/**
-	 * Updates the stock items of the product
-	 *
-	 * @param \Aimeos\MShop\Common\Manager\Iface $manager Product manager object
-	 * @param \Aimeos\MShop\Product\Item\Iface $item Product item to update
-	 * @param array $entries List of entries with key/value pairs of the stock data
-	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
-	 */
-	protected function updateStocks( \Aimeos\MShop\Common\Manager\Iface $manager,
-		\Aimeos\MShop\Product\Item\Iface $item, array $entries ) : \Aimeos\MShop\Common\Item\Iface
-	{
-		$stockItems = [];
-
-		// Only one stock item per product and stock type is allowed
-		foreach( $item->getStockItems() as $stockItem ) {
-			$stockItems[$stockItem->getType()] = $stockItem;
-		}
-
-		foreach( $entries as $subentry )
-		{
-			$type = (string) ( $subentry['stock.type'] ?? 'default' );
-			$stockItem = $stockItems[$type] ?? $manager->createStockItem();
-			unset( $stockItems[$type] );
-
-			// @phpstan-ignore argument.type
-			$item->addStockItem( $stockItem->fromArray( $subentry ) );
-		}
-
-		return $item->deleteStockItems( $stockItems );
 	}
 }
