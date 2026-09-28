@@ -81,9 +81,10 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	{
 		$stockStub = $this->getMockBuilder( '\\Aimeos\\MShop\\Stock\\Manager\\Standard' )
 			->setConstructorArgs( array( $this->context ) )
-			->onlyMethods( ['save'] )
+			->onlyMethods( ['save', 'type'] )
 			->getMock();
 
+		$stockStub->method( 'type' )->willReturn( ['stock'] );
 		$stockStub->expects( $this->once() )->method( 'save' )->willReturnCallback( fn( $item ) => $item->setId( 123 ) );
 
 		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Stock\\Manager\\Standard', $stockStub );
