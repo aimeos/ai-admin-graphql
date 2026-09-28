@@ -82,9 +82,10 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	{
 		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Order\\Manager\\Standard' )
 			->setConstructorArgs( array( $this->context ) )
-			->onlyMethods( ['save'] )
+			->onlyMethods( ['save', 'type'] )
 			->getMock();
 
+		$stub->method( 'type' )->willReturn( ['order'] );
 		$stub->expects( $this->once() )->method( 'save' )->willReturn( $stub->create( ['order.id' => 123, 'order.channel' => 'unittest'] ) );
 
 		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Order\\Manager\\Standard', $stub );
