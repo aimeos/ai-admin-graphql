@@ -82,10 +82,6 @@ class Registry
 					$list['property'] = Type::listOf( $this->inputType( $path . '/property' ) );
 				}
 
-				if( $item instanceof \Aimeos\MShop\Product\Item\Iface ) {
-					$list['stock'] = Type::listOf( $this->inputType( 'stock' ) );
-				}
-
 				return $list;
 			},
 			'parseValue' => function( array $values ) use ( $path ) {
@@ -612,7 +608,7 @@ class Registry
 
 		foreach( $entry as $key => $value )
 		{
-			if( !in_array( $key, ['address', 'property', 'lists', 'item', 'stock'] ) ) {
+			if( !in_array( $key, ['address', 'property', 'lists', 'item'] ) ) {
 				$map[$domain . '.' . $key] = $value;
 			} else {
 				$map[$key] = $value;
