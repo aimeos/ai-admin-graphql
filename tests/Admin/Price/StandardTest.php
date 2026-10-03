@@ -197,6 +197,29 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	}
 
 
+	public function testSaveProductNestedExisting()
+	{
+		$item = $this->price( 'product' );
+		$product = $this->product( $item );
+		$listId = $product->getListItems( 'price' )->firstKey();
+
+		foreach( ['id: "' . $listId . '"', 'refid: "' . $item->getId() . '"'] as $key )
+		{
+			// Existing list items must be updated instead of being replaced by new ones
+			$result = $this->execute( 'mutation { saveProduct(input: {id: "' . $product->getId() . '", lists: {price: [{'
+				. $key . ', type: "default", position: 1, item: {value: "13.37"}'
+				. '}]}}) { id } }' );
+
+			$listItems = \Aimeos\MShop::create( $this->context, 'product' )->get( $product->getId(), ['price'] )->getListItems( 'price' );
+
+			$this->assertArrayNotHasKey( 'errors', $result );
+			$this->assertEquals( [$listId], $listItems->keys()->all() );
+			$this->assertEquals( 1, $listItems->first()->getPosition() );
+			$this->assertEquals( '13.37', $this->manager->get( $item->getId() )->getValue() );
+		}
+	}
+
+
 	public function testSaveProductNestedUnknownId()
 	{
 		$product = $this->product();

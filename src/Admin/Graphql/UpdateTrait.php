@@ -83,6 +83,8 @@ trait UpdateTrait
 	protected function updateLists( \Aimeos\MShop\Common\Manager\Iface $manager,
 		\Aimeos\MShop\Common\Item\ListsRef\Iface $item, array $entries ) : \Aimeos\MShop\Common\Item\Iface
 	{
+		$resource = $item->getResourceType();
+
 		foreach( $entries as $domain => $list )
 		{
 			// Referenced items are created/updated with their own manager, so the caller
@@ -95,7 +97,7 @@ trait UpdateTrait
 			foreach( $list as $subentry )
 			{
 				if( isset( $subentry['item'] ) ) {
-					$ids[] = (string) ( $subentry['item'][$domain . '.id'] ?? $subentry['refid'] ?? '' );
+					$ids[] = (string) ( $subentry['item'][$domain . '.id'] ?? $subentry[$resource . '.lists.refid'] ?? '' );
 					$perm = 'save';
 				}
 			}
@@ -107,7 +109,7 @@ trait UpdateTrait
 			}
 
 			$domainManager = \Aimeos\MShop::create( $this->context(), $domain );
-			$listItems = $item->getListItems( $domain );
+			$listItems = $item->getListItems( $domain, null, null, false );
 			$refItems = $item->getRefItems( $domain, null, null, false );
 
 			// Existing items not referenced yet are loaded at once so they are checked and updated as stored
@@ -120,14 +122,11 @@ trait UpdateTrait
 
 			foreach( $list as $subentry )
 			{
-				$listId = $subentry['id'] ?? '';
-				$refId = $subentry['item'][$domain.'.id'] ?? $subentry['refid'] ?? '';
+				$listId = $subentry[$resource . '.lists.id'] ?? '';
+				$listType = $subentry[$resource . '.lists.type'] ?? 'default';
+				$refId = $subentry['item'][$domain.'.id'] ?? $subentry[$resource . '.lists.refid'] ?? '';
 
-				$listItem = $listItems->find( function( $item ) use ( $listId, $refId ) {
-					return $listId == $item->getId() || $refId == $item->getRefId();
-				}, $manager->createListItem() );
-
-				unset( $listItems[$listItem->getId()] );
+				$listItem = $listItems->get( $listId ) ?? $item->getListItem( $domain, $listType, (string) $refId, false ) ?? $manager->createListItem();
 
 				$refItem = null;
 				if ( isset( $subentry['item'] ) ) {
@@ -156,6 +155,7 @@ trait UpdateTrait
 
 				// @phpstan-ignore argument.type, argument.type
 				$item->addListItem( $domain, $listItem->fromArray( $subentry ), $refItem );
+				unset( $listItems[(string) $listItem->getId()] );
 			}
 
 			$item->deleteListItems( $listItems );
