@@ -12,6 +12,7 @@ namespace Aimeos\Admin\Media;
 class StandardTest extends \PHPUnit\Framework\TestCase
 {
 	private $context;
+	private $ids = [];
 
 
 	protected function setUp() : void
@@ -20,6 +21,12 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$this->context = \TestHelper::context();
 		$this->context->config()->set( 'admin/graphql/debug', true );
 		$this->context->setView( \TestHelper::view( 'unittest', $this->context->config() ) );
+	}
+
+
+	protected function tearDown() : void
+	{
+		\Aimeos\MShop::create( $this->context, 'media' )->delete( $this->ids );
 	}
 
 
@@ -47,5 +54,24 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
 
 		$this->assertStringContainsString( '"label":"upload.gif"', (string) $response->getBody() );
+	}
+
+
+	public function testSaveMediaEditorServiceOwned()
+	{
+		$manager = \Aimeos\MShop::create( $this->context, 'media' );
+		$item = $manager->save( $manager->create()->setDomain( 'service' )->setLabel( 'service' )->setUrl( 'test.jpg' ) );
+		$this->ids[] = $item->getId();
+
+		$view = \TestHelper::view( 'unittest', $this->context->config() );
+		$view->addHelper( 'access', new \Aimeos\Base\View\Helper\Access\Standard( $view, ['editor'] ) );
+		$this->context->setView( $view );
+
+		$body = json_encode( ['query' => 'mutation { saveMedia(input: {id: "' . $item->getId() . '", label: "changed"}) { id } }'] );
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+		$result = json_decode( (string) \Aimeos\Admin\Graphql::execute( $this->context, $request )->getBody(), true );
+
+		$this->assertEquals( 'Forbidden', $result['errors'][0]['message'] ?? null );
+		$this->assertEquals( 'service', $manager->get( $item->getId() )->getLabel() );
 	}
 }
