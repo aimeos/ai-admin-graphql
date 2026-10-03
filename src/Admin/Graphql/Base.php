@@ -39,6 +39,47 @@ abstract class Base
 
 
 	/**
+	 * Checks if the user has access to the given domain and action
+	 *
+	 * @param string $domain Domain path of the manager
+	 * @param string $action Action name
+	 * @return bool True if access is allowed, false if not
+	 */
+	protected function access( string $domain, string $action ) : bool
+	{
+		$groups = $this->context->config()->get( 'admin/graphql/resource/' . $domain . '/' . $action, [] );
+
+		// @phpstan-ignore argument.type
+		if( $this->context->view()->access( $groups ) === true ) {
+			return true;
+		}
+
+		throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
+	}
+
+
+	/**
+	 * Checks if the user has access to the domain the item belongs to
+	 *
+	 * Items shared between domains (e.g. prices, texts and media) are owned by the
+	 * domain stored in their "<type>.domain" field. Changing them requires the same
+	 * permission as changing the owning item, so they can't be modified via their
+	 * own resource if the user isn't allowed to modify the owning domain. For list
+	 * items, the field contains the referenced domain instead, which requires the
+	 * same permission as for the referenced items themselves.
+	 *
+	 * @param \Aimeos\MShop\Common\Item\Iface $item Item to check
+	 * @param string $action Action name
+	 */
+	protected function permit( \Aimeos\MShop\Common\Item\Iface $item, string $action ) : void
+	{
+		if( $domain = $item->get( str_replace( '/', '.', $item->getResourceType() ) . '.domain' ) ) {
+			$this->access( (string) $domain, $action );
+		}
+	}
+
+
+	/**
 	 * Returns the context object
 	 *
 	 * @return \Aimeos\MShop\ContextIface Context object
@@ -66,7 +107,19 @@ abstract class Base
 				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
 			}
 
-			\Aimeos\MShop::create( $context, $domain )->delete( $args['id'] );
+			$ids = (array) $args['id'];
+			$manager = \Aimeos\MShop::create( $context, $domain );
+			$filter = $manager->filter()->add( str_replace( '/', '.', $domain ) . '.id', '==', $ids )->slice( 0, count( $ids ) );
+
+			$items = $manager->search( $filter );
+
+			foreach( $items as $item ) {
+				// @phpstan-ignore argument.type
+				$this->permit( $item, 'delete' );
+			}
+
+			// Only the checked items are deleted
+			$manager->delete( $items->keys()->all() );
 			return $args['id'];
 		};
 	}
@@ -236,7 +289,12 @@ abstract class Base
 
 			foreach( $entries as $entry )
 			{
-				$item = $map->get( $entry[$domain . '.id'] ?? null ) ?: $manager->create();
+				if( empty( $entry[$domain . '.id'] ) ) {
+					$item = $manager->create();
+				} elseif( ( $item = $map->get( (string) $entry[$domain . '.id'] ) ) === null ) {
+					throw new \Aimeos\Admin\Graphql\Exception( sprintf( 'Item with ID "%1$s" not found', (string) $entry[$domain . '.id'] ), 404 );
+				}
+
 				$items[] = $this->updateItem( $manager, $item, $entry );
 			}
 
