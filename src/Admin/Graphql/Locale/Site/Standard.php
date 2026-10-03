@@ -277,8 +277,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 			$this->access( $domain, 'insert' );
 			$manager = $this->manager();
-			$data = (array) $entry;
-			$item = $manager->create()->fromArray( $data, true );
+			$item = $this->fromArrayRef( $manager->create(), (array) $entry, $domain );
 
 			return $manager->insert( $item, $args['parentid'], $args['refid'] );
 		};
@@ -401,6 +400,6 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
 		}
 
-		return $item->fromArray( $entry, true );
+		return $this->fromArrayRef( $item, $entry, 'locale/site' );
 	}
 }

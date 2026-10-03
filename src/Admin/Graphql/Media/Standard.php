@@ -108,7 +108,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function updateItem( \Aimeos\MShop\Common\Manager\Iface $manager,
 		\Aimeos\MShop\Common\Item\Iface $item, array $entry ) : \Aimeos\MShop\Common\Item\Iface
 	{
-		$item = $item->fromArray( $entry, true );
+		$item = $this->fromArrayRef( $item, $entry, 'media' );
 
 		if( isset( $entry['media.file'] ) ) {
 			$item = $manager->upload( $item, $entry['media.file'], $entry['media.filepreview'] ?? null );
