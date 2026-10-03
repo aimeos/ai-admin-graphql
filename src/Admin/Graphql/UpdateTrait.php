@@ -54,7 +54,7 @@ trait UpdateTrait
 	protected function updateItem( \Aimeos\MShop\Common\Manager\Iface $manager,
 		\Aimeos\MShop\Common\Item\Iface $item, array $entry ) : \Aimeos\MShop\Common\Item\Iface
 	{
-		$item = $item->fromArray( $entry, true );
+		$item = $this->fromArrayRef( $item, $entry, $item->getResourceType() );
 
 		if( isset( $entry['address'] ) && $item instanceof \Aimeos\MShop\Common\Item\AddressRef\Iface ) {
 			$item = $this->updateAddresses( $manager, $item, (array) $entry['address'] );
@@ -92,12 +92,13 @@ trait UpdateTrait
 			// memberships are granted through list references, so linking a group is
 			// privileged too and always requires the "save" permission.
 			$perm = ( (string) $domain === 'group' ) ? 'save' : 'get';
+			$ids = [];
 
 			foreach( $list as $subentry )
 			{
 				if( isset( $subentry['item'] ) ) {
+					$ids[] = (string) ( $subentry['item'][$domain . '.id'] ?? $subentry[$resource . '.lists.refid'] ?? '' );
 					$perm = 'save';
-					break;
 				}
 			}
 
@@ -105,6 +106,15 @@ trait UpdateTrait
 
 			$domainManager = \Aimeos\MShop::create( $this->context(), $domain );
 			$listItems = $item->getListItems( $domain, null, null, false );
+			$refItems = $item->getRefItems( $domain, null, null, false );
+
+			// Existing items not referenced yet are loaded at once so they are checked and updated as stored
+			// @phpstan-ignore argument.type
+			if( !empty( $ids = array_unique( array_diff( array_filter( $ids ), $refItems->keys()->all() ) ) ) )
+			{
+				$filter = $domainManager->filter()->add( str_replace( '/', '.', (string) $domain ) . '.id', '==', $ids );
+				$refItems = $refItems->union( $domainManager->search( $filter->slice( 0, count( $ids ) ) ) );
+			}
 
 			foreach( $list as $subentry )
 			{
@@ -116,7 +126,14 @@ trait UpdateTrait
 				$listItem = $listItems->get( (string) $listId ) ?? $item->getListItem( $domain, (string) $listType, (string) $refId ) ?? $manager->createListItem();
 
 				if ( isset( $subentry['item'] ) ) {
-					$refBase = $listItem->getRefItem() ?? $domainManager->create();
+					$refBase = $listItem->getRefItem() ?? $refItems->get( (string) $refId );
+
+					if( $refBase === null && (string) $refId !== '' ) {
+						throw new \Aimeos\Admin\Graphql\Exception( sprintf( 'Item with ID "%1$s" not found', (string) $refId ), 404 );
+					}
+
+					$refBase = $refBase ?? $domainManager->create();
+					// @phpstan-ignore argument.type
 					$refItem = $this->fromArrayRef( $refBase, (array) $subentry['item'], (string) $domain );
 				}
 
@@ -145,42 +162,44 @@ trait UpdateTrait
 
 
 	/**
-	 * Updates a referenced item while enforcing the field-level permissions of privileged domains
+	 * Updates an item while enforcing the permissions of privileged domains and fields
 	 *
-	 * The generic nested writer stores referenced items in private mode, which unlocks
-	 * privileged fields (e.g. customer password, group membership and account status).
-	 * This method strips those fields unless the current user is allowed to change them,
-	 * so editors cannot escalate privileges through nested list references. It's also
-	 * used for customer items saved directly to apply the same rules.
+	 * All items are stored in private mode, which unlocks privileged fields (e.g. customer
+	 * password, group membership and account status). This method strips those fields
+	 * unless the current user is allowed to change them and requires the permission of
+	 * the domain owning the item before and after the update, so editors cannot escalate
+	 * privileges through direct writes or nested list references.
 	 *
-	 * @param \Aimeos\MShop\Common\Item\Iface $item Referenced item to update
-	 * @param array $entry Associative list of key/value pairs of the referenced item data
-	 * @param string $domain Domain of the referenced item
-	 * @return \Aimeos\MShop\Common\Item\Iface Updated referenced item
+	 * @param \Aimeos\MShop\Common\Item\Iface $item Item to update
+	 * @param array $entry Associative list of key/value pairs of the item data
+	 * @param string $domain Domain of the item
+	 * @return \Aimeos\MShop\Common\Item\Iface Updated item
 	 */
 	protected function fromArrayRef( \Aimeos\MShop\Common\Item\Iface $item, array $entry, string $domain ) : \Aimeos\MShop\Common\Item\Iface
 	{
+		// In private mode, the ID re-points the item to another row which bypasses all checks
+		// for the stored item, so the row to write is always the one passed to this method
+		unset( $entry[str_replace( '/', '.', $item->getResourceType() ) . '.id'] );
+
+		$this->permit( $item, 'save' );
+
 		if( $item instanceof \Aimeos\MShop\Customer\Item\Iface && !$this->context()->view()->access( ['super', 'admin'] ) )
 		{
 			// Group membership, account status and verification are admin-only
 			unset( $entry['customer.groups'], $entry['customer.status'], $entry['customer.dateverified'] );
 
-			// In private mode "customer.id" re-points the item to another row when fromArray()
-			// is applied below, so the ownership check must use the ID that will actually be
-			// written and not the one the base item currently carries. Otherwise an editor
-			// could pass the check with their own row and redirect the write to a foreign one.
-			$target = array_key_exists( 'customer.id', $entry )
-				? ( $entry['customer.id'] !== null ? (string) $entry['customer.id'] : null )
-				: $item->getId();
-
 			// Credentials, login code and login e-mail (the login identifier that getCode()
 			// falls back to) may only be changed for the own account
-			if( $target === null || $target !== $this->context()->user()?->getId() ) {
+			if( $item->getId() === null || $item->getId() !== $this->context()->user()?->getId() ) {
 				unset( $entry['customer.password'], $entry['customer.code'], $entry['customer.email'] );
 			}
 		}
 
-		return $item->fromArray( $entry, true );
+		// Items must not be moved to domains the user isn't allowed to change
+		$item = $item->fromArray( $entry, true );
+		$this->permit( $item, 'save' );
+
+		return $item;
 	}
 
 
