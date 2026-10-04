@@ -75,8 +75,13 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function updateItem( \Aimeos\MShop\Common\Manager\Iface $manager,
 		\Aimeos\MShop\Common\Item\Iface $item, array $entry ) : \Aimeos\MShop\Common\Item\Iface
 	{
-		$view = $this->context()->view();
-		$siteId = (string) $this->context()->user()?->getSiteId();
+		$context = $this->context();
+		$view = $context->view();
+		$siteId = '';
+
+		if( $userId = $context->user() ) {
+			$siteId = (string) \Aimeos\MShop::create( $context, 'customer' )->get( $userId )->getSiteId();
+		}
 
 		if( $view->access( ['super'] ) || strlen( $siteId ) > 0 && !strncmp( $item->getSiteId(), $siteId, strlen( $siteId ) ) )
 		{
