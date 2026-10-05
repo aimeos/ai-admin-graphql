@@ -15,7 +15,7 @@
 	"require": {
 		"php": "^8.2",
 		"aimeos/aimeos-core": "dev-master",
-		"aimeos/prisma": "dev-master",
+		"aimeos/prisma": "~0.7",
 		"webonyx/graphql-php": "~15.0",
 		"nyholm/psr7": "~1.2"
 	},
