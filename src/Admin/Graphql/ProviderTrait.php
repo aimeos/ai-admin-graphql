@@ -61,9 +61,15 @@ trait ProviderTrait
 
 			$this->access( $domain, 'get' );
 			$manager = \Aimeos\MShop::create( $this->context(), $domain );
-			$item = $manager->create()->setProvider( $args['provider'] );
+			$item = $manager->create()->setProvider( (string) ( $args['provider'] ?? '' ) );
 
-			return $manager->getProvider( $item, $args['type'] )->getConfigBE();
+			try {
+				$provider = $manager->getProvider( $item, (string) ( $args['type'] ?? '' ) );
+			} catch( \LogicException $e ) {
+				throw new \Aimeos\Admin\Graphql\Exception( 'Invalid provider', 400, $e );
+			}
+
+			return $provider->getConfigBE();
 		};
 	}
 }

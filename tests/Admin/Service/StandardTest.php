@@ -44,4 +44,26 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$this->assertStringContainsString( '"code":"xml.exportpath"', (string) $response->getBody() );
 		$this->assertStringContainsString( '"code":"basketvalues.total-value-min"', (string) $response->getBody() );
 	}
+
+
+	public function testGetServiceConfigInvalid()
+	{
+		$body = '{"query":"query {\n  getServiceConfig(provider: \"Unknown\", type: \"delivery\") {\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"message":"Invalid provider"', (string) $response->getBody() );
+	}
+
+
+	public function testGetServiceConfigMissingType()
+	{
+		$body = '{"query":"query {\n  getServiceConfig(provider: \"Standard\", type: null) {\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"message":"Invalid provider"', (string) $response->getBody() );
+	}
 }
