@@ -33,4 +33,26 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$this->assertStringContainsString( '"code":"percent"', (string) $response->getBody() );
 		$this->assertStringContainsString( '"code":"category.code"', (string) $response->getBody() );
 	}
+
+
+	public function testGetRuleConfigInvalid()
+	{
+		$body = '{"query":"query {\n  getRuleConfig(provider: \"Unknown\", type: \"catalog\") {\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"message":"Invalid provider"', (string) $response->getBody() );
+	}
+
+
+	public function testGetRuleConfigMissingType()
+	{
+		$body = '{"query":"query {\n  getRuleConfig(provider: \"Percent\", type: null) {\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
+
+		$this->assertStringContainsString( '"message":"Invalid provider"', (string) $response->getBody() );
+	}
 }

@@ -63,17 +63,17 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 
-			$context = $this->context();
-			$groups = $context->config()->get( 'admin/graphql/resource/' . $domain . '/get', [] );
+			$this->access( $domain, 'get' );
+			$manager = \Aimeos\MShop::create( $this->context(), $domain );
+			$item = $manager->create()->setProvider( (string) ( $args['provider'] ?? '' ) );
 
-			if( $context->view()->access( (string) $groups ) !== true ) {
-				throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
+			try {
+				$provider = $manager->getProvider( $item, (string) ( $args['type'] ?? '' ) );
+			} catch( \LogicException $e ) {
+				throw new \Aimeos\Admin\Graphql\Exception( 'Invalid provider', 400, $e );
 			}
 
-			$manager = \Aimeos\MShop::create( $context, $domain );
-			$item = $manager->create()->setProvider( $args['provider'] );
-
-			return $manager->getProvider( $item, $args['type'] )->getConfigBE();
+			return $provider->getConfigBE();
 		};
 	}
 }
