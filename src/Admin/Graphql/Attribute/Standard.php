@@ -55,6 +55,8 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	protected function findItem( string $domain ) : \Closure
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
+
+			$this->access( $domain, 'get' );
 			return \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'], $args['include'], $args['domain'], $args['type'] );
 		};
 	}
