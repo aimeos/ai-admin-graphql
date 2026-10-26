@@ -18,6 +18,20 @@ return [
 		],
 	],
 	'graphql' => [
+		/** admin/graphql/domains
+		 * List of domains available via the GraphQL API
+		 *
+		 * Queries and mutations are only available for the domains in this
+		 * list. Remove domains you don't want to manage via GraphQL or add the
+		 * domains of your own extensions. The class used for each domain is
+		 * configured by "admin/graphql/<domain>/name" and users also need the
+		 * permissions configured below "admin/graphql/resource".
+		 *
+		 * @param array Associative list of domain names as keys and values
+		 * @since 2022.10
+		 * @see admin/graphql/name
+		 * @see admin/graphql/lists-domains
+		 */
 		'domains' => [
 			'ai' => 'ai',
 			'attribute' => 'attribute',
@@ -71,6 +85,19 @@ return [
 			'text/lists/type' => 'text/lists/type',
 			'type' => 'type',
 		],
+		/** admin/graphql/lists-domains
+		 * Domains of the referenced items available via list items
+		 *
+		 * Items like products or catalogs can reference other items via list
+		 * items, e.g. texts, prices or media. GraphQL clients can only fetch
+		 * and save referenced items of the domains in this list together with
+		 * the parent item. Add the domains of your own extensions if their
+		 * items should be available as references too.
+		 *
+		 * @param array Associative list of domain names as keys and values
+		 * @since 2022.10
+		 * @see admin/graphql/domains
+		 */
 		'lists-domains' => [
 			'attribute' => 'attribute',
 			'catalog' => 'catalog',

@@ -239,7 +239,7 @@ class Standard extends \Aimeos\Admin\Graphql\Base
 				/** admin/graphql/ai/isolate/max-size
 				 * Maximum size of images uploaded for background removal
 				 *
-				 * @type int Maximum image size in bytes
+				 * @param integer Maximum image size in bytes
 				 * @since 2026.10
 				 */
 				$maxSize = max( 1, (int) $this->context()->config()->get( 'admin/graphql/ai/isolate/max-size', 10485760 ) );

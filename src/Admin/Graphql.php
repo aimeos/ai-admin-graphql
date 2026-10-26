@@ -52,7 +52,7 @@ class Graphql
 			 * your requests it's helpful to see the stack strace. If you set this
 			 * configuration option to true, the stack trace will be returned too.
 			 *
-			 * @type boolean True to return the stack trace in response, false for error message only
+			 * @param boolean True to return the stack trace in response, false for error message only
 			 * @since 2022.10
 			 * @category Developer
 			 */
@@ -82,7 +82,34 @@ class Graphql
 				$query = $input['query'] ?? '';
 			}
 
+			/** admin/graphql/max-query-depth
+			 * Maximum nesting level of the fields in GraphQL queries
+			 *
+			 * Deeply nested queries can be very expensive to resolve and may be
+			 * used to overload the server. Requests with queries nested deeper
+			 * than this value are rejected with an error. Increase the value if
+			 * your clients need to fetch more levels of referenced items.
+			 *
+			 * @param integer Number of levels
+			 * @since 2026.04
+			 * @category Developer
+			 * @see admin/graphql/max-query-complexity
+			 */
 			$maxDepth = (int) $context->config()->get( 'admin/graphql/max-query-depth', 10 );
+
+			/** admin/graphql/max-query-complexity
+			 * Maximum complexity of GraphQL queries
+			 *
+			 * The complexity of a query is the number of fields it requests,
+			 * including all fields of nested items. Requests with queries more
+			 * complex than this value are rejected with an error to protect the
+			 * server against expensive requests.
+			 *
+			 * @param integer Maximum complexity score
+			 * @since 2026.04
+			 * @category Developer
+			 * @see admin/graphql/max-query-depth
+			 */
 			$maxComplexity = (int) $context->config()->get( 'admin/graphql/max-query-complexity', 500 );
 
 			$validationRules = array_merge( DocumentValidator::allRules(), [
@@ -174,6 +201,27 @@ class Graphql
 		$config = $context->config();
 		$registry = new \Aimeos\Admin\Graphql\Registry( $context );
 
+		/** admin/graphql/name
+		 * Class name of the GraphQL implementation used for all domains
+		 *
+		 * The GraphQL queries and mutations of each domain are provided by the
+		 * class configured in "admin/graphql/<domain>/name", e.g.
+		 *
+		 *  admin/graphql/product/name = Myproduct
+		 *
+		 * uses \Aimeos\Admin\Graphql\Product\Myproduct. For sub-domains like
+		 * "product/lists/type", the class is \Aimeos\Admin\Graphql\Product\Lists\Type\...
+		 * If no such class exists, the class configured by this setting is used
+		 * instead, which is \Aimeos\Admin\Graphql\Standard by default.
+		 *
+		 * The value is the last part of your own class name and it's case
+		 * sensitive, so take care that the configuration value is exactly named
+		 * like the last part of the class name.
+		 *
+		 * @param string Last part of the class name
+		 * @since 2022.10
+		 * @see admin/graphql/domains
+		 */
 		$stdname = $config->get( 'admin/graphql/name', 'Standard' );
 		$domains = $config->get( 'admin/graphql/domains', [] );
 

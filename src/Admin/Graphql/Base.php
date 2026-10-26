@@ -29,7 +29,7 @@ abstract class Base
 	 * Initializes the object
 	 *
 	 * @param \Aimeos\MShop\ContextIface $context Context object
-	 * @type \Aimeos\Admin\Graphql\Registry Type registry object
+	 * @param \Aimeos\Admin\Graphql\Registry $registry Type registry object
 	 */
 	public function __construct( \Aimeos\MShop\ContextIface $context, Registry $registry )
 	{

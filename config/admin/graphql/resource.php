@@ -509,16 +509,16 @@ return [
 			 */
 			'delete' => ['super'],
 
-			/** admin/graphql/resource/locale/site/delete
-			 * List of user groups that are allowed to delete locale site items
+			/** admin/graphql/resource/locale/site/insert
+			 * List of user groups that are allowed to create new locale site items in the site tree
 			 *
 			 * @param array List of user group names
 			 * @since 2023.10
 			 */
 			'insert' => ['super'],
 
-			/** admin/graphql/resource/locale/site/delete
-			 * List of user groups that are allowed to delete locale site items
+			/** admin/graphql/resource/locale/site/move
+			 * List of user groups that are allowed to move locale site items within the site tree
 			 *
 			 * @param array List of user group names
 			 * @since 2023.10
@@ -822,24 +822,24 @@ return [
 		],
 	],
 	'price' => [
-		/** admin/graphql/resource/product/delete
-		 * List of user groups that are allowed to delete product items
+		/** admin/graphql/resource/price/delete
+		 * List of user groups that are allowed to delete price items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
 		'delete' => ['admin', 'editor', 'super'],
 
-		/** admin/graphql/resource/product/save
-		 * List of user groups that are allowed to create and update product items
+		/** admin/graphql/resource/price/save
+		 * List of user groups that are allowed to create and update price items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
 		 */
 		'save' => ['admin', 'editor', 'super'],
 
-		/** admin/graphql/resource/product/get
-		 * List of user groups that are allowed to retrieve product items
+		/** admin/graphql/resource/price/get
+		 * List of user groups that are allowed to retrieve price items
 		 *
 		 * @param array List of user group names
 		 * @since 2022.10
@@ -847,24 +847,24 @@ return [
 		'get' => ['admin', 'editor', 'super'],
 
 		'lists' => [
-			/** admin/graphql/resource/product/lists/delete
-			 * List of user groups that are allowed to delete product lists items
+			/** admin/graphql/resource/price/lists/delete
+			 * List of user groups that are allowed to delete price lists items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
 			'delete' => ['admin', 'editor', 'super'],
 
-			/** admin/graphql/resource/product/lists/save
-			 * List of user groups that are allowed to create and update product lists items
+			/** admin/graphql/resource/price/lists/save
+			 * List of user groups that are allowed to create and update price lists items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
 			'save' => ['admin', 'editor', 'super'],
 
-			/** admin/graphql/resource/product/lists/get
-			 * List of user groups that are allowed to retrieve product lists items
+			/** admin/graphql/resource/price/lists/get
+			 * List of user groups that are allowed to retrieve price lists items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
@@ -872,24 +872,24 @@ return [
 			'get' => ['admin', 'editor', 'super'],
 
 			'type' => [
-				/** admin/graphql/resource/product/lists/type/delete
-				 * List of user groups that are allowed to delete product lists type items
+				/** admin/graphql/resource/price/lists/type/delete
+				 * List of user groups that are allowed to delete price lists type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
 				'delete' => ['admin', 'super'],
 
-				/** admin/graphql/resource/product/lists/type/save
-				 * List of user groups that are allowed to create and update product lists type items
+				/** admin/graphql/resource/price/lists/type/save
+				 * List of user groups that are allowed to create and update price lists type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
 				'save' => ['admin', 'super'],
 
-				/** admin/graphql/resource/product/lists/type/get
-				 * List of user groups that are allowed to retrieve product lists type items
+				/** admin/graphql/resource/price/lists/type/get
+				 * List of user groups that are allowed to retrieve price lists type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
@@ -898,24 +898,24 @@ return [
 			],
 		],
 		'property' => [
-			/** admin/graphql/resource/product/property/delete
-			 * List of user groups that are allowed to delete product property items
+			/** admin/graphql/resource/price/property/delete
+			 * List of user groups that are allowed to delete price property items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
 			'delete' => ['admin', 'editor', 'super'],
 
-			/** admin/graphql/resource/product/property/save
-			 * List of user groups that are allowed to create and update product property items
+			/** admin/graphql/resource/price/property/save
+			 * List of user groups that are allowed to create and update price property items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
 			'save' => ['admin', 'editor', 'super'],
 
-			/** admin/graphql/resource/product/property/get
-			 * List of user groups that are allowed to retrieve product property items
+			/** admin/graphql/resource/price/property/get
+			 * List of user groups that are allowed to retrieve price property items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
@@ -923,24 +923,24 @@ return [
 			'get' => ['admin', 'editor', 'super'],
 
 			'type' => [
-				/** admin/graphql/resource/product/property/type/delete
-				 * List of user groups that are allowed to delete product property type items
+				/** admin/graphql/resource/price/property/type/delete
+				 * List of user groups that are allowed to delete price property type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
 				'delete' => ['admin', 'super'],
 
-				/** admin/graphql/resource/product/property/type/save
-				 * List of user groups that are allowed to create and update product property type items
+				/** admin/graphql/resource/price/property/type/save
+				 * List of user groups that are allowed to create and update price property type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
 				 */
 				'save' => ['admin', 'super'],
 
-				/** admin/graphql/resource/product/property/type/get
-				 * List of user groups that are allowed to retrieve product property type items
+				/** admin/graphql/resource/price/property/type/get
+				 * List of user groups that are allowed to retrieve price property type items
 				 *
 				 * @param array List of user group names
 				 * @since 2022.10
@@ -949,24 +949,24 @@ return [
 			],
 		],
 		'type' => [
-			/** admin/graphql/resource/product/type/delete
-			 * List of user groups that are allowed to delete product type items
+			/** admin/graphql/resource/price/type/delete
+			 * List of user groups that are allowed to delete price type items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
 			'delete' => ['admin', 'super'],
 
-			/** admin/graphql/resource/product/type/save
-			 * List of user groups that are allowed to create and update product type items
+			/** admin/graphql/resource/price/type/save
+			 * List of user groups that are allowed to create and update price type items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
 			 */
 			'save' => ['admin', 'super'],
 
-			/** admin/graphql/resource/product/type/get
-			 * List of user groups that are allowed to retrieve product type items
+			/** admin/graphql/resource/price/type/get
+			 * List of user groups that are allowed to retrieve price type items
 			 *
 			 * @param array List of user group names
 			 * @since 2022.10
