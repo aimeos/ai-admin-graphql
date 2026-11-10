@@ -341,7 +341,7 @@ abstract class Base
 		foreach( $entry['lists'] ?? [] as $listDomain => $subentry )
 		{
 			foreach( $subentry ?? [] as $subItem ) {
-				$ref = array_merge( $ref, $this->getRefs( (array) $subItem['item'], (string) $listDomain ) );
+				$ref = array_merge( $ref, $this->getRefs( (array) ( $subItem['item'] ?? [] ), (string) $listDomain ) );
 			}
 		}
 
