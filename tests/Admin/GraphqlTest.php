@@ -28,7 +28,7 @@ class GraphqlTest extends \PHPUnit\Framework\TestCase
 	{
 		$context = $this->context();
 
-		$this->assertTrue( \Aimeos\Admin\Graphql::allowed( $context, 'order' ) );
+		$this->assertTrue( \Aimeos\Admin\Graphql::allowed( $context, 'order', 'get' ) );
 		$this->assertFalse( \Aimeos\Admin\Graphql::allowed( $context, 'order/address', 'get' ) );
 	}
 

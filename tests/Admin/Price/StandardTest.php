@@ -65,7 +65,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$result = $this->execute( 'mutation { savePrice(input: {id: "' . $item->getId() . '", value: "13.37"}) { id value } }' );
 
 		// items of domains the user isn't allowed to access can't be changed
-		$this->assertStringContainsString( 'domain "service" is not allowed', $result['errors'][0]['message'] ?? '' );
+		$this->assertStringContainsString( 'Permission "save" for "service" is required', $result['errors'][0]['message'] ?? '' );
 		$this->assertEquals( '10.00', $this->manager->get( $item->getId() )->getValue() );
 	}
 
@@ -149,7 +149,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 		$result = $this->execute( 'mutation { deletePrice(id: "' . $item->getId() . '") }' );
 
-		$this->assertStringContainsString( 'domain "service" is not allowed', $result['errors'][0]['message'] ?? '' );
+		$this->assertStringContainsString( 'Permission "save" for "service" is required', $result['errors'][0]['message'] ?? '' );
 		$this->assertEquals( $item->getId(), $this->manager->get( $item->getId() )->getId() );
 	}
 
