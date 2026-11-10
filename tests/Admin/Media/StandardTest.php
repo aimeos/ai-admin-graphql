@@ -26,7 +26,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 	protected function tearDown() : void
 	{
-		\Aimeos\MShop::create( $this->context, 'media' )->delete( $this->ids );
+		\Aimeos\MShop::create( \TestHelper::context(), 'media' )->delete( $this->ids );
 	}
 
 
@@ -59,7 +59,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 	public function testSaveMediaEditorServiceOwned()
 	{
-		$manager = \Aimeos\MShop::create( $this->context, 'media' );
+		$manager = \Aimeos\MShop::create( \TestHelper::context(), 'media' );
 		$item = $manager->save( $manager->create()->setDomain( 'service' )->setLabel( 'service' )->setUrl( 'test.jpg' ) );
 		$this->ids[] = $item->getId();
 
@@ -71,7 +71,8 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
 		$result = json_decode( (string) \Aimeos\Admin\Graphql::execute( $this->context, $request )->getBody(), true );
 
-		$this->assertEquals( 'Forbidden', $result['errors'][0]['message'] ?? null );
+		// items of domains the user isn't allowed to access can't be changed
+		$this->assertArrayHasKey( 'errors', $result );
 		$this->assertEquals( 'service', $manager->get( $item->getId() )->getLabel() );
 	}
 

@@ -22,6 +22,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	{
 		\Aimeos\MShop::cache( true );
 		$this->context = new \Aimeos\MShop\Context();
+		$this->context->setPolicy( \Aimeos\Admin\Graphql::policy() );
 		$this->context->setConfig( new \Aimeos\Base\Config\PHPArray( [
 			'admin' => ['graphql' => ['debug' => true, 'domains' => ['ai']]],
 		] ) );

@@ -166,8 +166,7 @@ trait UpdateTrait
 	 *
 	 * All items are stored in private mode, which unlocks privileged fields (e.g. customer
 	 * password, group membership and account status). This method strips those fields
-	 * unless the current user is allowed to change them and requires the permission of
-	 * the domain owning the item before and after the update, so editors cannot escalate
+	 * unless the current user is allowed to change them, so editors cannot escalate
 	 * privileges through direct writes or nested list references.
 	 *
 	 * @param \Aimeos\MShop\Common\Item\Iface $item Item to update
@@ -180,8 +179,6 @@ trait UpdateTrait
 		// In private mode, the ID re-points the item to another row which bypasses all checks
 		// for the stored item, so the row to write is always the one passed to this method
 		unset( $entry[str_replace( '/', '.', $item->getResourceType() ) . '.id'] );
-
-		$this->permit( $item, 'save' );
 
 		if( $item instanceof \Aimeos\MShop\Customer\Item\Iface && !$this->context()->view()->access( ['super', 'admin'] ) )
 		{
@@ -200,11 +197,7 @@ trait UpdateTrait
 			unset( $entry['media.url'], $entry['media.preview'], $entry['media.previews'], $entry['media.filesystem'] );
 		}
 
-		// Items must not be moved to domains the user isn't allowed to change
-		$item = $item->fromArray( $entry, true );
-		$this->permit( $item, 'save' );
-
-		return $item;
+		return $item->fromArray( $entry, true );
 	}
 
 

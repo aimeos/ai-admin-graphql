@@ -198,7 +198,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 			$this->access( $domain, 'get' );
-			return $this->manager()->getPath( $args['id'], $args['include'] );
+			return $this->manager()->getPath( $args['id'], $this->included( $args['include'] ) );
 		};
 	}
 
@@ -213,7 +213,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 	{
 		return function( $root, $args, $context ) use ( $domain ) {
 			$this->access( $domain, 'get' );
-			return $this->manager()->getTree( $args['id'], $args['include'], $args['level'] );
+			return $this->manager()->getTree( $args['id'], $this->included( $args['include'] ), $args['level'] );
 		};
 	}
 
@@ -288,8 +288,9 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			$filter = $manager->filter()->order( ['-catalog.level', 'sort:catalog:position'] );
 			$filter->add( $filter->parse( (array) json_decode( (string) $args['filter'], true ) ) );
 
+			$include = $this->included( $args['include'] );
 			// @phpstan-ignore argument.type
-			$items = $manager->search( $filter->slice( 0, (int) $args['limit'] ), (array) $args['include'] );
+			$items = $manager->search( $filter->slice( 0, (int) $args['limit'] ), $include );
 
 			foreach( $items as $key => $item )
 			{
@@ -299,7 +300,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				}
 			}
 
-			return $this->getParents( $items->values(), (array) $args['include'] );
+			return $this->getParents( $items->values(), $include );
 		};
 	}
 }

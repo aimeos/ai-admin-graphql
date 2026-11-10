@@ -39,43 +39,33 @@ abstract class Base
 
 
 	/**
-	 * Checks if the user has access to the given domain and action
+	 * Ensures that the user has access to the given domain and action
 	 *
 	 * @param string $domain Domain path of the manager
 	 * @param string $action Action name
-	 * @return bool True if access is allowed, false if not
+	 * @return bool Always TRUE because an exception is thrown if access isn't allowed
+	 * @throws \Aimeos\Admin\Graphql\Exception If access isn't allowed
 	 */
 	protected function access( string $domain, string $action ) : bool
 	{
-		$groups = $this->context->config()->get( 'admin/graphql/resource/' . $domain . '/' . $action, [] );
-
-		// @phpstan-ignore argument.type
-		if( $this->context->view()->access( $groups ) === true ) {
-			return true;
-		}
-
-		throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
+		\Aimeos\Admin\Graphql::check( $this->context, $domain, $action );
+		return true;
 	}
 
 
 	/**
-	 * Checks if the user has access to the domain the item belongs to
+	 * Returns the domains of the related items the user is allowed to retrieve
 	 *
-	 * Items shared between domains (e.g. prices, texts and media) are owned by the
-	 * domain stored in their "<type>.domain" field. Changing them requires the same
-	 * permission as changing the owning item, so they can't be modified via their
-	 * own resource if the user isn't allowed to modify the owning domain. For list
-	 * items, the field contains the referenced domain instead, which requires the
-	 * same permission as for the referenced items themselves.
+	 * Sub-domains without own permissions (e.g. "order/address") inherit the
+	 * permission of their parent domain, domains without any configured
+	 * permission are removed.
 	 *
-	 * @param \Aimeos\MShop\Common\Item\Iface $item Item to check
-	 * @param string $action Action name
+	 * @param mixed $include Domain name or list of domain names whose items should be fetched too
+	 * @return array List of domain names the user is allowed to retrieve
 	 */
-	protected function permit( \Aimeos\MShop\Common\Item\Iface $item, string $action ) : void
+	protected function included( $include ) : array
 	{
-		if( $domain = $item->get( str_replace( '/', '.', $item->getResourceType() ) . '.domain' ) ) {
-			$this->access( (string) $domain, $action );
-		}
+		return \Aimeos\Admin\Graphql::permitted( $this->context, (array) $include, 'get', inherit: true );
 	}
 
 
@@ -96,6 +86,7 @@ abstract class Base
 			$filter = $manager->filter()->order( $args['sort'] )->slice( 0, (int) $args['limit'] );
 			// @phpstan-ignore argument.type
 			$filter->add( $filter->parse( json_decode( (string) $args['filter'], true ) ) );
+			\Aimeos\Admin\Graphql::restrict( $this->context(), $manager, $filter );
 
 			// @phpstan-ignore argument.type, argument.type, argument.type
 			return $manager->aggregate( $filter, $args['key'], $args['value'], $args['type'] )->all();
@@ -125,20 +116,8 @@ abstract class Base
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$this->access( $domain, 'delete' );
-
-			$ids = (array) $args['id'];
-			$manager = \Aimeos\MShop::create( $this->context(), $domain );
-			$filter = $manager->filter()->add( str_replace( '/', '.', $domain ) . '.id', '==', $ids )->slice( 0, count( $ids ) );
-
-			$items = $manager->search( $filter );
-
-			foreach( $items as $item ) {
-				// @phpstan-ignore argument.type
-				$this->permit( $item, 'delete' );
-			}
-
-			// Only the checked items are deleted
-			$manager->delete( $items->keys()->all() );
+			// @phpstan-ignore argument.type
+			\Aimeos\MShop::create( $this->context(), $domain )->delete( $args['id'] );
 			return $args['id'];
 		};
 	}
@@ -156,25 +135,32 @@ abstract class Base
 
 			$this->access( $domain, 'get' );
 			// @phpstan-ignore argument.type
-			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->get( (string) $args['id'], (array) $args['include'] ) );
+			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->get( (string) $args['id'], $this->included( $args['include'] ) ) );
 		};
 	}
 
 
 	/**
-	 * Returns the item if not removed for security reasons
+	 * Returns the item if the user is allowed to retrieve it
+	 *
+	 * Shared items (e.g. prices, texts and media) require the read permission of the owning domain.
+	 * Subclasses adding their own checks must call this method too.
 	 *
 	 * @param \Aimeos\MShop\Common\Item\Iface $item Item to check
-	 * @return \Aimeos\MShop\Common\Item\Iface Item if not removed
+	 * @return \Aimeos\MShop\Common\Item\Iface Passed item
+	 * @throws \Aimeos\MShop\Exception If the user isn't allowed to retrieve the item, same as for missing items
 	 */
 	protected function filter( \Aimeos\MShop\Common\Item\Iface $item ) : \Aimeos\MShop\Common\Item\Iface
 	{
-		return $item;
+		return \Aimeos\Admin\Graphql::readable( $this->context(), $item );
 	}
 
 
 	/**
 	 * Returns the items if not removed for security reasons
+	 *
+	 * Search results don't need the checks of filter() because restrict() already limits
+	 * the filter to the items the user is allowed to retrieve.
 	 *
 	 * @param iterable $items List of items to check
 	 * @return iterable List of items not removed
@@ -197,7 +183,7 @@ abstract class Base
 
 			$this->access( $domain, 'get' );
 			// @phpstan-ignore argument.type
-			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'], $args['include'] ) );
+			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'], $this->included( $args['include'] ) ) );
 		};
 	}
 
@@ -236,10 +222,11 @@ abstract class Base
 			$filter = $manager->filter()->order( $args['sort'] )->slice( (int) $args['offset'], (int) $args['limit'] );
 			// @phpstan-ignore argument.type
 			$filter->add( $filter->parse( json_decode( (string) $args['filter'], true ) ) );
+			\Aimeos\Admin\Graphql::restrict( $this->context(), $manager, $filter );
 
 			$total = 0;
 			// @phpstan-ignore argument.type
-			$items = $this->filters( $manager->search( $filter, (array) $args['include'], $total )->toArray() );
+			$items = $this->filters( $manager->search( $filter, $this->included( $args['include'] ), $total )->toArray() );
 
 			return [
 				'items' => $items,

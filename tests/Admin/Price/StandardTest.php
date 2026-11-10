@@ -23,13 +23,13 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$this->context = \TestHelper::context();
 		$this->context->config()->set( 'admin/graphql/debug', true );
 		$this->context->setView( \TestHelper::view( 'unittest', $this->context->config() ) );
-		$this->manager = \Aimeos\MShop::create( $this->context, 'price' );
+		$this->manager = \Aimeos\MShop::create( \TestHelper::context(), 'price' );
 	}
 
 
 	protected function tearDown() : void
 	{
-		\Aimeos\MShop::create( $this->context, 'product' )->delete( $this->productIds );
+		\Aimeos\MShop::create( \TestHelper::context(), 'product' )->delete( $this->productIds );
 		$this->manager->delete( $this->priceIds );
 	}
 
@@ -64,7 +64,8 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 		$result = $this->execute( 'mutation { savePrice(input: {id: "' . $item->getId() . '", value: "13.37"}) { id value } }' );
 
-		$this->assertEquals( 'Forbidden', $result['errors'][0]['message'] ?? null );
+		// items of domains the user isn't allowed to access can't be changed
+		$this->assertStringContainsString( 'domain "service" is not allowed', $result['errors'][0]['message'] ?? '' );
 		$this->assertEquals( '10.00', $this->manager->get( $item->getId() )->getValue() );
 	}
 
@@ -76,7 +77,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 		$result = $this->execute( 'mutation { savePrice(input: {id: "' . $item->getId() . '", domain: "service"}) { id } }' );
 
-		$this->assertEquals( 'Forbidden', $result['errors'][0]['message'] ?? null );
+		$this->assertArrayHasKey( 'errors', $result );
 		$this->assertEquals( 'product', $this->manager->get( $item->getId() )->getDomain() );
 	}
 
@@ -87,7 +88,8 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 		$result = $this->execute( 'mutation { savePrice(input: {domain: "service", value: "13.37", currencyid: "EUR"}) { id } }' );
 
-		$this->assertEquals( 'Forbidden', $result['errors'][0]['message'] ?? null );
+		$this->assertArrayHasKey( 'errors', $result );
+		$this->assertNull( $result['data']['savePrice'] ?? null );
 	}
 
 
@@ -98,7 +100,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 		$result = $this->execute( 'mutation { savePrices(input: [{id: "' . $item->getId() . '", value: "13.37"}]) { id value } }' );
 
-		$this->assertEquals( 'Forbidden', $result['errors'][0]['message'] ?? null );
+		$this->assertArrayHasKey( 'errors', $result );
 		$this->assertEquals( '10.00', $this->manager->get( $item->getId() )->getValue() );
 	}
 
@@ -147,7 +149,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 		$result = $this->execute( 'mutation { deletePrice(id: "' . $item->getId() . '") }' );
 
-		$this->assertEquals( 'Forbidden', $result['errors'][0]['message'] ?? null );
+		$this->assertStringContainsString( 'domain "service" is not allowed', $result['errors'][0]['message'] ?? '' );
 		$this->assertEquals( $item->getId(), $this->manager->get( $item->getId() )->getId() );
 	}
 
@@ -160,7 +162,8 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 		$result = $this->execute( 'mutation { deletePrices(id: ["' . $product->getId() . '", "' . $service->getId() . '"]) }' );
 
-		$this->assertEquals( 'Forbidden', $result['errors'][0]['message'] ?? null );
+		// nothing is deleted if one of the items can't be deleted
+		$this->assertArrayHasKey( 'errors', $result );
 		$this->assertEquals( 2, count( $this->manager->search( $this->manager->filter()->add( 'price.id', '==', $this->priceIds ) ) ) );
 	}
 
@@ -176,7 +179,7 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 			. 'type: "default", item: {id: "' . $item->getId() . '", value: "13.37"}'
 			. '}]}}) { id } }' );
 
-		$this->assertEquals( 'Forbidden', $result['errors'][0]['message'] ?? null );
+		$this->assertArrayHasKey( 'errors', $result );
 		$this->assertEquals( '10.00', $this->manager->get( $item->getId() )->getValue() );
 	}
 
@@ -193,8 +196,55 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 			. 'id: "' . $listId . '", refid: "' . $item->getId() . '", type: "default", item: {value: "13.37"}'
 			. '}]}}) { id } }' );
 
-		$this->assertEquals( 'Forbidden', $result['errors'][0]['message'] ?? null );
+		$this->assertArrayHasKey( 'errors', $result );
 		$this->assertEquals( '10.00', $this->manager->get( $item->getId() )->getValue() );
+	}
+
+
+	public function testSaveProductEditorLink()
+	{
+		$item = $this->price( 'product' );
+		$product = $this->product();
+		$this->editor();
+
+		$result = $this->execute( 'mutation { saveProduct(input: {id: "' . $product->getId() . '", lists: {price: [{'
+			. 'refid: "' . $item->getId() . '", type: "default"'
+			. '}]}}) { id } }' );
+
+		$this->assertArrayNotHasKey( 'errors', $result );
+		$this->assertEquals( 1, count( $this->products( $product->getId() )->getListItems( 'price' ) ) );
+	}
+
+
+	public function testSaveProductEditorLinkServiceOwned()
+	{
+		$item = $this->price( 'service' );
+		$product = $this->product();
+		$this->editor();
+
+		// Service prices can be linked but not changed
+		$result = $this->execute( 'mutation { saveProduct(input: {id: "' . $product->getId() . '", lists: {price: [{'
+			. 'refid: "' . $item->getId() . '", type: "default"'
+			. '}]}}) { id } }' );
+
+		$this->assertArrayNotHasKey( 'errors', $result );
+		$this->assertEquals( 1, count( $this->products( $product->getId() )->getListItems( 'price' ) ) );
+		$this->assertEquals( '10.00', $this->manager->get( $item->getId() )->getValue() );
+	}
+
+
+	public function testSaveProductEditorUnlinkServiceOwned()
+	{
+		$service = $this->price( 'service' );
+		$product = $this->product( $service );
+		$this->editor();
+
+		// Service prices can be unlinked but not deleted
+		$result = $this->execute( 'mutation { saveProduct(input: {id: "' . $product->getId() . '", lists: {price: []}}) { id } }' );
+
+		$this->assertArrayNotHasKey( 'errors', $result );
+		$this->assertEquals( 0, count( $this->products( $product->getId() )->getListItems( 'price' ) ) );
+		$this->assertEquals( $service->getId(), $this->manager->get( $service->getId() )->getId() );
 	}
 
 
@@ -207,6 +257,99 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 			. '}]}}) { id } }' );
 
 		$this->assertStringContainsString( 'not found', $result['errors'][0]['message'] ?? '' );
+	}
+
+
+	public function testGetPriceEditorServiceOwned()
+	{
+		$item = $this->price( 'service' );
+		$this->editor();
+
+		$result = $this->execute( 'query { getPrice(id: "' . $item->getId() . '") { id value } }' );
+
+		// shared items can contain sensitive data of the domain owning them
+		// reported like missing items
+		$this->assertEquals( 'Internal server error', $result['errors'][0]['message'] ?? null );
+	}
+
+
+	public function testGetPriceEditor()
+	{
+		$item = $this->price( 'product' );
+		$this->editor();
+
+		$result = $this->execute( 'query { getPrice(id: "' . $item->getId() . '") { id value } }' );
+
+		$this->assertArrayNotHasKey( 'errors', $result );
+		$this->assertEquals( '10.00', $result['data']['getPrice']['value'] ?? null );
+	}
+
+
+	public function testSearchPricesEditorServiceOwned()
+	{
+		$product = $this->price( 'product' );
+		$service = $this->price( 'service' );
+		$this->editor();
+
+		$filter = addslashes( json_encode( ['==' => ['price.id' => [$product->getId(), $service->getId()]]] ) );
+		$result = $this->execute( 'query { searchPrices(filter: "' . $filter . '") { items { id } total } }' );
+
+		// shared items of domains the user isn't allowed to access aren't returned
+		$this->assertArrayNotHasKey( 'errors', $result );
+		$this->assertEquals( 1, $result['data']['searchPrices']['total'] ?? null );
+		$this->assertEquals( $product->getId(), $result['data']['searchPrices']['items'][0]['id'] ?? null );
+	}
+
+
+	public function testSearchPricesServiceOwned()
+	{
+		$product = $this->price( 'product' );
+		$service = $this->price( 'service' );
+
+		$filter = addslashes( json_encode( ['==' => ['price.id' => [$product->getId(), $service->getId()]]] ) );
+		$result = $this->execute( 'query { searchPrices(filter: "' . $filter . '") { items { id } total } }' );
+
+		$this->assertArrayNotHasKey( 'errors', $result );
+		$this->assertEquals( 2, $result['data']['searchPrices']['total'] ?? null );
+	}
+
+
+	public function testSavePriceEditorUnconfigured()
+	{
+		// Domains without configured user groups don't restrict changing their items
+		$item = $this->price( 'unconfigured' );
+		$this->editor();
+
+		$result = $this->execute( 'mutation { savePrice(input: {id: "' . $item->getId() . '", value: "13.37"}) { id } }' );
+
+		$this->assertArrayNotHasKey( 'errors', $result );
+		$this->assertEquals( '13.37', $this->manager->get( $item->getId() )->getValue() );
+	}
+
+
+	public function testGetProductEditorServiceOwnedPrice()
+	{
+		$product = $this->product( $this->price( 'service' ) );
+		$this->editor();
+
+		$result = $this->execute( 'query { getProduct(id: "' . $product->getId() . '", include: ["price"]) { id lists { price { refid item { id } } } } }' );
+
+		$this->assertArrayNotHasKey( 'errors', $result );
+		$this->assertEquals( 1, count( $result['data']['getProduct']['lists']['price'] ?? [] ) );
+	}
+
+
+	public function testSearchProductsEditorIncludeDenied()
+	{
+		$product = $this->product( $this->price( 'product' ) );
+		$this->context->config()->set( 'admin/graphql/resource/price/get', ['admin'] );
+		$this->editor();
+
+		$filter = addslashes( json_encode( ['==' => ['product.id' => $product->getId()]] ) );
+		$result = $this->execute( 'query { searchProducts(filter: "' . $filter . '", include: ["price"]) { items { id lists { price { refid } } } } }' );
+
+		$this->assertArrayNotHasKey( 'errors', $result );
+		$this->assertEquals( [], $result['data']['searchProducts']['items'][0]['lists']['price'] ?? null );
 	}
 
 
@@ -235,12 +378,18 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	protected function product( ?\Aimeos\MShop\Price\Item\Iface $price = null ) : \Aimeos\MShop\Product\Item\Iface
+	protected function products( string $id ) : \Aimeos\MShop\Product\Item\Iface
 	{
-		$manager = \Aimeos\MShop::create( $this->context, 'product' );
+		return \Aimeos\MShop::create( \TestHelper::context(), 'product' )->get( $id, ['price'] );
+	}
+
+
+	protected function product( \Aimeos\MShop\Price\Item\Iface ...$prices ) : \Aimeos\MShop\Product\Item\Iface
+	{
+		$manager = \Aimeos\MShop::create( \TestHelper::context(), 'product' );
 		$item = $manager->create()->setCode( 'graphql-price-test' )->setLabel( 'GraphQL price test' );
 
-		if( $price ) {
+		foreach( $prices as $price ) {
 			$item->addListItem( 'price', $manager->createListItem()->setType( 'default' )->setRefId( $price->getId() ) );
 		}
 

@@ -57,7 +57,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		return function( $root, $args, $context ) use ( $domain ) {
 
 			$this->access( $domain, 'get' );
-			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'], $args['include'], $args['domain'], $args['type'] ) );
+			return $this->filter( \Aimeos\MShop::create( $this->context(), $domain )->find( $args['code'], $this->included( $args['include'] ), $args['domain'], $args['type'] ) );
 		};
 	}
 }

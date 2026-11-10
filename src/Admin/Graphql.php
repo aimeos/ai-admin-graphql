@@ -13,6 +13,8 @@ namespace Aimeos\Admin;
 
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Error\DebugFlag;
+use GraphQL\Error\Error;
+use GraphQL\Error\FormattedError;
 use GraphQL\Type\Schema;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Validator\DocumentValidator;
@@ -29,6 +31,8 @@ use Nyholm\Psr7\Factory\Psr17Factory;
  */
 class Graphql
 {
+	use \Aimeos\MShop\PolicyTrait;
+
 	/**
 	 * Executes the GraphQL request
 	 *
@@ -39,6 +43,8 @@ class Graphql
 	public static function execute( \Aimeos\MShop\ContextIface $context,
 		\Psr\Http\Message\ServerRequestInterface $request ) : \Psr\Http\Message\ResponseInterface
 	{
+		$context = static::withPolicy( $context );
+
 		$debug = false;
 
 		try
@@ -129,7 +135,8 @@ class Graphql
 				$opname,
 				null, // fieldResolver
 				$validationRules
-			)->toArray( $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : 0 );
+			)->setErrorFormatter( fn( \Throwable $e ) => static::error( $e ) )
+				->toArray( $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : 0 );
 		}
 		catch( \Throwable $t )
 		{
@@ -145,6 +152,26 @@ class Graphql
 		// @phpstan-ignore argument.type
 		$body = \Nyholm\Psr7\Stream::create( json_encode( $result ) );
 		return ( new Psr17Factory )->createResponse()->withBody( $body );
+	}
+
+
+	/**
+	 * Returns the formatted error shown to the client
+	 *
+	 * The permission errors of the managers (e.g. for shared items of domains the user
+	 * isn't allowed to change) are shown with their message and the 403 code instead
+	 * of hiding them behind an "Internal server error" message.
+	 *
+	 * @param \Throwable $e Error thrown while executing the query
+	 * @return array Formatted error
+	 */
+	protected static function error( \Throwable $e ) : array
+	{
+		if( $e instanceof Error && ( $prev = $e->getPrevious() ) instanceof \Aimeos\MShop\PolicyException ) {
+			$e = Error::createLocatedError( static::forbidden( $prev->getMessage(), $prev ), $e->getNodes(), $e->getPath() );
+		}
+
+		return FormattedError::createFromException( $e );
 	}
 
 
@@ -252,5 +279,45 @@ class Graphql
 				'fields' => $mutation
 			] ),
 		] );
+	}
+
+
+	/**
+	 * Returns the default authorization policy of the GraphQL admin interface
+	 *
+	 * The interface uses it if the passed context contains no policy, so it also protects
+	 * shared items like prices of domains the user isn't allowed to access. Host applications
+	 * can use their own policy by setting it in the context with $context->setPolicy().
+	 *
+	 * @return \Aimeos\MShop\PolicyIface Authorization policy
+	 */
+	public static function policy() : \Aimeos\MShop\PolicyIface
+	{
+		return new \Aimeos\MShop\Policy\Actions( static::prefix() );
+	}
+
+
+	/**
+	 * Creates the exception of the interface
+	 *
+	 * @param string $msg Translated error message
+	 * @param int $code Error code, e.g. 403 for actions which aren't allowed
+	 * @param \Throwable|null $previous Previous exception
+	 * @return \Exception Exception with the passed code
+	 */
+	protected static function exception( string $msg, int $code, ?\Throwable $previous = null ) : \Exception
+	{
+		return new \Aimeos\Admin\Graphql\Exception( $msg, $code, $previous );
+	}
+
+
+	/**
+	 * Returns the configuration key prefix of the resources protected by the interface
+	 *
+	 * @return string Configuration key prefix
+	 */
+	protected static function prefix() : string
+	{
+		return 'admin/graphql/resource';
 	}
 }

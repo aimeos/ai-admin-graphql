@@ -164,7 +164,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			throw new \Aimeos\Admin\Graphql\Exception( 'Forbidden', 403 );
 		}
 
-		return $item;
+		return parent::filter( $item );
 	}
 
 
@@ -240,7 +240,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		return function( $root, $args, $context ) use ( $domain ) {
 			$this->access( $domain, 'get' );
 			// @phpstan-ignore argument.type
-			return $this->filters( $this->manager()->getPath( $args['id'], $args['include'] ) );
+			return $this->filters( $this->manager()->getPath( $args['id'], $this->included( $args['include'] ) ) );
 		};
 	}
 
@@ -256,7 +256,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 		return function( $root, $args, $context ) use ( $domain ) {
 			$this->access( $domain, 'get' );
 			// @phpstan-ignore argument.type
-			return $this->filter( $this->manager()->getTree( $args['id'], $args['include'], $args['level'] ) );
+			return $this->filter( $this->manager()->getTree( $args['id'], $this->included( $args['include'] ), $args['level'] ) );
 		};
 	}
 
@@ -339,7 +339,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 
 			$total = 0;
 			// @phpstan-ignore argument.type
-			$items = $manager->search( $filter, (array) $args['include'], $total )->toArray();
+			$items = $manager->search( $filter, $this->included( $args['include'] ), $total )->toArray();
 
 			return [
 				'items' => $items,
@@ -366,8 +366,9 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 			$filter->add( 'locale.site.siteid', '=~', (string) $this->context()->user()?->getSiteId() );
 			$filter->add( $filter->parse( (array) json_decode( (string) $args['filter'], true ) ) );
 
+			$include = $this->included( $args['include'] );
 			// @phpstan-ignore argument.type
-			$items = $manager->search( $filter->slice( 0, (int) $args['limit'] ), (array) $args['include'] );
+			$items = $manager->search( $filter->slice( 0, (int) $args['limit'] ), $include );
 
 			foreach( $items as $key => $item )
 			{
@@ -377,7 +378,7 @@ class Standard extends \Aimeos\Admin\Graphql\Standard
 				}
 			}
 
-			return $this->getParents( $items->values(), (array) $args['include'] );
+			return $this->getParents( $items->values(), $include );
 		};
 	}
 
