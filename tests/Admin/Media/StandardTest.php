@@ -74,4 +74,21 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals( 'Forbidden', $result['errors'][0]['message'] ?? null );
 		$this->assertEquals( 'service', $manager->get( $item->getId() )->getLabel() );
 	}
+
+
+	public function testSaveMediaPaths()
+	{
+		$manager = \Aimeos\MShop::create( $this->context, 'media' );
+		$item = $manager->save( $manager->create()->setDomain( 'product' )->setLabel( 'paths' )->setUrl( 'test.jpg' ) );
+		$this->ids[] = $item->getId();
+
+		$body = json_encode( ['query' => 'mutation { saveMedia(input: {id: "' . $item->getId() . '", url: "index.php", filesystem: "fs"}) { id } }'] );
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+		$response = json_decode( (string) \Aimeos\Admin\Graphql::execute( $this->context, $request )->getBody(), true );
+		$result = $manager->get( $item->getId() );
+
+		$this->assertEquals( $item->getId(), $response['data']['saveMedia']['id'] ?? null );
+		$this->assertEquals( 'test.jpg', $result->getUrl() );
+		$this->assertEquals( 'fs-media', $result->getFileSystem() );
+	}
 }

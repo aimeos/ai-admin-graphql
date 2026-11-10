@@ -195,6 +195,11 @@ trait UpdateTrait
 			}
 		}
 
+		// File paths and file systems are only set by uploads to prevent deleting arbitrary files
+		if( $item instanceof \Aimeos\MShop\Media\Item\Iface ) {
+			unset( $entry['media.url'], $entry['media.preview'], $entry['media.previews'], $entry['media.filesystem'] );
+		}
+
 		// Items must not be moved to domains the user isn't allowed to change
 		$item = $item->fromArray( $entry, true );
 		$this->permit( $item, 'save' );
