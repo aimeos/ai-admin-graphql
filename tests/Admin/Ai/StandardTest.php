@@ -120,6 +120,65 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	}
 
 
+	public function testImagineSiteSettingsWithoutConfigSettings() : void
+	{
+		$this->context->config()->set( 'admin/ai/imagine', ['provider' => 'replicate', 'api_key' => 'config-secret'] );
+		$site = $this->context->locale()->getSiteItem()->setConfigValue( 'admin/ai/imagine', [
+			'model' => 'test/model',
+			'url' => 'https://attacker.example.com',
+		] );
+		$this->context->config()->apply( $site->getConfig() );
+
+		$result = $this->execute( 'mutation($prompt: String!) { imagine(prompt: $prompt) }', ['prompt' => 'A shoe'] );
+
+		$this->assertSame( 'No provider name given', $result['errors'][0]['message'] ?? null );
+	}
+
+
+	public function testImagineSiteProviderWithoutConfigKey() : void
+	{
+		$this->context->config()->set( 'admin/ai/imagine', ['provider' => 'openai', 'api_key' => 'config-secret'] );
+		$site = $this->context->locale()->getSiteItem()->setConfigValue( 'admin/ai/imagine', [
+			'provider' => 'replicate',
+			'url' => 'https://attacker.example.com',
+		] );
+		$this->context->config()->apply( $site->getConfig() );
+
+		$result = $this->execute( 'mutation($prompt: String!) { imagine(prompt: $prompt) }', ['prompt' => 'A shoe'] );
+
+		$this->assertSame( 'No API key', $result['errors'][0]['message'] ?? null );
+	}
+
+
+	public function testImagineSiteInternalHost() : void
+	{
+		$site = $this->context->locale()->getSiteItem()->setConfigValue( 'admin/ai/imagine', [
+			'provider' => 'replicate',
+			'api_key' => 'site-secret',
+			'url' => 'http://169.254.169.254/',
+		] );
+		$this->context->config()->apply( $site->getConfig() );
+
+		$result = $this->execute( 'mutation($prompt: String!) { imagine(prompt: $prompt) }', ['prompt' => 'A shoe'] );
+
+		$this->assertStringContainsString( 'does not resolve to a public address', $result['errors'][0]['message'] ?? '' );
+	}
+
+
+	public function testImagineConfigInternalHost() : void
+	{
+		$this->context->config()->set( 'admin/ai/imagine', [
+			'provider' => 'replicate',
+			'api_key' => 'config-secret',
+			'url' => 'http://127.0.0.1:1/',
+		] );
+
+		$result = $this->execute( 'mutation($prompt: String!) { imagine(prompt: $prompt) }', ['prompt' => 'A shoe'] );
+
+		$this->assertStringNotContainsString( 'public address', $result['errors'][0]['message'] ?? 'missing error' );
+	}
+
+
 	public function testIsolate() : void
 	{
 		$this->context->config()->set( 'admin/ai/isolate', [

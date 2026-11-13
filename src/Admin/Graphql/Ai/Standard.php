@@ -94,15 +94,23 @@ class Standard extends \Aimeos\Admin\Graphql\Base
 	 */
 	protected function provider( string $type, string $action ) : \Aimeos\Prisma\Contracts\Provider
 	{
+		$context = $this->context();
+		$site = $context->locale()->getSiteItem()->getConfigValue( 'admin/ai/' . $action );
+		$custom = is_array( $site ) && $site !== [];
+
+		// site settings replace the application settings, so the configured API key is never sent to site endpoints
 		/** @var array<string, mixed> $settings */
-		$settings = (array) $this->context()->config()->get( 'admin/ai/' . $action, [] );
+		$settings = $custom ? $site : (array) $context->config()->get( 'admin/ai/' . $action, [] );
 		$name = (string) ( $settings['provider'] ?? '' );
 		$model = isset( $settings['model'] ) ? (string) $settings['model'] : null;
 
 		unset( $settings['provider'], $settings['model'] );
 		$settings = array_filter( $settings, fn( $value ) => $value !== '' && $value !== null );
 
-		return Prisma::type( $type )->using( $name, $settings )->model( $model );
+		$provider = Prisma::type( $type )->using( $name, $settings )->model( $model );
+
+		// only endpoints from the application config may be internal hosts like local LLMs
+		return $custom ? $provider : $provider->withInternalHosts();
 	}
 
 
