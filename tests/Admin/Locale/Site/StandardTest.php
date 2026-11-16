@@ -138,14 +138,15 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	{
 		$this->admin( \Aimeos\MShop::create( $this->context, 'locale/site' )->find( 'unittest' )->getSiteId() );
 
-		$body = '{"query":"query {\n  searchLocaleSites {\n    items {\n      id\n      code\n    }\n    total\n  }\n}\n","variables":{},"operationName":null}';
+		// the "default" site is outside the site tree of the user
+		$search = addslashes( addslashes( json_encode( ['==' => ['locale.site.code' => ['default', 'unittest']]] ) ) );
+		$body = '{"query":"query {\n  searchLocaleSites(filter: \"' . $search . '\") {\n    items {\n      id\n      code\n    }\n    total\n  }\n}\n","variables":{},"operationName":null}';
 		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
 
 		$result = json_decode( (string) \Aimeos\Admin\Graphql::execute( $this->context, $request )->getBody(), true );
 		$codes = array_column( $result['data']['searchLocaleSites']['items'], 'code' );
-		sort( $codes );
 
-		$this->assertEquals( ['unittest', 'unittest-child'], $codes );
+		$this->assertEquals( ['unittest'], $codes );
 	}
 
 
@@ -179,16 +180,16 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 	public function testSearchLocaleSiteTreeAdmin()
 	{
-		// the parent site of the user's site is outside the site tree of the user
-		$this->admin( \Aimeos\MShop::create( $this->context, 'locale/site' )->find( 'unittest-child' )->getSiteId() );
+		$this->admin( \Aimeos\MShop::create( $this->context, 'locale/site' )->find( 'unittest' )->getSiteId() );
 
-		$search = addslashes( addslashes( json_encode( ['==' => ['locale.site.code' => 'unittest-child']] ) ) );
+		// the "default" site is outside the site tree of the user
+		$search = addslashes( addslashes( json_encode( ['==' => ['locale.site.code' => ['default', 'unittest']]] ) ) );
 		$body = '{"query":"query {\n  searchLocaleSiteTree(filter: \"' . $search . '\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
 		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
 
 		$result = json_decode( (string) \Aimeos\Admin\Graphql::execute( $this->context, $request )->getBody(), true );
 
-		$this->assertEquals( ['unittest-child'], array_column( $result['data']['searchLocaleSiteTree'], 'code' ) );
+		$this->assertEquals( ['unittest'], array_column( $result['data']['searchLocaleSiteTree'], 'code' ) );
 	}
 
 
