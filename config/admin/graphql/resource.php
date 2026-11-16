@@ -517,14 +517,6 @@ return [
 			 */
 			'insert' => ['super'],
 
-			/** admin/graphql/resource/locale/site/move
-			 * List of user groups that are allowed to move locale site items within the site tree
-			 *
-			 * @param array List of user group names
-			 * @since 2023.10
-			 */
-			'move' => ['super'],
-
 			/** admin/graphql/resource/locale/site/save
 			 * List of user groups that are allowed to create and update locale site items
 			 *

@@ -34,6 +34,20 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 	}
 
 
+	public function testFindLocaleSiteOtherSite()
+	{
+		$this->admin( \Aimeos\MShop::create( $this->context, 'locale/site' )->find( 'unittest' )->getSiteId() );
+
+		$body = '{"query":"query {\n  findLocaleSite(code: \"default\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$result = json_decode( (string) \Aimeos\Admin\Graphql::execute( $this->context, $request )->getBody(), true );
+
+		$this->assertNull( $result['data']['findLocaleSite'] ?? null );
+		$this->assertArrayHasKey( 'errors', $result );
+	}
+
+
 	public function testGetLocaleSitePath()
 	{
 		$id = \Aimeos\MShop::create( $this->context, 'locale/site' )->find( 'unittest' );
@@ -98,23 +112,13 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 
 	public function testMoveLocaleSite()
 	{
-		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Locale\\Manager\\Site\\Standard' )
-			->setConstructorArgs( array( $this->context ) )
-			->onlyMethods( ['move', 'type'] )
-			->getMock();
-
-		$stub->method( 'type' )->willReturn( ['locale', 'site'] );
-		$stub->expects( $this->once() )->method( 'move' );
-
-		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Locale\\Manager\\Site\\Standard', $stub );
-		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Locale\\Manager\\Site\\Sites', $stub );
-
-		$body = '{"query":"mutation {\n  moveLocaleSite(id: \"1\", parentid: null)\n}\n","variables":{},"operationName":null}';
+		$body = '{"query":"mutation {\n  moveLocaleSite(id: \\"1\\", parentid: null)\n}\n","variables":{},"operationName":null}';
 		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
 
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
 
-		$this->assertStringContainsString( '"moveLocaleSite":"1"', (string) $response->getBody() );
+		// moving sites isn't supported
+		$this->assertStringContainsString( 'Cannot query field \\"moveLocaleSite\\"', (string) $response->getBody() );
 	}
 
 
@@ -127,6 +131,35 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$response = \Aimeos\Admin\Graphql::execute( $this->context, $request );
 
 		$this->assertStringContainsString( '"code":"unittest"', (string) $response->getBody() );
+	}
+
+
+	public function testSearchLocaleSiteAdmin()
+	{
+		$this->admin( \Aimeos\MShop::create( $this->context, 'locale/site' )->find( 'unittest' )->getSiteId() );
+
+		$body = '{"query":"query {\n  searchLocaleSites {\n    items {\n      id\n      code\n    }\n    total\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$result = json_decode( (string) \Aimeos\Admin\Graphql::execute( $this->context, $request )->getBody(), true );
+		$codes = array_column( $result['data']['searchLocaleSites']['items'], 'code' );
+		sort( $codes );
+
+		$this->assertEquals( ['unittest', 'unittest-child'], $codes );
+	}
+
+
+	public function testSearchLocaleSiteNoUserSite()
+	{
+		$this->admin( '' );
+
+		$body = '{"query":"query {\n  searchLocaleSites {\n    items {\n      id\n      code\n    }\n    total\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$result = json_decode( (string) \Aimeos\Admin\Graphql::execute( $this->context, $request )->getBody(), true );
+
+		$this->assertNull( $result['data']['searchLocaleSites'] ?? null );
+		$this->assertArrayHasKey( 'errors', $result );
 	}
 
 
@@ -143,4 +176,28 @@ class StandardTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals( 'unittest', $result['data']['searchLocaleSiteTree'][0]['code'] );
 	}
 
+
+	public function testSearchLocaleSiteTreeAdmin()
+	{
+		// the parent site of the user's site is outside the site tree of the user
+		$this->admin( \Aimeos\MShop::create( $this->context, 'locale/site' )->find( 'unittest-child' )->getSiteId() );
+
+		$search = addslashes( addslashes( json_encode( ['==' => ['locale.site.code' => 'unittest-child']] ) ) );
+		$body = '{"query":"query {\n  searchLocaleSiteTree(filter: \"' . $search . '\") {\n    id\n    code\n  }\n}\n","variables":{},"operationName":null}';
+		$request = new \Nyholm\Psr7\ServerRequest( 'POST', 'localhost', [], $body );
+
+		$result = json_decode( (string) \Aimeos\Admin\Graphql::execute( $this->context, $request )->getBody(), true );
+
+		$this->assertEquals( ['unittest-child'], array_column( $result['data']['searchLocaleSiteTree'], 'code' ) );
+	}
+
+
+	protected function admin( string $siteid ) : void
+	{
+		$view = $this->context->view();
+		$view->addHelper( 'access', new \Aimeos\Base\View\Helper\Access\Standard( $view, ['admin'] ) );
+
+		$user = \Aimeos\MShop::create( $this->context, 'customer' )->create( ['customer.siteid' => $siteid] );
+		$this->context->setView( $view )->setUser( $user );
+	}
 }

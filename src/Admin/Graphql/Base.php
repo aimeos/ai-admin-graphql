@@ -143,7 +143,8 @@ abstract class Base
 	/**
 	 * Returns the item if the user is allowed to retrieve it
 	 *
-	 * Shared items (e.g. prices, texts and media) require the read permission of the owning domain.
+	 * Shared items (e.g. prices, texts and media) require the read permission of the owning domain
+	 * and sites must be within the site tree of the user.
 	 * Subclasses adding their own checks must call this method too.
 	 *
 	 * @param \Aimeos\MShop\Common\Item\Iface $item Item to check
